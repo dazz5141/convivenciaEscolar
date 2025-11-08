@@ -1,0 +1,28 @@
+# Dependencias
+/vendor/
+/node_modules/
+
+# Builds de Vite
+/public/build
+/public/hot
+
+# Archivos de entorno
+.env
+.env.*
+*.key
+
+# Cachés y logs
+/storage/logs/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/views/
+/bootstrap/cache/
+
+# Archivos de Laravel
+/public/storage
+
+# IDEs y sistema operativo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
