@@ -21,6 +21,14 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
+        // Si no hay establecimiento seleccionado, asignar el primero disponible
+        if (!session('establecimiento_id')) {
+            $primerEst = Establecimiento::where('activo', 1)->first();
+            if ($primerEst) {
+                session(['establecimiento_id' => $primerEst->id]);
+            }
+        }
+
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {

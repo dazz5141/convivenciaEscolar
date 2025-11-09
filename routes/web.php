@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EstablecimientoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FuncionarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,40 +97,20 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         [EstablecimientoController::class, 'enable']
     )->name('establecimientos.enable');
 
-
     /*
     |--------------------------------------------------------------------------
-    | MÓDULOS TEMPORALES
+    | CRUD REAL DE FUNCIONARIOS (habilitar/deshabilitar)
     |--------------------------------------------------------------------------
     */
-    function crudViews($base, $folder) {
-        Route::view("/modulos/$base", "modulos.$folder.index")->name("$base.index");
-        Route::view("/modulos/$base/crear", "modulos.$folder.create")->name("$base.create");
-        Route::view("/modulos/$base/editar", "modulos.$folder.edit")->name("$base.edit");
-        Route::view("/modulos/$base/ver", "modulos.$folder.show")->name("$base.show");
-    }
 
-    /* MÓDULOS PRINCIPALES */
-    crudViews('bitacora', 'bitacora');
-    crudViews('alumnos', 'alumnos');
-    crudViews('citaciones', 'citaciones');
-    crudViews('seguimiento-emocional', 'seguimiento-emocional');
-    crudViews('conflicto-apoderado', 'conflictos-apoderados');
-    crudViews('conflicto-funcionario', 'conflictos-funcionarios');
-    crudViews('denuncias-ley-karin', 'denuncias-ley-karin');
-    crudViews('accidentes', 'accidentes');
-    crudViews('retiros', 'retiros');
-    crudViews('atrasos-asistencia', 'atrasos-asistencia');
-    crudViews('libro-novedades', 'libro-novedades');
-    crudViews('derivaciones', 'derivaciones');
-    crudViews('medidas-restaurativas', 'medidas-restaurativas');
-    crudViews('pie', 'pie');
+    Route::resource('funcionarios', FuncionarioController::class)
+        ->except(['destroy']);
 
-    /* MÓDULOS ADMINISTRATIVOS */
-    crudViews('funcionarios', 'funcionarios');
-    crudViews('cursos', 'cursos');
-    crudViews('usuarios', 'usuarios');
-    crudViews('roles', 'roles');
-    crudViews('auditoria', 'auditoria');
-    crudViews('documentos', 'documentos');
+    Route::put('/funcionarios/{id}/deshabilitar',
+        [FuncionarioController::class, 'disable']
+    )->name('funcionarios.disable');
+
+    Route::put('/funcionarios/{id}/habilitar',
+        [FuncionarioController::class, 'enable']
+    )->name('funcionarios.enable'); 
 });

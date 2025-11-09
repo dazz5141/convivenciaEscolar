@@ -19,7 +19,10 @@ class CargosSeeder extends Seeder
         ];
 
         foreach ($items as $i) {
-            Cargo::firstOrCreate(['nombre' => $i]);
+            Cargo::firstOrCreate(
+                ['nombre' => $i],
+                ['created_at' => now(), 'updated_at' => now()]
+            );
         }
     }
 }

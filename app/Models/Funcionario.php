@@ -60,4 +60,19 @@ class Funcionario extends Model
     {
         return $query->where('activo', 1);
     }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id');
+    }
+
+    public function provincia()
+    {
+        return $this->belongsTo(Provincia::class, 'provincia_id');
+    }
+
+    public function comuna()
+    {
+        return $this->belongsTo(Comuna::class, 'comuna_id');
+    }
 }

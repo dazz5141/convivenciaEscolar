@@ -18,6 +18,14 @@ class EstablecimientoMiddleware
 
         // 1. Admin General (rol_id = 1) tiene acceso libre a todos los colegios
         if ($usuario->rol_id === 1) {
+
+            // Si no hay establecimiento seleccionado en sesión, asignar uno
+            if (!session('establecimiento_id')) {
+                $primerEst = \App\Models\Establecimiento::where('activo', 1)->first();
+                if ($primerEst) {
+                    session(['establecimiento_id' => $primerEst->id]);
+                }
+            }
             return $next($request);
         }
 

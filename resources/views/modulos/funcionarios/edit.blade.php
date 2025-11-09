@@ -1,40 +1,205 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Registro')
+@section('title', 'Editar Funcionario')
 
 @section('content')
+
 <div class="page-header">
-    <h1 class="page-title">Editar Registro</h1>
+    <h1 class="page-title">Editar Funcionario</h1>
 </div>
 
-<form action="/modulos/funcionarios/1" method="POST">
+<form action="{{ route('funcionarios.update', $funcionario->id) }}" method="POST">
+    @csrf
+    @method('PUT')
+
     <div class="form-section">
-        <h5 class="form-section-title">Información</h5>
+        <h5 class="form-section-title">Datos Personales</h5>
+
         <div class="row g-3">
-            <div class="col-md-6">
-                <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" id="fecha" name="fecha" value="2025-11-08" required>
+
+            <div class="col-md-4">
+                <label class="form-label">RUN</label>
+                <input type="text" class="form-control" value="{{ $funcionario->run }}" readonly>
             </div>
-            <div class="col-12">
-                <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
-                <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required>Información de ejemplo</textarea>
+
+            <div class="col-md-4">
+                <label class="form-label">Nombre *</label>
+                <input type="text" name="nombre" class="form-control" value="{{ $funcionario->nombre }}" required>
             </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Apellido Paterno *</label>
+                <input type="text" name="apellido_paterno" class="form-control"
+                       value="{{ $funcionario->apellido_paterno }}" required>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Apellido Materno *</label>
+                <input type="text" name="apellido_materno" class="form-control"
+                       value="{{ $funcionario->apellido_materno }}" required>
+            </div>
+
         </div>
     </div>
 
+
+    <div class="form-section">
+        <h5 class="form-section-title">Información Laboral</h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Cargo *</label>
+                <select name="cargo_id" class="form-select" required>
+                    @foreach($cargos as $c)
+                        <option value="{{ $c->id }}"
+                            {{ $c->id == $funcionario->cargo_id ? 'selected' : '' }}>
+                            {{ $c->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Tipo Contrato *</label>
+                <select name="tipo_contrato_id" class="form-select" required>
+                    @foreach($tiposContrato as $tc)
+                        <option value="{{ $tc->id }}"
+                            {{ $tc->id == $funcionario->tipo_contrato_id ? 'selected' : '' }}>
+                            {{ $tc->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="form-section">
+        <h5 class="form-section-title">Ubicación</h5>
+
+        <div class="row g-3">
+
+            {{-- REGIÓN --}}
+            <div class="col-md-4">
+                <label class="form-label">Región</label>
+                <select name="region_id" id="region_id" class="form-select">
+                    <option value="">— Seleccione región —</option>
+
+                    @foreach($regiones as $r)
+                        <option value="{{ $r->id }}"
+                            {{ $r->id == $funcionario->region_id ? 'selected' : '' }}>
+                            {{ $r->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- PROVINCIA --}}
+            <div class="col-md-4">
+                <label class="form-label">Provincia</label>
+                <select name="provincia_id" id="provincia_id" class="form-select">
+                    <option value="">— Seleccione provincia —</option>
+                </select>
+            </div>
+
+            {{-- COMUNA --}}
+            <div class="col-md-4">
+                <label class="form-label">Comuna</label>
+                <select name="comuna_id" id="comuna_id" class="form-select">
+                    <option value="">— Seleccione comuna —</option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Dirección</label>
+                <input type="text" name="direccion" class="form-control" value="{{ $funcionario->direccion }}">
+            </div>
+
+        </div>
+    </div>
+
+
     <div class="d-flex gap-2 flex-wrap">
         <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save me-2"></i>
-            Guardar Cambios
+            <i class="bi bi-save me-2"></i> Guardar Cambios
         </button>
-        <a href="/modulos/funcionarios" class="btn btn-secondary">
-            <i class="bi bi-x-circle me-2"></i>
-            Cancelar
+
+        <a href="{{ route('funcionarios.index') }}" class="btn btn-secondary">
+            <i class="bi bi-x-circle me-2"></i> Cancelar
         </a>
-        <button type="button" class="btn btn-danger ms-auto" data-confirm-delete>
-            <i class="bi bi-trash me-2"></i>
-            Eliminar
-        </button>
     </div>
+
 </form>
+
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    let regionSelect = document.getElementById('region_id');
+    let provinciaSelect = document.getElementById('provincia_id');
+    let comunaSelect = document.getElementById('comuna_id');
+
+    let provinciaActual = "{{ $funcionario->provincia_id }}";
+    let comunaActual = "{{ $funcionario->comuna_id }}";
+
+    // Cargar provincias al entrar si region ya está seleccionada
+    if (regionSelect.value) {
+        cargarProvincias(regionSelect.value, provinciaActual);
+    }
+
+    // Al cambiar región
+    regionSelect.addEventListener('change', function () {
+        cargarProvincias(this.value, null);
+        comunaSelect.innerHTML = '<option value="">— Seleccione comuna —</option>';
+    });
+
+    // Al cambiar provincia
+    provinciaSelect.addEventListener('change', function () {
+        cargarComunas(this.value, null);
+    });
+
+    // ---- FUNCIONES ----
+
+    function cargarProvincias(regionId, provinciaSeleccionada = null) {
+        provinciaSelect.innerHTML = '<option value="">Cargando...</option>';
+
+        fetch(`/api-interna/provincias/${regionId}`)
+            .then(res => res.json())
+            .then(data => {
+                provinciaSelect.innerHTML = '<option value="">— Seleccione provincia —</option>';
+                data.forEach(p => {
+                    provinciaSelect.innerHTML += `
+                        <option value="${p.id}" ${p.id == provinciaSeleccionada ? 'selected' : ''}>
+                            ${p.nombre}
+                        </option>`;
+                });
+
+                if (provinciaSeleccionada) {
+                    cargarComunas(provinciaSeleccionada, comunaActual);
+                }
+            });
+    }
+
+    function cargarComunas(provinciaId, comunaSeleccionada = null) {
+        comunaSelect.innerHTML = '<option value="">Cargando...</option>';
+
+        fetch(`/api-interna/comunas/${provinciaId}`)
+            .then(res => res.json())
+            .then(data => {
+                comunaSelect.innerHTML = '<option value="">— Seleccione comuna —</option>';
+                data.forEach(c => {
+                    comunaSelect.innerHTML += `
+                        <option value="${c.id}" ${c.id == comunaSeleccionada ? 'selected' : ''}>
+                            ${c.nombre}
+                        </option>`;
+                });
+            });
+    }
+});
+</script>
+@endsection
+
 @endsection

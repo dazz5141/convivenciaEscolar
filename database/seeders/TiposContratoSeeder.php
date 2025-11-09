@@ -12,7 +12,10 @@ class TiposContratoSeeder extends Seeder
         $items = ['Titular', 'Contrata', 'Honorarios'];
 
         foreach ($items as $i) {
-            TipoContrato::firstOrCreate(['nombre' => $i]);
+            TipoContrato::firstOrCreate(
+                ['nombre' => $i],
+                ['created_at' => now(), 'updated_at' => now()]
+            );
         }
     }
 }
