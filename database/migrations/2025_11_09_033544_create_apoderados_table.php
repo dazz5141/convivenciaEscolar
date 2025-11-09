@@ -23,8 +23,10 @@ return new class extends Migration
 
             $table->boolean('activo')->default(1);
 
-            $table->timestamp('creado_en')->nullable()->useCurrent();
+            // timestamps estándar
+            $table->timestamps();
 
+            // Índices
             $table->index('activo');
         });
     }

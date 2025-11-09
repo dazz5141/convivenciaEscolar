@@ -18,7 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('funcionario_id');
             $table->unsignedBigInteger('tipo_id'); // tipos_profesional_pie
 
-            $table->timestamp('creado_en')->nullable()->useCurrent();
+            // Timestamps estándar Laravel
+            $table->timestamps();
 
             // Índices lógicos
             $table->index('establecimiento_id', 'idx_pie_prof_est');

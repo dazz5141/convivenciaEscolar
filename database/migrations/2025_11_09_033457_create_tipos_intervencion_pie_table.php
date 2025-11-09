@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('tipos_intervencion_pie', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 120)->unique();
+            $table->timestamps();
         });
     }
 

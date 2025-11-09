@@ -8,18 +8,41 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // GEO
+        $this->call(RegionesSeeder::class);
+        $this->call(ProvinciasSeeder::class);
+        $this->call(ComunasSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Catálogos
+        $this->call(DependenciasSeeder::class);
+        $this->call(CargosSeeder::class);
+        $this->call(TiposContratoSeeder::class);
+        $this->call(SexosSeeder::class);
+        $this->call(NivelesEmocionalesSeeder::class);
+        $this->call(EstadosIncidenteSeeder::class);
+        $this->call(EstadosConflictoApoderadoSeeder::class);
+        $this->call(EstadosConflictoFuncionarioSeeder::class);
+        $this->call(TiposDenunciaLeyKarinSeeder::class);
+        $this->call(TiposNovedadSeeder::class);
+        $this->call(TiposAsistenciaSeeder::class);
+        $this->call(TiposAccidenteSeeder::class);
+        $this->call(EstadosCitacionSeeder::class);
+        $this->call(TiposMedidaRestaurativaSeeder::class);
+        $this->call(EstadosCumplimientoSeeder::class);
+        $this->call(TiposProfesionalPIESeeder::class);
+        $this->call(TiposIntervencionPIESeeder::class);
+
+        // Roles
+        $this->call(RolesSeeder::class);
+
+        // Base institucional
+        $this->call(EstablecimientosSeeder::class);
+        $this->call(CursosSeeder::class);
+        $this->call(FuncionariosSeeder::class);
+
+        // Usuarios
+        $this->call(UsuariosSeeder::class);
     }
 }

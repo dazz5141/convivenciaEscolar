@@ -22,6 +22,7 @@ return new class extends Migration
                 ->onUpdate('cascade')->onDelete('restrict');
 
             $table->unique(['denuncia_id', 'tipo_id']);
+            $table->timestamps();
         });
     }
 

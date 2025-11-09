@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('tipo_contratos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 120)->unique();
+            $table->timestamps();
         });
     }
 

@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('estados_citacion', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 80)->unique();
+            $table->timestamps();
         });
     }
 

@@ -22,13 +22,16 @@ return new class extends Migration
             $table->unsignedBigInteger('funcionario_id');
 
             // Tipo de acción
-            $table->string('accion', 120);   // Ej: "Cambio de estado", "Asignación"
+            $table->string('accion', 120);
             $table->dateTime('fecha');
 
             // Índices
             $table->index(['entidad', 'entidad_id'], 'idx_hist_polimorfico');
             $table->index('fecha', 'idx_hist_fecha');
             $table->index('establecimiento_id', 'idx_hist_est');
+
+            // Timestamps Laravel
+            $table->timestamps();
 
             // FKs
             $table->foreign('funcionario_id')

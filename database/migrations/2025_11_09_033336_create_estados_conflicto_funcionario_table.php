@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('estados_conflicto_funcionario', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 100)->unique();
+            $table->timestamps();
         });
     }
 

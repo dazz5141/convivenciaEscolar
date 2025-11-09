@@ -70,16 +70,18 @@ return new class extends Migration
             $table->text('observaciones')->nullable();
             $table->date('fecha_firma')->nullable();
 
-            // Timestamps
-            $table->timestamp('creado_en')->nullable()->useCurrent();
+            // Timestamps estándar Laravel
+            $table->timestamps();
 
-            // FKs
-            $table->foreign('establecimiento_id')->references('id')->on('establecimientos')
-                ->onUpdate('cascade')->onDelete('restrict');
-
-            // Polimórfico
+            // Índices
             $table->index(['conflictable_type', 'conflictable_id']);
             $table->index('establecimiento_id');
+
+            // FKs
+            $table->foreign('establecimiento_id')
+                ->references('id')->on('establecimientos')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
         });
     }
 

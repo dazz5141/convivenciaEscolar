@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('tipos_denuncia_ley_karin', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 150)->unique();
+            $table->timestamps();
         });
     }
 

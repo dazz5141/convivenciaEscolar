@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('modulo', 120);     // Ej: Alumno, Bitácora Incidentes
             $table->text('detalle')->nullable();
 
-            $table->timestamp('created_at')->nullable()->useCurrent();
+            // timestamps Laravel estándar
+            $table->timestamps();
 
             // Índices
             $table->index('modulo', 'idx_auditoria_modulo');

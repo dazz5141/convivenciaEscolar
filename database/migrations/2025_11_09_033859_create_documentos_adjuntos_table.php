@@ -25,8 +25,8 @@ return new class extends Migration
             // Subido por funcionario
             $table->unsignedBigInteger('subido_por');
 
-            $table->timestamp('created_at')->nullable()->useCurrent();
-            $table->timestamp('updated_at')->nullable();
+            // Timestamps estándar
+            $table->timestamps();
 
             // Índices optimizados
             $table->index(['entidad', 'entidad_id'], 'idx_docs_polimorfico');

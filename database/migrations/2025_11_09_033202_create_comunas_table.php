@@ -19,6 +19,7 @@ return new class extends Migration
                 ->onDelete('restrict');
 
             $table->unique(['provincia_id', 'nombre']);
+            $table->timestamps();
         });
     }
 

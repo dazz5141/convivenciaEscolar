@@ -23,6 +23,7 @@ return new class extends Migration
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->unique(['alumno_id', 'apoderado_id', 'tipo']);
+            $table->timestamps();
         });
     }
 
