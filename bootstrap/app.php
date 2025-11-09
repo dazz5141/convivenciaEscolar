@@ -11,8 +11,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+
+        /*
+        |--------------------------------------------------------------------------
+        | MIDDLEWARE PERSONALIZADOS (alias)
+        |--------------------------------------------------------------------------
+        */
+        $middleware->alias([
+            'rol'             => \App\Http\Middleware\RolMiddleware::class,
+            'establecimiento' => \App\Http\Middleware\EstablecimientoMiddleware::class,
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->create();

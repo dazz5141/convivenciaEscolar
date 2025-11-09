@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
-    use HasFactory;
+    use Notifiable;
 
     protected $table = 'usuarios';
 
@@ -16,6 +16,7 @@ class Usuario extends Model
         'password',
         'rol_id',
         'funcionario_id',
+        'establecimiento_id',
         'nombre',
         'apellido_paterno',
         'apellido_materno',
@@ -23,21 +24,29 @@ class Usuario extends Model
         'activo'
     ];
 
-    protected $hidden = ['password'];
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     public function rol()
     {
-        return $this->belongsTo(Rol::class);
+        return $this->belongsTo(Rol::class, 'rol_id');
     }
 
     public function funcionario()
     {
-        return $this->belongsTo(Funcionario::class);
+        return $this->belongsTo(Funcionario::class, 'funcionario_id');
+    }
+
+    public function establecimiento()
+    {
+        return $this->belongsTo(Establecimiento::class, 'establecimiento_id');
     }
 
     public function auditorias()
     {
-        return $this->hasMany(Auditoria::class);
+        return $this->hasMany(Auditoria::class, 'usuario_id');
     }
 
     public function scopeActivos($query)

@@ -4,47 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Convivencia Escolar</title>
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Estilos -->
     <link href="/css/app.css" rel="stylesheet">
 </head>
 <body>
+
     <div class="login-container">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-                    <div class="card login-card">
+
+                    <div class="card login-card shadow-lg">
                         <div class="card-body p-4 p-sm-5">
+
+                            <!-- Logo / Encabezado -->
                             <div class="text-center mb-4">
                                 <i class="bi bi-shield-check" style="font-size: 4rem; color: var(--primary-color);"></i>
                                 <h3 class="mt-3 mb-2">Sistema de Convivencia Escolar</h3>
                                 <p class="text-muted">Ingrese sus credenciales</p>
                             </div>
 
-                            <form action="/dashboard" method="GET">
+                            <!-- FORMULARIO -->
+                            <form action="{{ route('login.perform') }}" method="POST">
+                                @csrf
+
+                                <!-- EMAIL -->
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Correo Electrónico</label>
                                     <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="correo@ejemplo.cl" required>
+                                        <span class="input-group-text">
+                                            <i class="bi bi-envelope"></i>
+                                        </span>
+                                        <input 
+                                            type="email" 
+                                            class="form-control" 
+                                            id="email" 
+                                            name="email" 
+                                            placeholder="correo@ejemplo.cl" 
+                                            required
+                                            autofocus>
                                     </div>
                                 </div>
 
+                                <!-- PASSWORD -->
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Contraseña</label>
                                     <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                        <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+                                        <span class="input-group-text">
+                                            <i class="bi bi-lock"></i>
+                                        </span>
+                                        <input 
+                                            type="password" 
+                                            class="form-control" 
+                                            id="password" 
+                                            name="password" 
+                                            placeholder="••••••••" 
+                                            required>
                                     </div>
                                 </div>
 
+                                <!-- REMEMBER -->
                                 <div class="mb-3 form-check">
-                                    <input type="checkbox" class="form-check-input" id="remember">
+                                    <input 
+                                        type="checkbox" 
+                                        class="form-check-input" 
+                                        id="remember"
+                                        name="remember">
                                     <label class="form-check-label" for="remember">
                                         Recordar sesión
                                     </label>
                                 </div>
 
+                                <!-- BOTÓN -->
                                 <div class="d-grid mb-3">
                                     <button type="submit" class="btn btn-primary btn-lg">
                                         <i class="bi bi-box-arrow-in-right me-2"></i>
@@ -52,24 +88,37 @@
                                     </button>
                                 </div>
 
+                                <!-- OLVIDÓ CONTRASEÑA -->
                                 <div class="text-center">
                                     <a href="#" class="text-decoration-none">¿Olvidó su contraseña?</a>
                                 </div>
                             </form>
+
+                            <!-- ERRORES -->
+                            @if($errors->any())
+                                <div class="alert alert-danger mt-3">
+                                    {{ $errors->first() }}
+                                </div>
+                            @endif
+
                         </div>
                     </div>
 
+                    <!-- VOLVER AL INICIO -->
                     <div class="text-center mt-4">
                         <a href="/" class="text-white text-decoration-none">
                             <i class="bi bi-arrow-left me-2"></i>
                             Volver al inicio
                         </a>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

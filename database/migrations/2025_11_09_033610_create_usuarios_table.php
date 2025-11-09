@@ -17,6 +17,9 @@ return new class extends Migration
             $table->unsignedBigInteger('rol_id');
             $table->unsignedBigInteger('funcionario_id')->nullable();
 
+            // ✅ Establecimiento asociado (Multicolegio)
+            $table->unsignedBigInteger('establecimiento_id')->nullable();
+
             $table->string('nombre', 120)->nullable();
             $table->string('apellido_paterno', 120)->nullable();
             $table->string('apellido_materno', 120)->nullable();
@@ -27,12 +30,21 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->foreign('rol_id')->references('id')->on('roles')
+            // Relaciones
+            $table->foreign('rol_id')
+                ->references('id')->on('roles')
                 ->onUpdate('cascade')->onDelete('restrict');
 
-            $table->foreign('funcionario_id')->references('id')->on('funcionarios')
+            $table->foreign('funcionario_id')
+                ->references('id')->on('funcionarios')
                 ->onUpdate('cascade')->onDelete('set null');
 
+            // Nueva FK para multicoelgio
+            $table->foreign('establecimiento_id')
+                ->references('id')->on('establecimientos')
+                ->onUpdate('cascade')->onDelete('set null');
+
+            // Índices
             $table->index('activo');
         });
     }
