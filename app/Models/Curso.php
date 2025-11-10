@@ -33,4 +33,9 @@ class Curso extends Model
     {
         return $query->where('establecimiento_id', $id);
     }
+
+    public function getNombreAttribute()
+    {
+        return "{$this->nivel} {$this->letra} - {$this->anio}";
+    }
 }

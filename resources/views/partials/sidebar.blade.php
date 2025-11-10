@@ -95,6 +95,12 @@
             </a>
         </li>
         <li>
+            <a href="/modulos/apoderados">
+                <i class="bi bi-people-fill"></i>
+                <span>Apoderados</span>
+            </a>
+        </li>
+        <li>
             <a href="/modulos/funcionarios">
                 <i class="bi bi-person-workspace"></i>
                 <span>Funcionarios</span>

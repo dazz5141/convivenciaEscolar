@@ -5,6 +5,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\EstablecimientoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FuncionarioController;
+use App\Http\Controllers\ApoderadoController;
+use App\Http\Controllers\AlumnoController;
+use App\Http\Controllers\CursoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +34,7 @@ Route::view('/', 'index')->name('landing');
 
 /*
 |--------------------------------------------------------------------------
-| SELECCIÓN DE ESTABLECIMIENTO (solo autenticado)
+| SELECCIÓN DE ESTABLECIMIENTO
 |--------------------------------------------------------------------------
 */
 Route::post('/seleccionar-establecimiento', function () {
@@ -43,7 +46,6 @@ Route::post('/seleccionar-establecimiento', function () {
     session(['establecimiento_id' => request('establecimiento_id')]);
 
     return back();
-
 })->middleware('auth')->name('establecimiento.select');
 
 
@@ -56,61 +58,153 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | DASHBOARD PRINCIPAL (ahora dinámico)
+    | DASHBOARD PRINCIPAL Y POR ROLES
     |--------------------------------------------------------------------------
-    |
-    | El DashboardController decide a qué vista dirigir según el rol.
-    |
     */
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::prefix('dashboard')->group(function () {
+        Route::view('/admin', 'dashboard.roles.admin')->name('dashboard.admin');
+        Route::view('/establecimiento', 'dashboard.roles.establecimiento')->name('dashboard.establecimiento');
+        Route::view('/inspector-general', 'dashboard.roles.inspector-general')->name('dashboard.inspector.general');
+        Route::view('/inspector', 'dashboard.roles.inspector')->name('dashboard.inspector');
+        Route::view('/docente', 'dashboard.roles.docente')->name('dashboard.docente');
+        Route::view('/psicologo', 'dashboard.roles.psicologo')->name('dashboard.psicologo');
+        Route::view('/asistente', 'dashboard.roles.asistente')->name('dashboard.asistente');
+        Route::view('/convivencia', 'dashboard.roles.convivencia')->name('dashboard.convivencia');
+    });
 
 
     /*
     |--------------------------------------------------------------------------
-    | DASHBOARDS POR ROL (vistas directas si quieres navegar manualmente)
+    | MÓDULO ESTABLECIMIENTOS
     |--------------------------------------------------------------------------
     */
-    Route::view('/dashboard/admin', 'dashboard.roles.admin')->name('dashboard.admin');
-    Route::view('/dashboard/establecimiento', 'dashboard.roles.establecimiento')->name('dashboard.establecimiento');
-    Route::view('/dashboard/inspector-general', 'dashboard.roles.inspector-general')->name('dashboard.inspector.general');
-    Route::view('/dashboard/inspector', 'dashboard.roles.inspector')->name('dashboard.inspector');
-    Route::view('/dashboard/docente', 'dashboard.roles.docente')->name('dashboard.docente');
-    Route::view('/dashboard/psicologo', 'dashboard.roles.psicologo')->name('dashboard.psicologo');
-    Route::view('/dashboard/asistente', 'dashboard.roles.asistente')->name('dashboard.asistente');
-    Route::view('/dashboard/convivencia', 'dashboard.roles.convivencia')->name('dashboard.convivencia');
+    Route::prefix('modulos/establecimientos')->group(function () {
+
+        Route::get('/', [EstablecimientoController::class, 'index'])->name('establecimientos.index');
+        Route::get('/create', [EstablecimientoController::class, 'create'])->name('establecimientos.create');
+        Route::post('/', [EstablecimientoController::class, 'store'])->name('establecimientos.store');
+
+        Route::get('/{id}', [EstablecimientoController::class, 'show'])->name('establecimientos.show');
+        Route::get('/{id}/edit', [EstablecimientoController::class, 'edit'])->name('establecimientos.edit');
+        Route::put('/{id}', [EstablecimientoController::class, 'update'])->name('establecimientos.update');
+
+        Route::put('/{id}/deshabilitar', [EstablecimientoController::class, 'disable'])->name('establecimientos.disable');
+        Route::put('/{id}/habilitar', [EstablecimientoController::class, 'enable'])->name('establecimientos.enable');
+    });
 
 
     /*
     |--------------------------------------------------------------------------
-    | CRUD REAL DE ESTABLECIMIENTOS (habilitar/deshabilitar)
+    | MÓDULO FUNCIONARIOS
     |--------------------------------------------------------------------------
     */
-    Route::resource('establecimientos', EstablecimientoController::class)
-        ->except(['destroy']);
+    Route::prefix('modulos/funcionarios')->group(function () {
 
-    Route::put('/establecimientos/{id}/deshabilitar',
-        [EstablecimientoController::class, 'disable']
-    )->name('establecimientos.disable');
+        Route::get('/', [FuncionarioController::class, 'index'])->name('funcionarios.index');
+        Route::get('/create', [FuncionarioController::class, 'create'])->name('funcionarios.create');
+        Route::post('/', [FuncionarioController::class, 'store'])->name('funcionarios.store');
 
-    Route::put('/establecimientos/{id}/habilitar',
-        [EstablecimientoController::class, 'enable']
-    )->name('establecimientos.enable');
+        Route::get('/{id}', [FuncionarioController::class, 'show'])->name('funcionarios.show');
+        Route::get('/{id}/edit', [FuncionarioController::class, 'edit'])->name('funcionarios.edit');
+        Route::put('/{id}', [FuncionarioController::class, 'update'])->name('funcionarios.update');
+
+        Route::put('/{id}/deshabilitar', [FuncionarioController::class, 'disable'])->name('funcionarios.disable');
+        Route::put('/{id}/habilitar', [FuncionarioController::class, 'enable'])->name('funcionarios.enable');
+    });
 
     /*
     |--------------------------------------------------------------------------
-    | CRUD REAL DE FUNCIONARIOS (habilitar/deshabilitar)
+    | MÓDULO ALUMNOS
     |--------------------------------------------------------------------------
     */
 
-    Route::resource('funcionarios', FuncionarioController::class)
-        ->except(['destroy']);
+    Route::prefix('modulos/alumnos')->group(function () {
 
-    Route::put('/funcionarios/{id}/deshabilitar',
-        [FuncionarioController::class, 'disable']
-    )->name('funcionarios.disable');
+        Route::get('/', [AlumnoController::class, 'index'])->name('alumnos.index');
+        Route::get('/create', [AlumnoController::class, 'create'])->name('alumnos.create');
+        Route::post('/', [AlumnoController::class, 'store'])->name('alumnos.store');
 
-    Route::put('/funcionarios/{id}/habilitar',
-        [FuncionarioController::class, 'enable']
-    )->name('funcionarios.enable'); 
+        Route::get('/{id}', [AlumnoController::class, 'show'])->name('alumnos.show');
+        Route::get('/{id}/edit', [AlumnoController::class, 'edit'])->name('alumnos.edit');
+        Route::put('/{id}', [AlumnoController::class, 'update'])->name('alumnos.update');
+
+        Route::put('/{id}/deshabilitar', [AlumnoController::class, 'disable'])->name('alumnos.disable');
+        Route::put('/{id}/habilitar', [AlumnoController::class, 'enable'])->name('alumnos.enable');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MÓDULO CURSOS
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('modulos/cursos')->group(function () {
+
+        Route::get('/', [CursoController::class, 'index'])->name('cursos.index');
+        Route::get('/create', [CursoController::class, 'create'])->name('cursos.create');
+        Route::post('/', [CursoController::class, 'store'])->name('cursos.store');
+
+        Route::get('/{id}', [CursoController::class, 'show'])->name('cursos.show');
+        Route::get('/{id}/edit', [CursoController::class, 'edit'])->name('cursos.edit');
+        Route::put('/{id}', [CursoController::class, 'update'])->name('cursos.update');
+
+        Route::put('/{id}/deshabilitar', [CursoController::class, 'disable'])->name('cursos.disable');
+        Route::put('/{id}/habilitar', [CursoController::class, 'enable'])->name('cursos.enable');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MÓDULO APODERADOS
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('modulos/apoderados')->group(function () {
+
+        Route::get('/', [ApoderadoController::class, 'index'])->name('apoderados.index');
+        Route::get('/create', [ApoderadoController::class, 'create'])->name('apoderados.create');
+        Route::post('/', [ApoderadoController::class, 'store'])->name('apoderados.store');
+
+        Route::get('/{id}', [ApoderadoController::class, 'show'])->name('apoderados.show');
+        Route::get('/{id}/edit', [ApoderadoController::class, 'edit'])->name('apoderados.edit');
+        Route::put('/{id}', [ApoderadoController::class, 'update'])->name('apoderados.update');
+
+        Route::put('/{id}/deshabilitar', [ApoderadoController::class, 'disable'])->name('apoderados.disable');
+        Route::put('/{id}/habilitar', [ApoderadoController::class, 'enable'])->name('apoderados.enable');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | DUMMY ROUTES (SOLO LOS QUE AÚN NO EXISTEN)
+    |--------------------------------------------------------------------------
+    */
+
+    if (!function_exists('crudDummy')) {
+        function crudDummy($base, $folder) {
+            Route::view("/modulos/$base", "modulos.$folder.index")->name("$base.index");
+            Route::view("/modulos/$base/crear", "modulos.$folder.create")->name("$base.create");
+            Route::view("/modulos/$base/editar", "modulos.$folder.edit")->name("$base.edit");
+            Route::view("/modulos/$base/ver", "modulos.$folder.show")->name("$base.show");
+        }
+    }
+
+    // PRINCIPALES
+    crudDummy('bitacora', 'bitacora');
+    crudDummy('citaciones', 'citaciones');
+    crudDummy('seguimiento-emocional', 'seguimiento-emocional');
+    crudDummy('conflicto-apoderado', 'conflicto-apoderado');
+    crudDummy('conflicto-funcionario', 'conflicto-funcionario');
+    crudDummy('denuncia-ley-karin', 'denuncia-ley-karin');
+    crudDummy('accidentes', 'accidentes');
+    crudDummy('retiros', 'retiros');
+    crudDummy('atrasos-asistencia', 'atrasos-asistencia');
+    crudDummy('libro-novedades', 'libro-novedades');
+    crudDummy('derivaciones', 'derivaciones');
+    crudDummy('medidas-restaurativas', 'medidas-restaurativas');
+    crudDummy('pie', 'pie');
+
+    // ADMIN
+    crudDummy('roles', 'roles');
+    crudDummy('auditoria', 'auditoria');
+    crudDummy('documentos', 'documentos');
+
 });

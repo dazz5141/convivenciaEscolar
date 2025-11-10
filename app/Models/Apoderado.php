@@ -19,6 +19,10 @@ class Apoderado extends Model
         'telefono',
         'email',
         'direccion',
+        'region_id',
+        'provincia_id',
+        'comuna_id',
+        'establecimiento_id',   // ✅ FALTABA ESTO
         'activo'
     ];
 
@@ -36,5 +40,20 @@ class Apoderado extends Model
     public function scopeActivos($query)
     {
         return $query->where('activo', 1);
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id');
+    }
+
+    public function provincia()
+    {
+        return $this->belongsTo(Provincia::class, 'provincia_id');
+    }
+
+    public function comuna()
+    {
+        return $this->belongsTo(Comuna::class, 'comuna_id');
     }
 }

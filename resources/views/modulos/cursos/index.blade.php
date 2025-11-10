@@ -4,76 +4,109 @@
 
 @section('content')
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
-    <div class="mb-3 mb-md-0">
+    <div>
         <h1 class="page-title">Cursos</h1>
-        <p class="text-muted">Gestión de Cursos_LOWER</p>
+        <p class="text-muted">Gestión de cursos del establecimiento</p>
     </div>
     <div>
-        <a href="/modulos/cursos/create" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>
-            Nuevo Registro
+        <a href="{{ route('cursos.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i> Nuevo Curso
         </a>
     </div>
 </div>
 
 <div class="card card-table">
     <div class="card-header">
-        <div class="row g-3">
-            <div class="col-12 col-md-6">
-                <input type="text" class="form-control" placeholder="Buscar...">
+        <form method="GET" action="{{ route('cursos.index') }}">
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <select name="anio" class="form-select">
+                        <option value="">Año</option>
+                        @foreach($anios as $a)
+                            <option value="{{ $a->anio }}" {{ request('anio') == $a->anio ? 'selected' : '' }}>
+                                {{ $a->anio }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="nivel" class="form-select">
+                        <option value="">Nivel</option>
+                        @foreach($niveles as $n)
+                            <option value="{{ $n->nivel }}" {{ request('nivel') == $n->nivel ? 'selected' : '' }}>
+                                {{ $n->nivel }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="estado" class="form-select">
+                        <option value="">Estado</option>
+                        <option value="1" {{ request('estado') === "1" ? 'selected' : '' }}>Activo</option>
+                        <option value="0" {{ request('estado') === "0" ? 'selected' : '' }}>Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <button class="btn btn-secondary w-100">
+                        <i class="bi bi-funnel me-2"></i> Filtrar
+                    </button>
+                </div>
+
             </div>
-            <div class="col-12 col-md-4">
-                <input type="date" class="form-control">
-            </div>
-            <div class="col-12 col-md-2">
-                <button class="btn btn-secondary w-100">
-                    <i class="bi bi-funnel me-2"></i>Filtrar
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
+
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Fecha</th>
-                        <th>Descripción</th>
+                        <th>Año</th>
+                        <th>Nivel</th>
+                        <th>Letra</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
+                    @forelse($cursos as $c)
                     <tr>
-                        <td>#001</td>
-                        <td>08/11/2025</td>
-                        <td>Registro de ejemplo</td>
-                        <td><span class="badge bg-success">Activo</span></td>
+                        <td>{{ $c->anio }}</td>
+                        <td>{{ $c->nivel }}</td>
+                        <td>{{ $c->letra }}</td>
+                        <td>
+                            <span class="badge bg-{{ $c->activo ? 'success' : 'secondary' }}">
+                                {{ $c->activo ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </td>
+
                         <td class="table-actions">
-                            <a href="/modulos/cursos/1" class="btn btn-sm btn-info" title="Ver">
+                            <a href="{{ route('cursos.show', $c->id) }}" class="btn btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="/modulos/cursos/1/edit" class="btn btn-sm btn-primary" title="Editar">
+
+                            <a href="{{ route('cursos.edit', $c->id) }}" class="btn btn-sm btn-primary">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
                         </td>
                     </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No hay cursos registrados.</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
+
     <div class="card-footer">
-        <nav>
-            <ul class="pagination mb-0 justify-content-center">
-                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
-            </ul>
-        </nav>
+        {{ $cursos->links() }}
     </div>
 </div>
 @endsection

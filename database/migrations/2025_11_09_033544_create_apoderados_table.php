@@ -21,13 +21,37 @@ return new class extends Migration
             $table->string('email', 255)->nullable();
             $table->string('direccion', 255)->nullable();
 
-            $table->boolean('activo')->default(1);
+            // Colegio al que pertenece el apoderado
+            $table->unsignedBigInteger('establecimiento_id');
 
-            // timestamps estándar
+            // Ubicación territorial
+            $table->unsignedBigInteger('region_id')->nullable();
+            $table->unsignedBigInteger('provincia_id')->nullable();
+            $table->unsignedBigInteger('comuna_id')->nullable();
+
+            $table->boolean('activo')->default(1);
             $table->timestamps();
+
+            // Relaciones
+            $table->foreign('establecimiento_id')
+                ->references('id')->on('establecimientos')
+                ->onUpdate('cascade')->onDelete('restrict');
+
+            $table->foreign('region_id')
+                ->references('id')->on('regiones')
+                ->onUpdate('cascade')->onDelete('set null');
+
+            $table->foreign('provincia_id')
+                ->references('id')->on('provincias')
+                ->onUpdate('cascade')->onDelete('set null');
+
+            $table->foreign('comuna_id')
+                ->references('id')->on('comunas')
+                ->onUpdate('cascade')->onDelete('set null');
 
             // Índices
             $table->index('activo');
+            $table->index('establecimiento_id');
         });
     }
 

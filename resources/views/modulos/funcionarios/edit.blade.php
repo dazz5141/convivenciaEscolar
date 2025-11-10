@@ -133,73 +133,11 @@
 
 </form>
 
-
-@section('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-    let regionSelect = document.getElementById('region_id');
-    let provinciaSelect = document.getElementById('provincia_id');
-    let comunaSelect = document.getElementById('comuna_id');
-
-    let provinciaActual = "{{ $funcionario->provincia_id }}";
-    let comunaActual = "{{ $funcionario->comuna_id }}";
-
-    // Cargar provincias al entrar si region ya está seleccionada
-    if (regionSelect.value) {
-        cargarProvincias(regionSelect.value, provinciaActual);
-    }
-
-    // Al cambiar región
-    regionSelect.addEventListener('change', function () {
-        cargarProvincias(this.value, null);
-        comunaSelect.innerHTML = '<option value="">— Seleccione comuna —</option>';
-    });
-
-    // Al cambiar provincia
-    provinciaSelect.addEventListener('change', function () {
-        cargarComunas(this.value, null);
-    });
-
-    // ---- FUNCIONES ----
-
-    function cargarProvincias(regionId, provinciaSeleccionada = null) {
-        provinciaSelect.innerHTML = '<option value="">Cargando...</option>';
-
-        fetch(`/api-interna/provincias/${regionId}`)
-            .then(res => res.json())
-            .then(data => {
-                provinciaSelect.innerHTML = '<option value="">— Seleccione provincia —</option>';
-                data.forEach(p => {
-                    provinciaSelect.innerHTML += `
-                        <option value="${p.id}" ${p.id == provinciaSeleccionada ? 'selected' : ''}>
-                            ${p.nombre}
-                        </option>`;
-                });
-
-                if (provinciaSeleccionada) {
-                    cargarComunas(provinciaSeleccionada, comunaActual);
-                }
-            });
-    }
-
-    function cargarComunas(provinciaId, comunaSeleccionada = null) {
-        comunaSelect.innerHTML = '<option value="">Cargando...</option>';
-
-        fetch(`/api-interna/comunas/${provinciaId}`)
-            .then(res => res.json())
-            .then(data => {
-                comunaSelect.innerHTML = '<option value="">— Seleccione comuna —</option>';
-                data.forEach(c => {
-                    comunaSelect.innerHTML += `
-                        <option value="${c.id}" ${c.id == comunaSeleccionada ? 'selected' : ''}>
-                            ${c.nombre}
-                        </option>`;
-                });
-            });
-    }
-});
-</script>
 @endsection
 
+@section('scripts')
+@include('partials.select-territorio-js', [
+    'provinciaActual' => $funcionario->provincia_id,
+    'comunaActual' => $funcionario->comuna_id
+])
 @endsection

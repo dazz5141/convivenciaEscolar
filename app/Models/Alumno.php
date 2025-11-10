@@ -31,6 +31,12 @@ class Alumno extends Model
         'activo'
     ];
 
+    protected $casts = [
+        'fecha_nacimiento' => 'date',
+        'fecha_ingreso' => 'date',
+        'fecha_egreso' => 'date',
+    ];
+
     public function curso()
     {
         return $this->belongsTo(Curso::class);
@@ -60,5 +66,20 @@ class Alumno extends Model
     public function scopeActivos($query)
     {
         return $query->where('activo', 1);
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id');
+    }
+
+    public function provincia()
+    {
+        return $this->belongsTo(Provincia::class, 'provincia_id');
+    }
+
+    public function comuna()
+    {
+        return $this->belongsTo(Comuna::class, 'comuna_id');
     }
 }
