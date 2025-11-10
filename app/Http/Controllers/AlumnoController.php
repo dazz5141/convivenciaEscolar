@@ -89,6 +89,17 @@ class AlumnoController extends Controller
 
         $alumno = Alumno::create($request->except('apoderados'));
 
+        // refrescar para obtener relaciones recién creadas
+        $alumno->refresh();
+
+        // Registrar matrícula inicial en historial
+        $alumno->historialCursos()->create([
+            'curso_id' => $alumno->curso_id,
+            'establecimiento_id' => $alumno->curso->establecimiento_id,
+            'fecha_cambio' => $alumno->fecha_ingreso ?? now(),
+            'motivo' => 'Matrícula inicial'
+        ]);
+
         // Vincular apoderado único (por el momento)
         if ($request->apoderado_id) {
             $alumno->apoderados()->attach($request->apoderado_id, ['tipo' => 'titular']);
@@ -103,7 +114,7 @@ class AlumnoController extends Controller
      */
     public function show($id)
     {
-        $alumno = Alumno::with(['curso', 'region', 'provincia', 'comuna', 'apoderados'])
+        $alumno = Alumno::with(['curso', 'region', 'provincia', 'comuna', 'apoderados', 'historialCursos.curso'])
             ->findOrFail($id);
 
         return view('modulos.alumnos.show', compact('alumno'));
@@ -135,6 +146,10 @@ class AlumnoController extends Controller
     {
         $alumno = Alumno::findOrFail($id);
 
+        // Guardar curso anterior
+        $cursoAnterior = $alumno->curso_id;
+
+        // Validación
         $request->validate([
             'run' => 'required|max:20|unique:alumnos,run,' . $alumno->id,
             'nombre' => 'required',
@@ -144,14 +159,27 @@ class AlumnoController extends Controller
             'email' => 'nullable|email|unique:alumnos,email,' . $alumno->id,
         ]);
 
-        // Actualizar datos
+        // Actualizar el alumno (excepto apoderados)
         $alumno->update($request->except('apoderados'));
 
-        // Actualizar apoderado único (por el momento)
+        // ACTUALIZAR APODERADO
         $alumno->apoderados()->detach();
 
         if ($request->apoderado_id) {
             $alumno->apoderados()->attach($request->apoderado_id, ['tipo' => 'titular']);
+        }
+
+        // REFRESCAR para obtener el curso NUEVO
+        $alumno->refresh();
+
+        // Registrar historial SOLO si realmente cambió el curso
+        if ($cursoAnterior != $request->curso_id) {
+            $alumno->historialCursos()->create([
+                'curso_id' => $request->curso_id,
+                'establecimiento_id' => $alumno->curso->establecimiento_id,
+                'fecha_cambio' => now(),
+                'motivo' => 'Cambio de curso desde edición'
+            ]);
         }
 
         return redirect()->route('alumnos.index')
@@ -178,5 +206,50 @@ class AlumnoController extends Controller
 
         return redirect()->route('alumnos.index')
             ->with('success', 'Alumno habilitado.');
+    }
+
+    /**
+     * FORM CAMBIAR CURSO
+     */
+
+    public function cambiarCursoForm($id)
+    {
+        $alumno = Alumno::findOrFail($id);
+
+        // solo cursos del mismo establecimiento
+        $cursos = Curso::where('establecimiento_id', $alumno->curso->establecimiento_id)
+                    ->where('anio', $alumno->curso->anio) 
+                    ->orderBy('nivel')
+                    ->orderBy('letra')
+                    ->get();
+
+        return view('modulos.alumnos.cambiar-curso', compact('alumno', 'cursos'));
+    }
+
+    public function cambiarCurso(Request $request, $id)
+    {
+        $alumno = Alumno::findOrFail($id);
+
+        $request->validate([
+            'curso_id' => 'required|exists:cursos,id',
+            'motivo' => 'nullable|string|max:500'
+        ]);
+
+        $cursoAnterior = $alumno->curso_id;
+
+        // Actualizar curso
+        $alumno->curso_id = $request->curso_id;
+        $alumno->save();
+
+        // Registrar cambio en historial
+        $alumno->historialCursos()->create([
+            'curso_id' => $request->curso_id,
+            'establecimiento_id' => $alumno->curso->establecimiento_id,
+            'fecha_cambio' => now(),
+            'motivo' => $request->motivo ?? 'Cambio de curso'
+        ]);
+
+        return redirect()->route('alumnos.show', $alumno->id)
+            ->with('success', 'Curso actualizado correctamente.');
     }
 }

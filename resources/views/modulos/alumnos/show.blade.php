@@ -81,6 +81,39 @@
 
         </div>
 
+        {{-- Historial de Curso --}}
+        <div class="form-section">
+            <h5 class="form-section-title">Historial de Curso</h5>
+
+            @if($alumno->historialCursos->count() == 0)
+                <p class="text-muted">Sin movimientos registrados.</p>
+            @else
+                <ul class="list-group">
+                    @foreach($alumno->historialCursos as $h)
+                        <li class="list-group-item">
+                            <strong>{{ \Carbon\Carbon::parse($h->fecha_cambio)->format('d/m/Y') }}</strong> —
+
+                            {{ $h->curso->nivel }} {{ $h->curso->letra }}
+                            ({{ $h->curso->anio }})
+
+                            @if($h->motivo)
+                                <br>
+                                <small class="text-muted">
+                                    Motivo: {{ $h->motivo }}
+                                </small>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
+            <div class="mt-3">
+                <a href="{{ route('alumnos.cambiarCurso.form', $alumno->id) }}" class="btn btn-warning">
+                    <i class="bi bi-arrow-left-right me-2"></i> Cambiar de Curso
+                </a>
+            </div>
+        </div>
+
         {{-- Relación Apoderados --}}
         <div class="form-section">
             <h5 class="form-section-title">Apoderados Asociados</h5>

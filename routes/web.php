@@ -132,6 +132,9 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
         Route::put('/{id}/deshabilitar', [AlumnoController::class, 'disable'])->name('alumnos.disable');
         Route::put('/{id}/habilitar', [AlumnoController::class, 'enable'])->name('alumnos.enable');
+
+        Route::get('alumnos/{id}/cambiar-curso', [AlumnoController::class, 'cambiarCursoForm'])->name('alumnos.cambiarCurso.form');
+        Route::post('alumnos/{id}/cambiar-curso', [AlumnoController::class, 'cambiarCurso'])->name('alumnos.cambiarCurso');
     });
 
     /*

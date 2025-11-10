@@ -82,4 +82,9 @@ class Alumno extends Model
     {
         return $this->belongsTo(Comuna::class, 'comuna_id');
     }
+
+    public function historialCursos()
+    {
+        return $this->hasMany(AlumnoCursoHistorial::class);
+    }
 }
