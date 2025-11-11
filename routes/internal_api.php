@@ -6,6 +6,7 @@ use App\Http\Controllers\ProvinciaController;
 use App\Http\Controllers\ComunaController;
 use App\Models\Alumno;
 use App\Models\Funcionario;
+use App\Models\Apoderado;
 
 Route::get('/provincias/{region}', [ProvinciaController::class, 'porRegion']);
 Route::get('/comunas/{provincia}', [ComunaController::class, 'porProvincia']);
@@ -71,4 +72,36 @@ Route::get('/buscar/funcionarios', function (Request $request) {
         });
 
     return response()->json($funcionarios);
+});
+
+// Buscar apoderados por RUN, nombre o apellido
+Route::get('/buscar/apoderados', function (Request $request) {
+    $q = $request->query('q');
+
+    if (!$q) {
+        return response()->json([]);
+    }
+
+    $establecimientoId = session('establecimiento_id'); // Filtrar por colegio actual
+
+    $apoderados = Apoderado::where('establecimiento_id', $establecimientoId)
+        ->where(function ($query) use ($q) {
+            $query->where('run', 'like', "%{$q}%")
+                  ->orWhere('nombre', 'like', "%{$q}%")
+                  ->orWhere('apellido_paterno', 'like', "%{$q}%")
+                  ->orWhere('apellido_materno', 'like', "%{$q}%");
+        })
+        ->take(15)
+        ->get()
+        ->map(function ($ap) {
+            return [
+                'id' => $ap->id,
+                'run' => $ap->run,
+                'nombre_completo' =>
+                    "{$ap->apellido_paterno} {$ap->apellido_materno}, {$ap->nombre}",
+                'telefono' => $ap->telefono ?? '—',
+            ];
+        });
+
+    return response()->json($apoderados);
 });

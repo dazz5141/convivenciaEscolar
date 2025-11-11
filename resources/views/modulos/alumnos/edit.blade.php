@@ -152,16 +152,29 @@
         <div class="row g-3">
             <div class="col-md-12">
                 <label class="form-label">Apoderado *</label>
-                <select name="apoderado_id" class="form-select" required>
-                    <option value="">— Seleccione apoderado —</option>
 
-                    @foreach($apoderados as $ap)
-                        <option value="{{ $ap->id }}"
-                            {{ optional($alumno->apoderados->first())->id == $ap->id ? 'selected' : '' }}>
-                            {{ $ap->nombre }} {{ $ap->apellido_paterno }} {{ $ap->apellido_materno }}
-                        </option>
-                    @endforeach
-                </select>
+                <input type="hidden"
+                    name="apoderado_id"
+                    id="apoderado_id"
+                    value="{{ optional($alumno->apoderados->first())->id }}"
+                    required>
+
+                 <button type="button"
+                        class="btn btn-outline-primary mb-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalBuscarApoderado">
+                    <i class="bi bi-search"></i> Buscar Apoderado
+                </button>
+
+                <p id="textoApoderadoSeleccionado" class="fw-bold text-primary">
+                    {{ $alumno->apoderados->first()
+                        ? $alumno->apoderados->first()->apellido_paterno
+                        . ' '
+                        . $alumno->apoderados->first()->apellido_materno
+                        . ', '
+                        . $alumno->apoderados->first()->nombre
+                        : 'Ningún apoderado seleccionado' }}
+                </p>
             </div>
         </div>
     </div>
@@ -176,6 +189,40 @@
     </div>
 
 </form>
+<!-- MODAL BUSCAR APODERADO -->
+<div class="modal fade" id="modalBuscarApoderado" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Buscar Apoderado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <input type="text" id="inputBuscarApoderado" class="form-control mb-3"
+               placeholder="Buscar por RUN, nombre o apellido...">
+
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>RUN</th>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="resultadoApoderados">
+            <tr><td colspan="4" class="text-center">Ingrese un criterio de búsqueda.</td></tr>
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+  </div>
+</div>
 
 @endsection
 
@@ -184,4 +231,57 @@
     'provinciaActual' => $alumno->provincia_id,
     'comunaActual'    => $alumno->comuna_id
 ])
+<script>
+function buscarApoderados() {
+    let q = document.getElementById('inputBuscarApoderado').value;
+
+    if (q.length < 2) return;
+
+    fetch('/api-interna/buscar/apoderados?q=' + q)
+        .then(res => res.json())
+        .then(data => {
+            let html = "";
+
+            if (data.length === 0) {
+                html = `<tr><td colspan="4" class="text-center">Sin resultados.</td></tr>`;
+            } else {
+                data.forEach(ap => {
+                    html += `
+                    <tr>
+                        <td>${ap.run}</td>
+                        <td>${ap.nombre_completo}</td>
+                        <td>${ap.telefono}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success seleccionar-apoderado"
+                                data-id="${ap.id}"
+                                data-nombre="${ap.nombre_completo}">
+                                Seleccionar
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+            }
+
+            document.getElementById('resultadoApoderados').innerHTML = html;
+        });
+}
+
+document.getElementById('inputBuscarApoderado').addEventListener('keyup', buscarApoderados);
+
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('seleccionar-apoderado')) {
+
+        let id = e.target.dataset.id;
+        let nombre = e.target.dataset.nombre;
+
+        document.getElementById('apoderado_id').value = id;
+        document.getElementById('textoApoderadoSeleccionado').textContent = nombre;
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('modalBuscarApoderado')
+        ).hide();
+    }
+});
+</script>
+
 @endsection
