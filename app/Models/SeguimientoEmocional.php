@@ -15,10 +15,15 @@ class SeguimientoEmocional extends Model
         'alumno_id',
         'fecha',
         'nivel_emocional_id',
+        'estado_id',
         'comentario',
         'evaluado_por',
         'establecimiento_id'
     ];
+
+    /* =============================
+        RELACIONES
+    ==============================*/
 
     public function alumno()
     {
@@ -34,6 +39,20 @@ class SeguimientoEmocional extends Model
     {
         return $this->belongsTo(Funcionario::class, 'evaluado_por');
     }
+
+    public function estado()
+    {
+        return $this->belongsTo(EstadoSeguimientoEmocional::class, 'estado_id');
+    }
+
+    public function observaciones()
+    {
+        return $this->hasMany(SeguimientoEmocionalObservacion::class, 'seguimiento_id');
+    }
+
+    /* =============================
+        SCOPES
+    ==============================*/
 
     public function scopeDelColegio($query, $id)
     {

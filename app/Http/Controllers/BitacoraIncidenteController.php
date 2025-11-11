@@ -200,7 +200,8 @@ class BitacoraIncidenteController extends Controller
             'victimas',
             'agresores',
             'testigos',
-            'documentos'
+            'documentos',
+            'observaciones.funcionario'
         ])->findOrFail($id);
 
         return view('modulos.bitacora.show', compact('incidente'));
@@ -327,25 +328,5 @@ class BitacoraIncidenteController extends Controller
                 ->with('error', 'Ocurrió un error al actualizar el incidente.')
                 ->withInput();
         }
-    }
-
-    /**
-     * ANULAR INCIDENTE
-     */
-    public function anular($id)
-    {
-        $incidente = BitacoraIncidente::findOrFail($id);
-
-        $incidente->update([
-            'estado_id' => EstadoIncidente::where('nombre', 'Anulado')->first()->id,
-        ]);
-
-        // Registrar en auditoría
-        $incidente->auditoria()->create([
-            'accion' => 'Anulado por error',
-            'realizado_por' => auth()->id(),
-        ]);
-
-        return back()->with('success', 'Incidente anulado correctamente.');
     }
 }

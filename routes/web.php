@@ -9,6 +9,9 @@ use App\Http\Controllers\ApoderadoController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\BitacoraIncidenteController;
+use App\Http\Controllers\BitacoraIncidenteObservacionController;
+use App\Http\Controllers\SeguimientoEmocionalController;
+use App\Http\Controllers\SeguimientoEmocionalObservacionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -183,13 +186,30 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
     */
 
     Route::prefix('modulos/bitacora')->group(function () {
-    Route::get('/', [BitacoraIncidenteController::class, 'index'])->name('bitacora.index');
-    Route::get('/create', [BitacoraIncidenteController::class, 'create'])->name('bitacora.create');
-    Route::post('/', [BitacoraIncidenteController::class, 'store'])->name('bitacora.store');
-    Route::get('/{id}', [BitacoraIncidenteController::class, 'show'])->name('bitacora.show');
-    Route::get('/{id}/edit', [BitacoraIncidenteController::class, 'edit'])->name('bitacora.edit');
-    Route::put('/{id}', [BitacoraIncidenteController::class, 'update'])->name('bitacora.update');
-    Route::put('/{id}/anular', [BitacoraIncidenteController::class, 'anular'])->name('bitacora.anular');
+        Route::get('/', [BitacoraIncidenteController::class, 'index'])->name('bitacora.index');
+        Route::get('/create', [BitacoraIncidenteController::class, 'create'])->name('bitacora.create');
+        Route::post('/', [BitacoraIncidenteController::class, 'store'])->name('bitacora.store');
+        Route::get('/{id}', [BitacoraIncidenteController::class, 'show'])->name('bitacora.show');
+        Route::get('/{id}/edit', [BitacoraIncidenteController::class, 'edit'])->name('bitacora.edit');
+        Route::put('/{id}', [BitacoraIncidenteController::class, 'update'])->name('bitacora.update');
+        Route::post('bitacora/{id}/observaciones',[BitacoraIncidenteObservacionController::class, 'store'])->name('bitacora.observaciones.store');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MÓDULO SEGUIMIENTO EMOCIONAL
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('modulos/seguimiento-emocional')->middleware(['auth', 'establecimiento'])->group(function () {
+        Route::get('/',           [SeguimientoEmocionalController::class, 'index'])->name('seguimiento.index');
+        Route::get('/crear',      [SeguimientoEmocionalController::class, 'create'])->name('seguimiento.create');
+        Route::post('/',          [SeguimientoEmocionalController::class, 'store'])->name('seguimiento.store');
+        Route::get('/{id}',       [SeguimientoEmocionalController::class, 'show'])->name('seguimiento.show');
+        Route::get('/{id}/edit',  [SeguimientoEmocionalController::class, 'edit'])->name('seguimiento.edit');
+        Route::put('/{id}',       [SeguimientoEmocionalController::class, 'update'])->name('seguimiento.update');
+        // Observaciones al seguimiento emocional
+        Route::post('/{id}/observaciones', [SeguimientoEmocionalObservacionController::class, 'store'])->name('seguimiento.observaciones.store');
     });
 
     /*
@@ -209,7 +229,6 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
     // PRINCIPALES
     crudDummy('citaciones', 'citaciones');
-    crudDummy('seguimiento-emocional', 'seguimiento-emocional');
     crudDummy('conflicto-apoderado', 'conflicto-apoderado');
     crudDummy('conflicto-funcionario', 'conflicto-funcionario');
     crudDummy('denuncia-ley-karin', 'denuncia-ley-karin');

@@ -101,4 +101,9 @@ class BitacoraIncidente extends Model
     {
         return $query->where('establecimiento_id', $id);
     }
+
+    public function observaciones()
+    {
+        return $this->hasMany(BitacoraIncidenteObservacion::class, 'incidente_id');
+    }
 }

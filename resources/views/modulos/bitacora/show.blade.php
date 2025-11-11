@@ -17,16 +17,6 @@
         <a href="{{ route('bitacora.index') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i> Volver
         </a>
-
-        @if($incidente->estado && $incidente->estado->nombre !== 'Anulado')
-        <form action="{{ route('bitacora.anular', $incidente->id) }}" method="POST"
-              onsubmit="return confirm('¿Está seguro de anular este incidente?');">
-            @csrf
-            <button type="submit" class="btn btn-warning">
-                <i class="bi bi-x-circle me-2"></i> Anular Incidente
-            </button>
-        </form>
-        @endif
     </div>
 </div>
 
@@ -215,17 +205,46 @@
         </div>
 
 
-        {{-- ===========================
-             HISTORIAL SIMPLE (placeholder)
-        ============================ --}}
+        {{-- ============================================
+            HISTORIAL DE OBSERVACIONES
+        ============================================ --}}
         <div class="card mt-4">
             <div class="card-header">
-                <h5 class="mb-0">Historial</h5>
+                <h5 class="mb-0">Historial de Observaciones</h5>
             </div>
+
             <div class="card-body">
-                <p class="text-muted small">
-                    Próximamente agregaremos la auditoría profesional (quién modificó, cuándo, cambios, etc.).
-                </p>
+
+                {{-- FORMULARIO PARA AGREGAR OBSERVACIÓN --}}
+                <form action="{{ route('bitacora.observaciones.store', $incidente->id) }}" method="POST" class="mb-3">
+                    @csrf
+
+                    <label class="form-label fw-bold">Agregar nueva observación</label>
+                    <textarea name="observacion" class="form-control" rows="3" required></textarea>
+
+                    <button type="submit" class="btn btn-primary btn-sm mt-2">
+                        <i class="bi bi-plus-circle me-1"></i> Agregar Observación
+                    </button>
+                </form>
+
+                <hr>
+
+                {{-- LISTADO DE OBSERVACIONES --}}
+                @forelse ($incidente->observaciones->sortBy('fecha_observacion') as $obs)
+                    <div class="mb-3 p-2 border rounded bg-light">
+
+                        <div class="small text-muted">
+                            {{ \Carbon\Carbon::parse($obs->fecha_observacion)->format('d/m/Y H:i') }}
+                            — <strong>{{ $obs->funcionario->nombre ?? 'Funcionario' }}</strong>
+                        </div>
+
+                        <div>{!! nl2br(e($obs->observacion)) !!}</div>
+
+                    </div>
+                @empty
+                    <p class="text-muted small">No existen observaciones registradas.</p>
+                @endforelse
+
             </div>
         </div>
 
