@@ -3,179 +3,170 @@
 @section('title', 'Bitácora de Incidentes')
 
 @section('content')
-<div class="page-header d-flex justify-content-between align-items-center flex-wrap">
-    <div class="mb-3 mb-md-0">
-        <h1 class="page-title">Bitácora de Incidentes</h1>
-        <p class="text-muted">Registro y seguimiento de incidentes de convivencia escolar</p>
-    </div>
+
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap mb-3">
     <div>
-        <a href="/modulos/bitacora/create" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>
-            Nuevo Incidente
-        </a>
+        <h1 class="page-title">Bitácora de Incidentes</h1>
+        <p class="text-muted">Registro y seguimiento de incidentes dentro del establecimiento</p>
     </div>
+
+    <a href="{{ route('bitacora.create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i> Nuevo Incidente
+    </a>
 </div>
 
-<div class="card card-table">
+
+{{-- ============================
+     FILTROS
+============================ --}}
+<div class="card mb-4">
     <div class="card-header">
-        <div class="row g-3">
-            <div class="col-12 col-md-4">
-                <input type="text" class="form-control" placeholder="Buscar por alumno...">
-            </div>
-            <div class="col-12 col-md-3">
-                <select class="form-select">
-                    <option value="">Todos los tipos</option>
-                    <option>Conflicto</option>
-                    <option>Conducta</option>
-                    <option>Atraso</option>
-                    <option>Accidente</option>
-                </select>
-            </div>
-            <div class="col-12 col-md-3">
-                <select class="form-select">
-                    <option value="">Todos los estados</option>
-                    <option>En Proceso</option>
-                    <option>Resuelto</option>
-                    <option>Crítico</option>
-                </select>
-            </div>
-            <div class="col-12 col-md-2">
-                <button class="btn btn-secondary w-100">
-                    <i class="bi bi-funnel me-2"></i>Filtrar
-                </button>
+        <h5 class="mb-0">Filtros</h5>
+    </div>
+
+    <form method="GET" action="{{ route('bitacora.index') }}">
+        <div class="card-body">
+            <div class="row g-3">
+
+                {{-- Alumno --}}
+                <div class="col-md-3">
+                    <label class="form-label">Alumno</label>
+                    <select name="alumno_id" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach($alumnos as $a)
+                            <option value="{{ $a->id }}" {{ request('alumno_id') == $a->id ? 'selected' : '' }}>
+                                {{ $a->apellido_paterno }} {{ $a->apellido_materno }}, {{ $a->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Tipo --}}
+                <div class="col-md-3">
+                    <label class="form-label">Tipo de incidente</label>
+                    <input type="text" name="tipo" class="form-control" placeholder="Ej: Conflicto"
+                           value="{{ request('tipo') }}">
+                </div>
+
+                {{-- Estado --}}
+                <div class="col-md-3">
+                    <label class="form-label">Estado</label>
+                    <select name="estado_id" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach($estados as $e)
+                            <option value="{{ $e->id }}" {{ request('estado_id') == $e->id ? 'selected' : '' }}>
+                                {{ $e->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Curso --}}
+                <div class="col-md-3">
+                    <label class="form-label">Curso</label>
+                    <select name="curso_id" class="form-select">
+                        <option value="">Todos</option>
+                        @foreach($cursos as $c)
+                            <option value="{{ $c->id }}" {{ request('curso_id') == $c->id ? 'selected' : '' }}>
+                                {{ $c->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
             </div>
         </div>
-    </div>
+
+        <div class="card-footer text-end">
+            <button class="btn btn-secondary">
+                <i class="bi bi-funnel me-2"></i> Aplicar Filtros
+            </button>
+        </div>
+    </form>
+</div>
+
+
+{{-- ============================
+     TABLA
+============================ --}}
+<div class="card card-table">
     <div class="card-body">
+
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover align-middle">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Fecha</th>
-                        <th>Alumno</th>
-                        <th>Curso</th>
                         <th>Tipo</th>
-                        <th>Gravedad</th>
                         <th>Estado</th>
-                        <th>Acciones</th>
+                        <th>Involucrados</th>
+                        <th width="120">Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
+
+                @forelse($incidentes as $i)
+
                     <tr>
-                        <td>#001</td>
-                        <td>08/11/2025</td>
-                        <td>Juan Pérez Soto</td>
-                        <td>3° Básico A</td>
-                        <td>Conflicto</td>
-                        <td><span class="badge bg-warning">Media</span></td>
-                        <td><span class="badge bg-warning">En Proceso</span></td>
+                        <td>{{ \Carbon\Carbon::parse($i->fecha)->format('d/m/Y') }}</td>
+
+                        <td>{{ $i->tipo_incidente }}</td>
+
+                        <td>
+                            <span class="badge bg-primary">
+                                {{ $i->estado->nombre ?? 'Sin estado' }}
+                            </span>
+                        </td>
+
+                        {{-- Involucrados resumen --}}
+                        <td>
+                            @foreach($i->involucrados as $inv)
+                                <div class="d-flex justify-content-between align-items-center small py-1 border-bottom">
+                                    <div>
+                                        <strong>{{ ucfirst($inv->rol) }}:</strong>
+                                        {{ $inv->alumno->apellido_paterno }} {{ $inv->alumno->apellido_materno }}
+                                    </div>
+
+                                    <div class="text-muted ms-3">
+                                        {{ $inv->alumno->curso->nombre ?? '—' }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </td>
+
                         <td class="table-actions">
-                            <a href="/modulos/bitacora/1" class="btn btn-sm btn-info" title="Ver">
+
+                            <a href="{{ route('bitacora.show', $i->id) }}"
+                               class="btn btn-sm btn-info" title="Ver">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="/modulos/bitacora/1/edit" class="btn btn-sm btn-primary" title="Editar">
+
+                            <a href="{{ route('bitacora.edit', $i->id) }}"
+                               class="btn btn-sm btn-primary" title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
+
                         </td>
                     </tr>
+
+                @empty
                     <tr>
-                        <td>#002</td>
-                        <td>07/11/2025</td>
-                        <td>María González López</td>
-                        <td>5° Básico B</td>
-                        <td>Atraso</td>
-                        <td><span class="badge bg-info">Baja</span></td>
-                        <td><span class="badge bg-success">Resuelto</span></td>
-                        <td class="table-actions">
-                            <a href="/modulos/bitacora/2" class="btn btn-sm btn-info" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/modulos/bitacora/2/edit" class="btn btn-sm btn-primary" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            No se encontraron incidentes con los filtros aplicados.
                         </td>
                     </tr>
-                    <tr>
-                        <td>#003</td>
-                        <td>07/11/2025</td>
-                        <td>Pedro Soto Ramírez</td>
-                        <td>7° Básico C</td>
-                        <td>Conducta</td>
-                        <td><span class="badge bg-danger">Alta</span></td>
-                        <td><span class="badge bg-danger">Crítico</span></td>
-                        <td class="table-actions">
-                            <a href="/modulos/bitacora/3" class="btn btn-sm btn-info" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/modulos/bitacora/3/edit" class="btn btn-sm btn-primary" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#004</td>
-                        <td>06/11/2025</td>
-                        <td>Ana Martínez Silva</td>
-                        <td>2° Medio A</td>
-                        <td>Accidente</td>
-                        <td><span class="badge bg-warning">Media</span></td>
-                        <td><span class="badge bg-success">Resuelto</span></td>
-                        <td class="table-actions">
-                            <a href="/modulos/bitacora/4" class="btn btn-sm btn-info" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/modulos/bitacora/4/edit" class="btn btn-sm btn-primary" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#005</td>
-                        <td>06/11/2025</td>
-                        <td>Carlos Díaz Muñoz</td>
-                        <td>4° Básico A</td>
-                        <td>Conflicto</td>
-                        <td><span class="badge bg-warning">Media</span></td>
-                        <td><span class="badge bg-warning">En Proceso</span></td>
-                        <td class="table-actions">
-                            <a href="/modulos/bitacora/5" class="btn btn-sm btn-info" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/modulos/bitacora/5/edit" class="btn btn-sm btn-primary" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
+                @endforelse
+
                 </tbody>
             </table>
         </div>
+
     </div>
+
     <div class="card-footer">
-        <nav>
-            <ul class="pagination mb-0 justify-content-center">
-                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
-            </ul>
-        </nav>
+        {{ $incidentes->links() }}
     </div>
 </div>
+
 @endsection

@@ -37,6 +37,10 @@ class Alumno extends Model
         'fecha_egreso' => 'date',
     ];
 
+    // -------------------------------
+    // RELACIONES
+    // -------------------------------
+
     public function curso()
     {
         return $this->belongsTo(Curso::class);
@@ -58,16 +62,28 @@ class Alumno extends Model
         return $this->hasMany(SeguimientoEmocional::class);
     }
 
+    // Relación a la bitácora antigua (solo 1 alumno)
+    //    Se mantiene por compatibilidad pero ya no se usará
     public function bitacoras()
     {
         return $this->hasMany(BitacoraIncidente::class);
     }
 
+    // NUEVA: Relación muchos-a-muchos REAL
+    public function incidentes()
+    {
+        return $this->belongsToMany(BitacoraIncidente::class, 'bitacora_incidente_alumno', 'alumno_id', 'incidente_id')
+                    ->withPivot(['rol', 'curso_id', 'comentario'])
+                    ->withTimestamps();
+    }
+
+    // SCOPES
     public function scopeActivos($query)
     {
         return $query->where('activo', 1);
     }
 
+    // Datos geográficos
     public function region()
     {
         return $this->belongsTo(Region::class, 'region_id');
@@ -83,8 +99,26 @@ class Alumno extends Model
         return $this->belongsTo(Comuna::class, 'comuna_id');
     }
 
+    // Historial académico
     public function historialCursos()
     {
         return $this->hasMany(AlumnoCursoHistorial::class);
+    }
+
+    // FILTROS POR ROL DENTRO DEL INCIDENTE
+
+    public function victimaEn()
+    {
+        return $this->incidentes()->wherePivot('rol', 'victima');
+    }
+
+    public function agresorEn()
+    {
+        return $this->incidentes()->wherePivot('rol', 'agresor');
+    }
+
+    public function testigoEn()
+    {
+        return $this->incidentes()->wherePivot('rol', 'testigo');
     }
 }

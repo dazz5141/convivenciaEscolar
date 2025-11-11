@@ -8,6 +8,7 @@ use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\ApoderadoController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\CursoController;
+use App\Http\Controllers\BitacoraIncidenteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -177,6 +178,22 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | MÓDULO BITÁCORA DE INCIDENTES
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('modulos/bitacora')->group(function () {
+    Route::get('/', [BitacoraIncidenteController::class, 'index'])->name('bitacora.index');
+    Route::get('/create', [BitacoraIncidenteController::class, 'create'])->name('bitacora.create');
+    Route::post('/', [BitacoraIncidenteController::class, 'store'])->name('bitacora.store');
+    Route::get('/{id}', [BitacoraIncidenteController::class, 'show'])->name('bitacora.show');
+    Route::get('/{id}/edit', [BitacoraIncidenteController::class, 'edit'])->name('bitacora.edit');
+    Route::put('/{id}', [BitacoraIncidenteController::class, 'update'])->name('bitacora.update');
+    Route::put('/{id}/anular', [BitacoraIncidenteController::class, 'anular'])->name('bitacora.anular');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | DUMMY ROUTES (SOLO LOS QUE AÚN NO EXISTEN)
     |--------------------------------------------------------------------------
     */
@@ -191,7 +208,6 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
     }
 
     // PRINCIPALES
-    crudDummy('bitacora', 'bitacora');
     crudDummy('citaciones', 'citaciones');
     crudDummy('seguimiento-emocional', 'seguimiento-emocional');
     crudDummy('conflicto-apoderado', 'conflicto-apoderado');

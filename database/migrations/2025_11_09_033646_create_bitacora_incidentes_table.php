@@ -15,8 +15,7 @@ return new class extends Migration
             $table->string('tipo_incidente', 120)->nullable();
             $table->text('descripcion')->nullable();
 
-            $table->unsignedBigInteger('alumno_id');
-            $table->unsignedBigInteger('curso_id');
+            $table->unsignedBigInteger('curso_id'); // curso del primer alumno
             $table->unsignedBigInteger('establecimiento_id');
 
             $table->text('accion_realizada')->nullable();
@@ -28,9 +27,6 @@ return new class extends Migration
             $table->timestamps();
 
             // FKs
-            $table->foreign('alumno_id')->references('id')->on('alumnos')
-                ->onUpdate('cascade')->onDelete('restrict');
-
             $table->foreign('curso_id')->references('id')->on('cursos')
                 ->onUpdate('cascade')->onDelete('restrict');
 
@@ -46,8 +42,8 @@ return new class extends Migration
             $table->foreign('seguimiento_id')->references('id')->on('seguimiento_emocional')
                 ->onUpdate('cascade')->onDelete('set null');
 
-            // Índices clave para reportes globales
-            $table->index(['alumno_id', 'fecha']);
+            // Índices útiles
+            $table->index('fecha');
             $table->index('establecimiento_id');
         });
     }

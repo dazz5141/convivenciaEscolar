@@ -29,6 +29,11 @@ class Curso extends Model
         return $this->hasMany(Alumno::class);
     }
 
+    public function incidentesHistoricos()
+    {
+        return $this->hasMany(BitacoraIncidenteAlumno::class, 'curso_id');
+    }
+
     public function scopeDelColegio($query, $id)
     {
         return $query->where('establecimiento_id', $id);
