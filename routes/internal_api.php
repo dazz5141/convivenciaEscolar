@@ -7,6 +7,7 @@ use App\Http\Controllers\ComunaController;
 use App\Models\Alumno;
 use App\Models\Funcionario;
 use App\Models\Apoderado;
+use App\Models\EstudiantePIE;
 
 Route::get('/provincias/{region}', [ProvinciaController::class, 'porRegion']);
 Route::get('/comunas/{provincia}', [ComunaController::class, 'porProvincia']);
@@ -104,4 +105,69 @@ Route::get('/buscar/apoderados', function (Request $request) {
         });
 
     return response()->json($apoderados);
+});
+
+Route::get('/buscar/estudiantes-pie', function (Request $request) {
+
+    $q = $request->query('q');
+    $establecimientoId = session('establecimiento_id');
+
+    if (!$q) {
+        return response()->json([]);
+    }
+
+    $estudiantes = EstudiantePIE::select('estudiantes_pie.*')
+        ->join('alumnos', 'alumnos.id', '=', 'estudiantes_pie.alumno_id')
+        ->where('estudiantes_pie.establecimiento_id', $establecimientoId)
+        ->where(function ($query) use ($q) {
+            $query->where('alumnos.run', 'like', "%{$q}%")
+                  ->orWhere('alumnos.nombre', 'like', "%{$q}%")
+                  ->orWhere('alumnos.apellido_paterno', 'like', "%{$q}%")
+                  ->orWhere('alumnos.apellido_materno', 'like', "%{$q}%");
+        })
+        ->with('alumno.curso')
+        ->take(20)
+        ->get()
+        ->map(function ($e) {
+            return [
+                'id' => $e->id,
+                'run' => $e->alumno->run,
+                'nombre_completo' =>
+                    "{$e->alumno->apellido_paterno} {$e->alumno->apellido_materno}, {$e->alumno->nombre}",
+                'curso' => $e->alumno->curso->nombre ?? 'Sin curso'
+            ];
+        });
+
+    return response()->json($estudiantes);
+});
+
+Route::get('/buscar/profesionales-pie', function (Request $request) {
+    $q = $request->query('q');
+    $establecimientoId = session('establecimiento_id');
+
+    if (!$q) {
+        return response()->json([]);
+    }
+
+    $profesionales = \App\Models\ProfesionalPIE::where('establecimiento_id', $establecimientoId)
+        ->whereHas('funcionario', function ($query) use ($q) {
+            $query->where('run', 'like', "%{$q}%")
+                  ->orWhere('nombre', 'like', "%{$q}%")
+                  ->orWhere('apellido_paterno', 'like', "%{$q}%")
+                  ->orWhere('apellido_materno', 'like', "%{$q}%");
+        })
+        ->with('funcionario.cargo')
+        ->take(15)
+        ->get()
+        ->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'run' => $p->funcionario->run,
+                'nombre_completo' =>
+                    "{$p->funcionario->apellido_paterno} {$p->funcionario->apellido_materno}, {$p->funcionario->nombre}",
+                'cargo' => $p->funcionario->cargo->nombre ?? '',
+            ];
+        });
+
+    return response()->json($profesionales);
 });

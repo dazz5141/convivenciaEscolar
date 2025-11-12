@@ -1,0 +1,124 @@
+@extends('layouts.app')
+
+@section('title', 'Nueva Derivación PIE')
+
+@section('content')
+
+<div class="page-header">
+    <h1 class="page-title">Nueva Derivación PIE</h1>
+    <p class="text-muted">Registrar una derivación asociada a un estudiante del Programa de Integración Escolar.</p>
+</div>
+
+<form action="{{ route('pie.derivaciones.store') }}" method="POST">
+    @csrf
+
+    {{-- =============================
+        ESTUDIANTE PIE
+    ============================== --}}
+    <div class="form-section">
+        <h5 class="form-section-title">Estudiante PIE</h5>
+
+        <button type="button"
+                class="btn btn-outline-primary mb-3"
+                data-bs-toggle="modal"
+                data-bs-target="#modalBuscarAlumno">
+            <i class="bi bi-search"></i> Buscar Estudiante
+        </button>
+
+        <input type="hidden" name="estudiante_pie_id" id="inputAlumnoSeleccionado" required>
+
+        <p class="fw-bold" id="textoAlumnoSeleccionado">
+            No se ha seleccionado estudiante.
+        </p>
+    </div>
+
+    {{-- =============================
+        FECHA Y DESTINO
+    ============================== --}}
+    <div class="form-section mt-4">
+        <h5 class="form-section-title">Información de la Derivación</h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label class="form-label">Fecha <span class="text-danger">*</span></label>
+                <input type="date" name="fecha" class="form-control" required>
+            </div>
+
+            <div class="col-md-8">
+                <label class="form-label">Destino <span class="text-danger">*</span></label>
+                <input type="text" name="destino" class="form-control"
+                       placeholder="Ej: Psicólogo externo, fonoaudiólogo, UTP, etc."
+                       required>
+            </div>
+
+        </div>
+    </div>
+
+    {{-- =============================
+        MOTIVO
+    ============================== --}}
+    <div class="form-section mt-4">
+        <h5 class="form-section-title">Motivo de la Derivación</h5>
+
+        <textarea name="motivo" class="form-control" rows="4"
+                  placeholder="Describa el motivo de la derivación..." required></textarea>
+    </div>
+
+    {{-- =============================
+        ESTADO
+    ============================== --}}
+    <div class="form-section mt-4">
+        <h5 class="form-section-title">Estado (opcional)</h5>
+
+        <select name="estado" class="form-select">
+            <option value="">Seleccione...</option>
+            <option value="En curso">En curso</option>
+            <option value="Cerrada">Cerrada</option>
+            <option value="Pendiente">Pendiente</option>
+        </select>
+    </div>
+
+    {{-- BOTONES --}}
+    <div class="d-flex gap-2 flex-wrap mt-4">
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save me-2"></i> Guardar Derivación
+        </button>
+
+        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+            <i class="bi bi-x-circle me-2"></i> Cancelar
+        </a>
+
+    </div>
+
+</form>
+
+{{-- ===========================
+    MODAL SOLO DE ALUMNOS
+=========================== --}}
+@include('modulos.pie.partials.modal-buscar-alumno')
+
+{{-- ===========================
+    JS PARA SELECCIÓN DE ALUMNO
+=========================== --}}
+<script>
+document.addEventListener('click', function(e){
+
+    if (e.target.classList.contains('seleccionar-alumno')) {
+
+        let id     = e.target.dataset.id;
+        let nombre = e.target.dataset.nombre;
+        let curso  = e.target.dataset.curso;
+
+        document.getElementById('inputAlumnoSeleccionado').value = id;
+        document.getElementById('textoAlumnoSeleccionado').textContent =
+            `${nombre} (${curso})`;
+
+        bootstrap.Modal.getInstance(document.getElementById('modalBuscarAlumno')).hide();
+    }
+
+});
+</script>
+
+@endsection

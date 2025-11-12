@@ -12,6 +12,13 @@ use App\Http\Controllers\BitacoraIncidenteController;
 use App\Http\Controllers\BitacoraIncidenteObservacionController;
 use App\Http\Controllers\SeguimientoEmocionalController;
 use App\Http\Controllers\SeguimientoEmocionalObservacionController;
+use App\Http\Controllers\ProfesionalPieController;
+use App\Http\Controllers\EstudiantePieController;
+use App\Http\Controllers\IntervencionPieController;
+use App\Http\Controllers\InformePieController;
+use App\Http\Controllers\PlanIndividualPieController;
+use App\Http\Controllers\DerivacionPieController;
+use App\Http\Controllers\HistorialPieController;
 
 /*
 |--------------------------------------------------------------------------
@@ -214,6 +221,90 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | MÓDULO PIE – Programa de Integración Escolar
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('modulos/pie')->name('pie.')->group(function () {
+
+        /*
+        |----------------------------------------------------------------------
+        | PROFESIONALES PIE
+        |----------------------------------------------------------------------
+        */
+        Route::get('/profesionales', [ProfesionalPIEController::class, 'index'])->name('profesionales.index');
+        Route::get('/profesionales/create', [ProfesionalPIEController::class, 'create'])->name('profesionales.create');
+        Route::post('/profesionales', [ProfesionalPIEController::class, 'store'])->name('profesionales.store');
+        Route::get('/profesionales/{id}', [ProfesionalPIEController::class, 'show'])->name('profesionales.show');
+        Route::delete('/profesionales/{id}', [ProfesionalPIEController::class, 'destroy'])->name('profesionales.destroy');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | ESTUDIANTES PIE
+        |----------------------------------------------------------------------
+        */
+        Route::get('/estudiantes', [EstudiantePIEController::class, 'index'])->name('estudiantes.index');
+        Route::get('/estudiantes/create', [EstudiantePIEController::class, 'create'])->name('estudiantes.create');
+        Route::post('/estudiantes', [EstudiantePIEController::class, 'store'])->name('estudiantes.store');
+        Route::get('/estudiantes/{estudiantePIE}', [EstudiantePIEController::class, 'show'])->name('estudiantes.show');
+        Route::post('/pie/estudiantes/{estudiantePIE}/egresar', [EstudiantePIEController::class, 'egresar'])->name('estudiantes.egresar');
+
+        /*
+        |----------------------------------------------------------------------
+        | INTERVENCIONES PIE
+        |----------------------------------------------------------------------
+        */
+        Route::get('/intervenciones', [IntervencionPIEController::class, 'index'])->name('intervenciones.index');
+        Route::get('/intervenciones/create', [IntervencionPIEController::class, 'create'])->name('intervenciones.create');
+        Route::post('/intervenciones', [IntervencionPIEController::class, 'store'])->name('intervenciones.store');
+        Route::get('/intervenciones/{intervencionPIE}', [IntervencionPIEController::class, 'show'])->name('intervenciones.show');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | INFORMES PIE
+        |----------------------------------------------------------------------
+        */
+        Route::get('/informes', [InformePIEController::class, 'index'])->name('informes.index');
+        Route::get('/informes/create', [InformePIEController::class, 'create'])->name('informes.create');
+        Route::post('/informes', [InformePIEController::class, 'store'])->name('informes.store');
+        Route::get('/informes/{id}', [InformePIEController::class, 'show'])->name('informes.show');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | PLANES PIE
+        |----------------------------------------------------------------------
+        */
+        Route::get('/planes', [PlanIndividualPIEController::class, 'index'])->name('planes.index');
+        Route::get('/planes/create', [PlanIndividualPIEController::class, 'create'])->name('planes.create');
+        Route::post('/planes', [PlanIndividualPIEController::class, 'store'])->name('planes.store');
+        Route::get('/planes/{id}', [PlanIndividualPIEController::class, 'show'])->name('planes.show');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | DERIVACIONES PIE
+        |----------------------------------------------------------------------
+        */
+        Route::get('/derivaciones', [DerivacionPIEController::class, 'index'])->name('derivaciones.index');
+        Route::get('/derivaciones/create', [DerivacionPIEController::class, 'create'])->name('derivaciones.create');
+        Route::post('/derivaciones', [DerivacionPIEController::class, 'store'])->name('derivaciones.store');
+        Route::get('/derivaciones/{id}', [DerivacionPIEController::class, 'show'])->name('derivaciones.show');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | HISTORIAL PIE
+        |----------------------------------------------------------------------
+        */
+        Route::get('/historial/{estudiantePie}', [HistorialPieController::class, 'index'])->name('historial.index');
+        Route::get('/historial/detalle/{tipo}/{id}', [HistorialPieController::class, 'show'])->name('historial.show');
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
     | DUMMY ROUTES (SOLO LOS QUE AÚN NO EXISTEN)
     |--------------------------------------------------------------------------
     */
@@ -238,7 +329,6 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
     crudDummy('libro-novedades', 'libro-novedades');
     crudDummy('derivaciones', 'derivaciones');
     crudDummy('medidas-restaurativas', 'medidas-restaurativas');
-    crudDummy('pie', 'pie');
 
     // ADMIN
     crudDummy('roles', 'roles');

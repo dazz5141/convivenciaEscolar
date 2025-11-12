@@ -82,11 +82,51 @@
                 <span>Medidas Restaurativas</span>
             </a>
         </li>
-        <li>
-            <a href="/modulos/pie">
+        <li class="submenu">
+            <a href="#">
                 <i class="bi bi-clipboard2-pulse"></i>
                 <span>Módulo PIE</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
             </a>
+            <ul class="submenu-items">
+
+                <li>
+                    <a href="{{ route('pie.profesionales.index') }}">
+                        <i class="bi bi-people-fill"></i> Profesionales PIE
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('pie.estudiantes.index') }}">
+                        <i class="bi bi-person-badge"></i> Estudiantes PIE
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('pie.intervenciones.index') }}">
+                        <i class="bi bi-journal-medical"></i> Intervenciones PIE
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('pie.informes.index') }}">
+                        <i class="bi bi-file-earmark-text"></i> Informes PIE
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('pie.planes.index') }}">
+                        <i class="bi bi-clipboard-check"></i> Planes Individuales
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('pie.derivaciones.index') }}">
+                        <i class="bi bi-arrow-left-right"></i> Derivaciones PIE
+                    </a>
+                </li>
+
+            </ul>
         </li>
         <li>
             <a href="/modulos/alumnos">
