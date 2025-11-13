@@ -42,7 +42,14 @@
 
                 <div class="col-md-4">
                     <label class="form-label">Tipo de Informe</label>
-                    <input type="text" name="tipo" class="form-control" value="{{ request('tipo') }}">
+                    <select name="tipo" class="form-select">
+                        <option value="">-- Todos los tipos --</option>
+                        @foreach($tipos as $t)
+                            <option value="{{ $t }}" {{ request('tipo') == $t ? 'selected' : '' }}>
+                                {{ $t }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="col-md-4">
@@ -101,10 +108,10 @@
                                 <i class="bi bi-eye"></i>
                             </a>
 
-                            <a href="{{ route('pie.historial.show', ['tipo' => 'informe', 'id' => $informe->id]) }}"
+                            <a href="{{ route('pie.historial.show', ['tipo' => 'informe', 'id' => $i->id]) }}"
                                 class="btn btn-sm btn-secondary"
                                 title="Ver en historial">
-                                <i class="bi bi-clock-history"></i>
+                                 <i class="bi bi-clock-history"></i>
                             </a>
                         </td>
                     </tr>

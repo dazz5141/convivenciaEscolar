@@ -105,7 +105,7 @@
                                 <i class="bi bi-eye"></i>
                             </a>
 
-                            <a href="{{ route('pie.historial.show', ['tipo' => 'plan', 'id' => $plan->id]) }}"
+                            <a href="{{ route('pie.historial.show', ['tipo' => 'plan', 'id' => $p->id]) }}"
                                 class="btn btn-sm btn-secondary"
                                 title="Ver en historial">
                                 <i class="bi bi-clock-history"></i>

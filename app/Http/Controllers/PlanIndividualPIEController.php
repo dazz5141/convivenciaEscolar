@@ -77,13 +77,15 @@ class PlanIndividualPIEController extends Controller
     /**
      * Mostrar detalle del plan individual
      */
-    public function show(PlanIndividualPIE $planIndividualPIE)
+    public function show($id)
     {
-        $this->validarEstablecimiento($planIndividualPIE);
+        // Buscar manualmente el plan (evita el problema del model binding)
+        $planIndividualPIE = PlanIndividualPIE::with([
+            'estudiante.alumno.curso'
+        ])->findOrFail($id);
 
-        $planIndividualPIE->load([
-            'estudiante.alumno'
-        ]);
+        // Validar que el plan pertenezca al establecimiento actual
+        $this->validarEstablecimiento($planIndividualPIE);
 
         return view('modulos.pie.planes.show', compact('planIndividualPIE'));
     }
@@ -93,8 +95,20 @@ class PlanIndividualPIEController extends Controller
      */
     private function validarEstablecimiento($modelo)
     {
-        if ($modelo->establecimiento_id !== session('establecimiento_id')) {
-            abort(403, 'Acceso denegado.');
+        $establecimientoSesion = session('establecimiento_id');
+        $establecimientoModelo = $modelo->establecimiento_id ?? null;
+
+        if (!$establecimientoModelo) {
+            if (app()->environment('local')) {
+                \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
+                return;
+            } else {
+                abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
+            }
+        }
+
+        if ($establecimientoModelo != $establecimientoSesion) {
+            abort(403, 'Acceso denegado: el registro pertenece a otro establecimiento.');
         }
     }
 }

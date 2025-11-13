@@ -83,7 +83,13 @@ class DerivacionPIEController extends Controller
     {
         $this->validarEstablecimiento($derivacionPIE);
 
-        $derivacionPIE->load(['estudiante.alumno']);
+        // Cargar relaciones necesarias (anidado: estudiante -> alumno)
+        $derivacionPIE->load([
+            'estudiante.alumno'
+        ]);
+
+        // Alias corto para mantener compatibilidad con la vista
+        $derivacion = $derivacionPIE;
 
         return view('modulos.pie.derivaciones.show', compact('derivacionPIE'));
     }
@@ -93,8 +99,22 @@ class DerivacionPIEController extends Controller
      */
     private function validarEstablecimiento($modelo)
     {
-        if ($modelo->establecimiento_id !== session('establecimiento_id')) {
-            abort(403, 'Acceso denegado.');
+        $establecimientoSesion = session('establecimiento_id');
+        $establecimientoModelo = $modelo->establecimiento_id ?? null;
+
+        // Si no tiene establecimiento definido
+        if (!$establecimientoModelo) {
+            if (app()->environment('local')) {
+                \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
+                return;
+            } else {
+                abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
+            }
+        }
+
+        // Si pertenece a otro establecimiento
+        if ($establecimientoModelo != $establecimientoSesion) {
+            abort(403, 'Acceso denegado: el registro pertenece a otro establecimiento.');
         }
     }
 }

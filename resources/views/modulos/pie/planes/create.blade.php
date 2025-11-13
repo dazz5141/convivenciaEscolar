@@ -22,8 +22,8 @@
         <button type="button"
                 class="btn btn-outline-primary mb-3"
                 data-bs-toggle="modal"
-                data-bs-target="#modalBuscarAlumno">
-            <i class="bi bi-search"></i> Buscar Estudiante
+                data-bs-target="#modalBuscarAlumnoPIE">
+            <i class="bi bi-search"></i> Buscar Estudiante PIE
         </button>
 
         <input type="hidden" name="estudiante_pie_id" id="estudiante_pie_id" required>
@@ -103,8 +103,7 @@
 {{-- ===========================
     MODAL SOLO DE ALUMNO
 =========================== --}}
-@include('modulos.pie.partials.modal-buscar-alumno')
-
+@include('modulos.pie.partials.modal-buscar-estudiante-pie')
 
 
 {{-- ===========================
@@ -113,8 +112,10 @@
 <script>
 document.addEventListener('click', function(e) {
 
-    // Selección correcta del alumno
-    if (e.target.classList.contains('seleccionar-alumno')) {
+    // ============================
+    // Seleccionar Estudiante PIE
+    // ============================
+    if (e.target.classList.contains('seleccionar-estudiante-pie')) {
 
         let id = e.target.dataset.id;
         let nombre = e.target.dataset.nombre;
@@ -125,7 +126,9 @@ document.addEventListener('click', function(e) {
         document.getElementById('textoAlumnoSeleccionado').textContent =
             `${nombre} (${curso})`;
 
-        bootstrap.Modal.getInstance(document.getElementById('modalBuscarAlumno')).hide();
+        bootstrap.Modal.getInstance(
+            document.getElementById('modalBuscarAlumnoPIE')
+        ).hide();
     }
 
 });

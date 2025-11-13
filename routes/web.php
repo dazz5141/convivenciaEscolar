@@ -290,7 +290,7 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         Route::get('/derivaciones', [DerivacionPIEController::class, 'index'])->name('derivaciones.index');
         Route::get('/derivaciones/create', [DerivacionPIEController::class, 'create'])->name('derivaciones.create');
         Route::post('/derivaciones', [DerivacionPIEController::class, 'store'])->name('derivaciones.store');
-        Route::get('/derivaciones/{id}', [DerivacionPIEController::class, 'show'])->name('derivaciones.show');
+        Route::get('/derivaciones/{derivacionPIE}', [DerivacionPIEController::class, 'show'])->name('derivaciones.show');
 
 
         /*
@@ -298,7 +298,7 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         | HISTORIAL PIE
         |----------------------------------------------------------------------
         */
-        Route::get('/historial/{estudiantePie}', [HistorialPieController::class, 'index'])->name('historial.index');
+        Route::get('/historial/{estudiantePIE}', [HistorialPieController::class, 'index'])->name('historial.index');
         Route::get('/historial/detalle/{tipo}/{id}', [HistorialPieController::class, 'show'])->name('historial.show');
     });
 

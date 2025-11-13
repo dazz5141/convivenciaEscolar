@@ -6,17 +6,23 @@
 
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap mb-3">
     <div>
-        <h1 class="page-title">Derivación PIE #{{ $derivacion->id }}</h1>
+        <h1 class="page-title">Derivación PIE #{{ $derivacionPIE->id }}</h1>
         <p class="text-muted">Detalle completo de la derivación registrada</p>
     </div>
 
-    <a href="{{ route('pie.derivaciones.index') }}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left me-2"></i> Volver
-    </a>
+    <div class="d-flex gap-2 flex-wrap">
+        {{-- Volver --}}
+        <a href="{{ route('pie.derivaciones.index') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Volver
+        </a>
 
-    <a href="{{ route('pie.historial.index', $data->estudiante->id) }}" class="btn btn-outline-info">
-        <i class="bi bi-clock-history me-2"></i> Ver Historial PIE
-    </a>
+        {{-- Historial --}}
+        @if($derivacionPIE->estudiante)
+            <a href="{{ route('pie.historial.index', $derivacionPIE->estudiante->id) }}" class="btn btn-primary">
+                <i class="bi bi-clock-history me-1"></i> Historial
+            </a>
+        @endif
+    </div>
 </div>
 
 
@@ -34,20 +40,20 @@
             <div class="detail-item">
                 <div class="detail-label">Fecha:</div>
                 <div class="detail-value">
-                    {{ \Carbon\Carbon::parse($derivacion->fecha)->format('d/m/Y') }}
+                    {{ \Carbon\Carbon::parse($derivacionPIE->fecha)->format('d/m/Y') }}
                 </div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Destino:</div>
-                <div class="detail-value">{{ $derivacion->destino }}</div>
+                <div class="detail-value">{{ $derivacionPIE->destino }}</div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Estado:</div>
                 <div class="detail-value">
-                    <span class="badge bg-{{ $derivacion->estado == 'Cerrada' ? 'secondary' : ($derivacion->estado == 'En curso' ? 'info' : 'warning') }}">
-                        {{ $derivacion->estado ?? '—' }}
+                    <span class="badge bg-{{ $derivacionPIE->estado == 'Cerrada' ? 'secondary' : ($derivacionPIE->estado == 'En curso' ? 'info' : 'warning') }}">
+                        {{ $derivacionPIE->estado ?? '—' }}
                     </span>
                 </div>
             </div>
@@ -55,7 +61,7 @@
             <div class="detail-item">
                 <div class="detail-label">Motivo:</div>
                 <div class="detail-value">
-                    {!! nl2br(e($derivacion->motivo)) !!}
+                    {!! nl2br(e($derivacionPIE->motivo)) !!}
                 </div>
             </div>
         </div>
@@ -69,25 +75,25 @@
             <div class="detail-item">
                 <div class="detail-label">Nombre:</div>
                 <div class="detail-value">
-                    {{ $derivacion->estudiante->alumno->apellido_paterno }}
-                    {{ $derivacion->estudiante->alumno->apellido_materno }},
-                    {{ $derivacion->estudiante->alumno->nombre }}
+                    {{ $derivacionPIE->estudiante?->alumno?->apellido_paterno }}
+                    {{ $derivacionPIE->estudiante?->alumno?->apellido_materno }},
+                    {{ $derivacionPIE->estudiante?->alumno?->nombre }}
                 </div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Curso:</div>
                 <div class="detail-value">
-                    {{ $derivacion->estudiante->alumno->curso->nombre ?? '—' }}
+                    {{ $derivacionPIE->estudiante->alumno->curso->nombre ?? '—' }}
                 </div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Diagnóstico PIE:</div>
                 <div class="detail-value">
-                    {!! $derivacion->estudiante->diagnostico
-                        ? nl2br(e($derivacion->estudiante->diagnostico))
-                        : '<span class="text-muted">Sin diagnóstico registrado.</span>' !!}
+                    {!! $derivacionPIE->estudiante?->diagnostico
+                        ? nl2br(e($derivacionPIE->estudiante?->diagnostico))
+                            : '<span class="text-muted">Sin diagnóstico registrado.</span>' !!}
                 </div>
             </div>
 
@@ -111,24 +117,24 @@
 
                 <p class="mb-2">
                     <strong>Estudiante:</strong><br>
-                    {{ $derivacion->estudiante->alumno->apellido_paterno }}
-                    {{ $derivacion->estudiante->alumno->apellido_materno }},
-                    {{ $derivacion->estudiante->alumno->nombre }}
+                    {{ $derivacionPIE?->estudiante?->alumno?->apellido_paterno }}
+                    {{ $derivacionPIE?->estudiante?->alumno?->apellido_materno }},
+                    {{ $derivacionPIE?->estudiante?->alumno?->nombre }}
                 </p>
 
                 <p class="mb-2">
                     <strong>Fecha:</strong><br>
-                    {{ \Carbon\Carbon::parse($derivacion->fecha)->format('d/m/Y') }}
+                    {{ $derivacionPIE?->fecha ? \Carbon\Carbon::parse($derivacionPIE->fecha)->format('d/m/Y') : '—' }}
                 </p>
 
                 <p class="mb-2">
                     <strong>Destino:</strong><br>
-                    {{ $derivacion->destino }}
+                    {{ $derivacionPIE?->destino ?? '—' }}
                 </p>
 
                 <p class="mb-2">
                     <strong>Estado:</strong><br>
-                    {{ $derivacion->estado ?? '—' }}
+                    {{ $derivacionPIE?->estado ?? '—' }}
                 </p>
 
             </div>

@@ -25,7 +25,14 @@ class InformePIEController extends Controller
             ->with('alumno')
             ->get();
 
-        // Informes PIE filtrables
+        // Tipos de informe distintos (para el filtro)
+        $tipos = InformePIE::select('tipo')
+            ->distinct()
+            ->whereNotNull('tipo')
+            ->orderBy('tipo')
+            ->pluck('tipo');
+
+        // Filtrado
         $query = InformePIE::with(['estudiante.alumno'])
             ->where('establecimiento_id', $establecimiento_id);
 
@@ -33,9 +40,13 @@ class InformePIEController extends Controller
             $query->where('estudiante_pie_id', $request->estudiante_pie_id);
         }
 
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+
         $informes = $query->orderBy('fecha', 'desc')->paginate(20);
 
-        return view('modulos.pie.informes.index', compact('estudiantes', 'informes'));
+        return view('modulos.pie.informes.index', compact('estudiantes', 'informes', 'tipos'));
     }
 
     /**
@@ -43,7 +54,14 @@ class InformePIEController extends Controller
      */
     public function create($estudiante_pie_id = null)
     {
-        return view('modulos.pie.informes.create', compact('estudiante_pie_id'));
+        // 🔹 Obtener tipos de informe distintos ya usados
+        $tipos = InformePIE::select('tipo')
+            ->distinct()
+            ->whereNotNull('tipo')
+            ->orderBy('tipo')
+            ->pluck('tipo');
+
+        return view('modulos.pie.informes.create', compact('estudiante_pie_id', 'tipos'));
     }
 
     /**
@@ -79,22 +97,35 @@ class InformePIEController extends Controller
     /**
      * Mostrar informe PIE
      */
-    public function show(InformePIE $informePIE)
+    public function show($id)
     {
-        $this->validarEstablecimiento($informePIE);
+        $informePIE = InformePIE::with([
+            'estudiante.alumno.curso'
+        ])->findOrFail($id);
 
-        $informePIE->load(['estudiante.alumno']);
+        $this->validarEstablecimiento($informePIE);
 
         return view('modulos.pie.informes.show', compact('informePIE'));
     }
-
     /**
      * Validación de establecimiento
      */
     private function validarEstablecimiento($modelo)
     {
-        if ($modelo->establecimiento_id !== session('establecimiento_id')) {
-            abort(403, 'Acceso denegado.');
+        $establecimientoSesion = session('establecimiento_id');
+        $establecimientoModelo = $modelo->establecimiento_id ?? null;
+
+        if (!$establecimientoModelo) {
+            if (app()->environment('local')) {
+                \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
+                return;
+            } else {
+                abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
+            }
+        }
+
+        if ($establecimientoModelo != $establecimientoSesion) {
+            abort(403, 'Acceso denegado: el registro pertenece a otro establecimiento.');
         }
     }
 }

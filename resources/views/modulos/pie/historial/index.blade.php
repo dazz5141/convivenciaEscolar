@@ -71,7 +71,7 @@
                     'fecha' => $i->fecha,
                     'tipo' => 'Intervención',
                     'detalle' => $i->detalle,
-                    'extra' => $i->profesional->nombreCompleto() ?? 'Sin profesional',
+                    'extra' => $i->profesional->nombre_Completo ?? 'Sin profesional',
                 ];
             }
 

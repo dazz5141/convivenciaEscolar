@@ -21,15 +21,16 @@
         <button type="button"
                 class="btn btn-outline-primary mb-3"
                 data-bs-toggle="modal"
-                data-bs-target="#modalBuscarAlumno">
-            <i class="bi bi-search"></i> Buscar Estudiante
+                data-bs-target="#modalBuscarAlumnoPIE">
+            <i class="bi bi-search"></i> Buscar Estudiante PIE
         </button>
 
-        <input type="hidden" name="estudiante_pie_id" id="inputAlumnoSeleccionado" required>
+        <input type="hidden" name="estudiante_pie_id" id="estudiante_pie_id" required>
 
-        <p class="fw-bold" id="textoAlumnoSeleccionado">
+        <p class="fw-bold" id="textoAlumnoSeleccionado" style="min-height: 22px;">
             No se ha seleccionado estudiante.
         </p>
+
     </div>
 
     {{-- =============================
@@ -97,7 +98,7 @@
 {{-- ===========================
     MODAL SOLO DE ALUMNOS
 =========================== --}}
-@include('modulos.pie.partials.modal-buscar-alumno')
+@include('modulos.pie.partials.modal-buscar-estudiante-pie')
 
 {{-- ===========================
     JS PARA SELECCIÓN DE ALUMNO
@@ -105,17 +106,16 @@
 <script>
 document.addEventListener('click', function(e){
 
-    if (e.target.classList.contains('seleccionar-alumno')) {
+    if (e.target.classList.contains('seleccionar-estudiante-pie')) {
 
         let id     = e.target.dataset.id;
         let nombre = e.target.dataset.nombre;
         let curso  = e.target.dataset.curso;
 
-        document.getElementById('inputAlumnoSeleccionado').value = id;
-        document.getElementById('textoAlumnoSeleccionado').textContent =
-            `${nombre} (${curso})`;
+        document.getElementById('estudiante_pie_id').value = id;
+        document.getElementById('textoAlumnoSeleccionado').textContent =`${nombre} (${curso})`;
 
-        bootstrap.Modal.getInstance(document.getElementById('modalBuscarAlumno')).hide();
+        bootstrap.Modal.getInstance(document.getElementById('modalBuscarAlumnoPIE')).hide();
     }
 
 });

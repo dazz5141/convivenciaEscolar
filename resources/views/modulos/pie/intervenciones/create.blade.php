@@ -133,7 +133,7 @@
      INCLUIR MODALES
 ========================================================= --}}
 @include('modulos.pie.partials.modal-buscar-estudiante-pie')
-@include('modulos.pie.partials.modal-buscar-profesional-pie') {{-- ✅ LA NUEVA MODAL --}}
+@include('modulos.pie.partials.modal-buscar-profesional-pie') 
 
 
 {{-- =========================================================

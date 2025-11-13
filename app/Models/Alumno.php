@@ -69,7 +69,7 @@ class Alumno extends Model
         return $this->hasMany(BitacoraIncidente::class);
     }
 
-    // NUEVA: Relación muchos-a-muchos REAL
+    // Relación muchos-a-muchos REAL
     public function incidentes()
     {
         return $this->belongsToMany(BitacoraIncidente::class, 'bitacora_incidente_alumno', 'alumno_id', 'incidente_id')
@@ -120,5 +120,14 @@ class Alumno extends Model
     public function testigoEn()
     {
         return $this->incidentes()->wherePivot('rol', 'testigo');
+    }
+
+    // -------------------------------
+    // RELACIONES PIE
+    // -------------------------------
+
+    public function estudiantePIE()
+    {
+        return $this->hasOne(EstudiantePIE::class, 'alumno_id');
     }
 }

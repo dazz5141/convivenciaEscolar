@@ -24,7 +24,7 @@ class HistorialPieController extends Controller
             'derivaciones',
         ]);
 
-        return view('modulos.pie.historial.index', compact('estudiantePIE'));
+        return view('modulos.pie.historial.index', ['estudiantePie' => $estudiantePIE]);
     }
 
     /**

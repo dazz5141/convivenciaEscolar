@@ -37,6 +37,11 @@ class ProfesionalPIE extends Model
         return $this->hasMany(IntervencionPIE::class, 'profesional_id');
     }
 
+    public function cargo()
+    {
+        return $this->hasOneThrough(Cargo::class, Funcionario::class, 'id', 'id', 'funcionario_id', 'cargo_id');
+    }
+
     public function getNombreCompletoAttribute()
     {
         if (!$this->funcionario) {

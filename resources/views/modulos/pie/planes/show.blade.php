@@ -6,17 +6,23 @@
 
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div>
-        <h1 class="page-title">Plan Individual PIE #{{ $plan->id }}</h1>
+        <h1 class="page-title">Plan Individual PIE #{{ $planIndividualPIE->id }}</h1>
         <p class="text-muted">Detalle completo del plan individual</p>
     </div>
 
-    <a href="{{ route('pie.planes.index') }}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left me-2"></i> Volver
-    </a>
+    <div class="d-flex gap-2 flex-wrap">
+        {{-- Volver --}}
+        <a href="{{ route('pie.planes.index') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Volver
+        </a>
 
-    <a href="{{ route('pie.historial.index', $data->estudiante->id) }}" class="btn btn-outline-info">
-        <i class="bi bi-clock-history me-1"></i> Volver al Historial
-    </a>
+        {{-- Historial --}}
+        @if($planIndividualPIE->estudiante)
+            <a href="{{ route('pie.historial.index', $planIndividualPIE->estudiante->id) }}" class="btn btn-primary">
+                <i class="bi bi-clock-history me-1"></i> Historial
+            </a>
+        @endif
+    </div>
 </div>
 
 
@@ -34,29 +40,29 @@
             <div class="detail-item">
                 <div class="detail-label">Fecha Inicio:</div>
                 <div class="detail-value">
-                    {{ \Carbon\Carbon::parse($plan->fecha_inicio)->format('d/m/Y') }}
+                    {{ \Carbon\Carbon::parse($planIndividualPIE->fecha_inicio)->format('d/m/Y') }}
                 </div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Fecha Término:</div>
                 <div class="detail-value">
-                    {{ $plan->fecha_termino
-                        ? \Carbon\Carbon::parse($plan->fecha_termino)->format('d/m/Y')
+                    {{ $planIndividualPIE->fecha_termino
+                        ? \Carbon\Carbon::parse($planIndividualPIE->fecha_termino)->format('d/m/Y')
                         : '—' }}
                 </div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Objetivos:</div>
-                <div class="detail-value">{!! nl2br(e($plan->objetivos)) !!}</div>
+                <div class="detail-value">{!! nl2br(e($planIndividualPIE->objetivos)) !!}</div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Evaluación:</div>
                 <div class="detail-value">
-                    {!! $plan->evaluacion
-                        ? nl2br(e($plan->evaluacion))
+                    {!! $planIndividualPIE->evaluacion
+                        ? nl2br(e($planIndividualPIE->evaluacion))
                         : '<span class="text-muted">Sin evaluación registrada.</span>' !!}
                 </div>
             </div>
@@ -72,25 +78,29 @@
             <div class="detail-item">
                 <div class="detail-label">Nombre:</div>
                 <div class="detail-value">
-                    {{ $plan->estudiante->alumno->apellido_paterno }}
-                    {{ $plan->estudiante->alumno->apellido_materno }},
-                    {{ $plan->estudiante->alumno->nombre }}
+                    @if($planIndividualPIE->estudiante && $planIndividualPIE->estudiante->alumno)
+                        {{ $planIndividualPIE->estudiante->alumno->apellido_paterno }}
+                        {{ $planIndividualPIE->estudiante->alumno->apellido_materno }},
+                        {{ $planIndividualPIE->estudiante->alumno->nombre }}
+                    @else
+                        <span class="text-muted">Sin información del alumno.</span>
+                    @endif
                 </div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Curso:</div>
                 <div class="detail-value">
-                    {{ $plan->estudiante->alumno->curso->nombre ?? '—' }}
+                    {{ $planIndividualPIE->estudiante->alumno->curso->nombre ?? '—' }}
                 </div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Diagnóstico PIE:</div>
                 <div class="detail-value">
-                    {!! $plan->estudiante->diagnostico
-                        ? nl2br(e($plan->estudiante->diagnostico))
-                        : '<span class="text-muted">Sin diagnóstico registrado.</span>' !!}
+                    {!! $planIndividualPIE->estudiante?->diagnostico
+                        ? nl2br(e($planIndividualPIE->estudiante?->diagnostico))
+                            : '<span class="text-muted">Sin diagnóstico registrado.</span>' !!}
                 </div>
             </div>
         </div>
@@ -112,20 +122,20 @@
 
                 <p class="mb-2">
                     <strong>Estudiante:</strong><br>
-                    {{ $plan->estudiante->alumno->apellido_paterno }}
-                    {{ $plan->estudiante->alumno->apellido_materno }},
-                    {{ $plan->estudiante->alumno->nombre }}
+                    {{ $planIndividualPIE->estudiante?->alumno?->apellido_paterno }}
+                    {{ $planIndividualPIE->estudiante?->alumno?->apellido_materno }},
+                    {{ $planIndividualPIE->estudiante?->alumno?->nombre ?? '—' }}
                 </p>
 
                 <p class="mb-2">
                     <strong>Inicio:</strong><br>
-                    {{ \Carbon\Carbon::parse($plan->fecha_inicio)->format('d/m/Y') }}
+                    {{ \Carbon\Carbon::parse($planIndividualPIE->fecha_inicio)->format('d/m/Y') }}
                 </p>
 
                 <p class="mb-2">
                     <strong>Término:</strong><br>
-                    {{ $plan->fecha_termino
-                        ? \Carbon\Carbon::parse($plan->fecha_termino)->format('d/m/Y')
+                    {{ $planIndividualPIE->fecha_termino
+                        ? \Carbon\Carbon::parse($planIndividualPIE->fecha_termino)->format('d/m/Y')
                         : '—' }}
                 </p>
 

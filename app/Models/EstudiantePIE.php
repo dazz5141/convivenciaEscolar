@@ -51,6 +51,10 @@ class EstudiantePIE extends Model
         return $this->hasMany(DerivacionPIE::class, 'estudiante_pie_id');
     }
 
+    // -------------------------------
+    // RELACIÓN PIE
+    // -------------------------------
+
     public function informes()
     {
         return $this->hasMany(InformePIE::class, 'estudiante_pie_id');

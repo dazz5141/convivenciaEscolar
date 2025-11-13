@@ -19,8 +19,16 @@ class InformePIE extends Model
         'contenido',
     ];
 
+    protected $casts = [
+        'fecha' => 'date',
+    ];
+
+    // -------------------------------
+    // RELACIÓN PIE
+    // -------------------------------
+
     public function estudiante()
     {
-        return $this->belongsTo(EstudiantePIE::class, 'estudiante_pie_id');
+        return $this->belongsTo(EstudiantePIE::class, 'estudiante_pie_id', 'id');
     }
 }
