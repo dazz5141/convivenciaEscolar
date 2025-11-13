@@ -325,8 +325,13 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
     crudDummy('denuncia-ley-karin', 'denuncia-ley-karin');
     crudDummy('accidentes', 'accidentes');
     crudDummy('retiros', 'retiros');
-    crudDummy('atrasos-asistencia', 'atrasos-asistencia');
-    crudDummy('libro-novedades', 'libro-novedades');
+
+    // Sidebar usa /modulos/atrasos → debe coincidir
+    crudDummy('atrasos', 'atrasos-asistencia');
+
+    // Sidebar usa /modulos/novedades → debe coincidir
+    crudDummy('novedades', 'libro-novedades');
+
     crudDummy('derivaciones', 'derivaciones');
     crudDummy('medidas-restaurativas', 'medidas-restaurativas');
 

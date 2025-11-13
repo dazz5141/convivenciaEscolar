@@ -385,3 +385,23 @@ body {
 .card-table table {
   margin-bottom: 0;
 }
+
+/* Submenu styles */
+.submenu .submenu-items {
+    display: none;
+    padding-left: 35px;
+}
+
+.submenu.open .submenu-items {
+    display: block;
+}
+
+.toggle-icon {
+    margin-left: auto;
+    transition: transform .25s ease;
+}
+
+.submenu.open .toggle-icon {
+    transform: rotate(180deg);
+}
+
