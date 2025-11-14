@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
         $this->call(TiposProfesionalPIESeeder::class);
         $this->call(TiposIntervencionPIESeeder::class);
         $this->call(EstadoSeguimientoEmocionalSeeder::class);
+        $this->call(TiposNovedadInspectoriaSeeder::class);
 
         // Roles
         $this->call(RolesSeeder::class);

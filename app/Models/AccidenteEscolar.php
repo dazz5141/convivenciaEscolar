@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Usuario;
 
 class AccidenteEscolar extends Model
 {
@@ -23,6 +24,10 @@ class AccidenteEscolar extends Model
         'establecimiento_id'
     ];
 
+    protected $casts = [
+        'fecha' => 'datetime',
+    ];
+
     public function alumno()
     {
         return $this->belongsTo(Alumno::class);
@@ -36,6 +41,11 @@ class AccidenteEscolar extends Model
     public function funcionario()
     {
         return $this->belongsTo(Funcionario::class, 'registrado_por');
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'registrado_por');
     }
 
     public function scopeDelColegio($query, $id)

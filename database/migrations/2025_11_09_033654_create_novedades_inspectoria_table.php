@@ -37,8 +37,11 @@ return new class extends Migration
             $table->foreign('establecimiento_id')->references('id')->on('establecimientos')
                 ->onUpdate('cascade')->onDelete('restrict');
 
-            $table->foreign('tipo_novedad_id')->references('id')->on('tipos_novedad')
-                ->onUpdate('cascade')->onDelete('restrict');
+            $table->foreign('tipo_novedad_id')
+                ->references('id')
+                ->on('tipos_novedad_inspectoria')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
 
             // Index para dashboards
             $table->index('establecimiento_id');

@@ -19,6 +19,11 @@ use App\Http\Controllers\InformePieController;
 use App\Http\Controllers\PlanIndividualPieController;
 use App\Http\Controllers\DerivacionPieController;
 use App\Http\Controllers\HistorialPieController;
+use App\Http\Controllers\AccidenteEscolarController;
+use App\Http\Controllers\CitacionApoderadoController;
+use App\Http\Controllers\NovedadInspectoriaController;
+use App\Http\Controllers\AsistenciaEventoController;
+use App\Http\Controllers\RetiroAnticipadoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -302,6 +307,76 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         Route::get('/historial/detalle/{tipo}/{id}', [HistorialPieController::class, 'show'])->name('historial.show');
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | MÓDULO INSPECTORÍA – Gestión Interna del Colegio
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('modulos/inspectoria')->name('inspectoria.')->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOVEDADES DE INSPECTORÍA
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/novedades', [NovedadInspectoriaController::class, 'index'])->name('novedades.index');
+        Route::get('/novedades/create', [NovedadInspectoriaController::class, 'create'])->name('novedades.create');
+        Route::post('/novedades', [NovedadInspectoriaController::class, 'store'])->name('novedades.store');
+        Route::get('/novedades/{novedad}/edit', [NovedadInspectoriaController::class, 'edit'])->name('novedades.edit');
+        Route::put('/novedades/{novedad}', [NovedadInspectoriaController::class, 'update'])->name('novedades.update');
+        Route::get('/novedades/{novedad}', [NovedadInspectoriaController::class, 'show'])->name('novedades.show');
+
+        /*
+        |--------------------------------------------------------------------------
+        | ASISTENCIA / ATRASOS
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/asistencia', [AsistenciaEventoController::class, 'index'])->name('asistencia.index');
+        Route::get('/asistencia/create', [AsistenciaEventoController::class, 'create'])->name('asistencia.create');
+        Route::post('/asistencia', [AsistenciaEventoController::class, 'store'])->name('asistencia.store');
+        Route::get('/asistencia/{evento}', [AsistenciaEventoController::class, 'show'])->name('asistencia.show');
+        Route::get('/asistencia/{evento}/edit', [AsistenciaEventoController::class, 'edit'])->name('asistencia.edit');
+        Route::put('/asistencia/{evento}', [AsistenciaEventoController::class, 'update'])->name('asistencia.update');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETIROS ANTICIPADOS
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/retiros', [RetiroAnticipadoController::class, 'index'])->name('retiros.index');
+        Route::get('/retiros/create', [RetiroAnticipadoController::class, 'create'])->name('retiros.create');
+        Route::post('/retiros', [RetiroAnticipadoController::class, 'store'])->name('retiros.store');
+        Route::get('/retiros/{retiro}', [RetiroAnticipadoController::class, 'show'])->name('retiros.show');
+        Route::get('/retiros/{retiro}/edit', [RetiroAnticipadoController::class, 'edit'])->name('retiros.edit');
+        Route::put('/retiros/{retiro}', [RetiroAnticipadoController::class, 'update'])->name('retiros.update');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ACCIDENTES ESCOLARES
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/accidentes', [AccidenteEscolarController::class, 'index'])->name('accidentes.index');
+        Route::get('/accidentes/create', [AccidenteEscolarController::class, 'create'])->name('accidentes.create');
+        Route::post('/accidentes', [AccidenteEscolarController::class, 'store'])->name('accidentes.store');
+        Route::get('/accidentes/{accidente}', [AccidenteEscolarController::class, 'show'])->name('accidentes.show');
+        Route::get('/accidentes/{accidente}/edit', [AccidenteEscolarController::class, 'edit'])->name('accidentes.edit');
+        Route::put('/accidentes/{accidente}', [AccidenteEscolarController::class, 'update'])->name('accidentes.update');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CITACIONES A APODERADOS
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/citaciones', [CitacionApoderadoController::class, 'index'])->name('citaciones.index');
+        Route::get('/citaciones/create', [CitacionApoderadoController::class, 'create'])->name('citaciones.create');
+        Route::post('/citaciones', [CitacionApoderadoController::class, 'store'])->name('citaciones.store');
+        Route::get('/citaciones/{citacion}', [CitacionApoderadoController::class, 'show'])->name('citaciones.show');
+        Route::get('/citaciones/{citacion}/edit', [CitacionApoderadoController::class, 'edit'])->name('citaciones.edit');
+        Route::put('/citaciones/{citacion}', [CitacionApoderadoController::class, 'update'])->name('citaciones.update');
+    });
 
     /*
     |--------------------------------------------------------------------------
@@ -319,18 +394,9 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
     }
 
     // PRINCIPALES
-    crudDummy('citaciones', 'citaciones');
     crudDummy('conflicto-apoderado', 'conflicto-apoderado');
     crudDummy('conflicto-funcionario', 'conflicto-funcionario');
     crudDummy('denuncia-ley-karin', 'denuncia-ley-karin');
-    crudDummy('accidentes', 'accidentes');
-    crudDummy('retiros', 'retiros');
-
-    // Sidebar usa /modulos/atrasos → debe coincidir
-    crudDummy('atrasos', 'atrasos-asistencia');
-
-    // Sidebar usa /modulos/novedades → debe coincidir
-    crudDummy('novedades', 'libro-novedades');
 
     crudDummy('derivaciones', 'derivaciones');
     crudDummy('medidas-restaurativas', 'medidas-restaurativas');

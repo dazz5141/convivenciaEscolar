@@ -53,4 +53,13 @@ class Usuario extends Authenticatable
     {
         return $query->where('activo', 1);
     }
+
+    public function getNombreCompletoAttribute()
+    {
+        $nombre = $this->nombre ?? '';
+        $ap = $this->apellido_paterno ?? '';
+        $am = $this->apellido_materno ?? '';
+
+        return trim("$nombre $ap $am");
+    }
 }

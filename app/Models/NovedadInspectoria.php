@@ -38,7 +38,7 @@ class NovedadInspectoria extends Model
 
     public function tipo()
     {
-        return $this->belongsTo(TipoNovedad::class, 'tipo_novedad_id');
+        return $this->belongsTo(TipoNovedadInspectoria::class, 'tipo_novedad_id');
     }
 
     public function scopeDelColegio($query, $id)

@@ -130,4 +130,15 @@ class Alumno extends Model
     {
         return $this->hasOne(EstudiantePIE::class, 'alumno_id');
     }
+
+    /*
+    |-------------
+    | ACCESORES
+    |-------------
+    */
+
+    public function getNombreCompletoAttribute()
+    {
+        return trim("{$this->apellido_paterno} {$this->apellido_materno}, {$this->nombre}");
+    }
 }

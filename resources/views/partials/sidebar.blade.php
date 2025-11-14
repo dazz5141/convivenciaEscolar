@@ -57,11 +57,35 @@
             </a>
 
             <ul class="submenu-items">
-                <li><a href="/modulos/novedades"><i class="bi bi-book"></i> Libro de Novedades</a></li>
-                <li><a href="/modulos/atrasos"><i class="bi bi-clock-history"></i> Atrasos / Asistencia</a></li>
-                <li><a href="/modulos/retiros"><i class="bi bi-door-open"></i> Retiros Anticipados</a></li>
-                <li><a href="/modulos/accidentes"><i class="bi bi-bandaid"></i> Accidentes Escolares</a></li>
-                <li><a href="/modulos/citaciones"><i class="bi bi-calendar-check"></i> Citaciones Apoderados</a></li>
+                <li>
+                    <a href="{{ route('inspectoria.novedades.index') }}">
+                        <i class="bi bi-book"></i> Libro de Novedades
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('inspectoria.asistencia.index') }}">
+                        <i class="bi bi-clock-history"></i> Atrasos / Asistencia
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('inspectoria.retiros.index') }}">
+                        <i class="bi bi-door-open"></i> Retiros Anticipados
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('inspectoria.accidentes.index') }}">
+                        <i class="bi bi-bandaid"></i> Accidentes Escolares
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('inspectoria.citaciones.index') }}">
+                        <i class="bi bi-calendar-check"></i> Citaciones Apoderados
+                    </a>
+                </li>
             </ul>
         </li>
 
