@@ -24,6 +24,9 @@ use App\Http\Controllers\CitacionApoderadoController;
 use App\Http\Controllers\NovedadInspectoriaController;
 use App\Http\Controllers\AsistenciaEventoController;
 use App\Http\Controllers\RetiroAnticipadoController;
+use App\Http\Controllers\ConflictoFuncionarioController;
+use App\Http\Controllers\ConflictoApoderadoController;
+use App\Http\Controllers\DenunciaLeyKarinController;
 
 /*
 |--------------------------------------------------------------------------
@@ -380,6 +383,27 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | MÓDULO LEY KARIN – Conflictos y Denuncias
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('modulos/ley-karin')->name('leykarin.')->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONFLICTO ENTRE FUNCIONARIOS
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/conflictos-funcionarios', [ConflictoFuncionarioController::class, 'index'])->name('conflictos-funcionarios.index');
+        Route::get('/conflictos-funcionarios/create', [ConflictoFuncionarioController::class, 'create'])->name('conflictos-funcionarios.create');
+        Route::post('/conflictos-funcionarios', [ConflictoFuncionarioController::class, 'store'])->name('conflictos-funcionarios.store');
+        Route::get('/conflictos-funcionarios/{conflictoFuncionario}', [ConflictoFuncionarioController::class, 'show'])->name('conflictos-funcionarios.show');
+        Route::get('/conflictos-funcionarios/{conflictoFuncionario}/edit', [ConflictoFuncionarioController::class, 'edit'])->name('conflictos-funcionarios.edit');
+        Route::put('/conflictos-funcionarios/{conflictoFuncionario}', [ConflictoFuncionarioController::class, 'update'])->name('conflictos-funcionarios.update');
+
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | DUMMY ROUTES (SOLO LOS QUE AÚN NO EXISTEN)
     |--------------------------------------------------------------------------
     */
@@ -395,8 +419,6 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
     // PRINCIPALES
     crudDummy('conflicto-apoderado', 'conflicto-apoderado');
-    crudDummy('conflicto-funcionario', 'conflicto-funcionario');
-    crudDummy('denuncia-ley-karin', 'denuncia-ley-karin');
 
     crudDummy('derivaciones', 'derivaciones');
     crudDummy('medidas-restaurativas', 'medidas-restaurativas');

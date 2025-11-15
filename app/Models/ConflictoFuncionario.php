@@ -13,25 +13,33 @@ class ConflictoFuncionario extends Model
 
     protected $fillable = [
         'fecha',
-        'denunciante_id',
-        'denunciado_id',
+        'funcionario_1_id',
+        'funcionario_2_id',
+        'registrado_por_id',
         'tipo_conflicto',
+        'lugar_conflicto',
         'descripcion',
-        'accion_tomada',
+        'acuerdos_previos',
         'estado_id',
         'confidencial',
         'derivado_ley_karin',
-        'establecimiento_id'
+        'establecimiento_id',
     ];
 
-    public function denunciante()
+    // Relaciones
+    public function funcionario1()
     {
-        return $this->belongsTo(Funcionario::class, 'denunciante_id');
+        return $this->belongsTo(Funcionario::class, 'funcionario_1_id');
     }
 
-    public function denunciado()
+    public function funcionario2()
     {
-        return $this->belongsTo(Funcionario::class, 'denunciado_id');
+        return $this->belongsTo(Funcionario::class, 'funcionario_2_id');
+    }
+
+    public function registradoPor()
+    {
+        return $this->belongsTo(Usuario::class, 'registrado_por_id');
     }
 
     public function estado()
@@ -39,9 +47,10 @@ class ConflictoFuncionario extends Model
         return $this->belongsTo(EstadoConflictoFuncionario::class, 'estado_id');
     }
 
-    public function denunciasLeyKarin()
+    // Relación futura con Denuncias Ley Karin
+    public function denunciaLeyKarin()
     {
-        return $this->morphMany(DenunciaLeyKarin::class, 'conflictable');
+        return $this->hasOne(DenunciaLeyKarin::class, 'conflicto_funcionario_id');
     }
 
     public function scopeDelColegio($q, $id)

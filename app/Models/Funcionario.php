@@ -76,6 +76,11 @@ class Funcionario extends Model
         return $this->belongsTo(Comuna::class, 'comuna_id');
     }
 
+    public function scopeDelColegio($query, $id)
+    {
+        return $query->where('establecimiento_id', $id);
+    }
+
     public function getNombreCompletoAttribute()
     {
         return trim("{$this->nombre} {$this->apellido_paterno} {$this->apellido_materno}");

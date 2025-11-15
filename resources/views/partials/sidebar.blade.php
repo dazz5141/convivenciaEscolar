@@ -101,9 +101,25 @@
             </a>
 
             <ul class="submenu-items">
-                <li><a href="/modulos/conflicto-apoderado"><i class="bi bi-people"></i> Conflicto Apoderado</a></li>
-                <li><a href="/modulos/conflicto-funcionario"><i class="bi bi-person-badge"></i> Conflicto Funcionario</a></li>
-                <li><a href="/modulos/denuncia-ley-karin"><i class="bi bi-exclamation-triangle"></i> Denuncias Ley Karin</a></li>
+
+                {{-- <li>
+                <a href="{{ route('leykarin.conflictos-apoderados.index') }}">
+                    <i class="bi bi-people"></i> Conflictos Apoderados
+                </a>
+            </li> --}}
+
+                <li>
+                    <a href="{{ route('leykarin.conflictos-funcionarios.index') }}">
+                        <i class="bi bi-person-badge"></i> Conflictos Funcionarios
+                    </a>
+                </li>
+
+                {{-- <li>
+                    <a href="{{ route('leykarin.denuncias.index') }}">
+                        <i class="bi bi-exclamation-triangle"></i> Denuncias Ley Karin
+                    </a>
+                </li> --}}
+
             </ul>
         </li>
 

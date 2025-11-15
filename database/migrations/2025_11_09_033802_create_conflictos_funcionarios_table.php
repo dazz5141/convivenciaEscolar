@@ -14,12 +14,19 @@ return new class extends Migration
             $table->unsignedBigInteger('establecimiento_id');
 
             $table->date('fecha')->nullable();
-            $table->unsignedBigInteger('denunciante_id');
-            $table->unsignedBigInteger('denunciado_id');
+
+            // Funcionarios involucrados
+            $table->unsignedBigInteger('funcionario_1_id');
+            $table->unsignedBigInteger('funcionario_2_id');
+
+            // Quien registra el caso
+            $table->unsignedBigInteger('registrado_por_id');
 
             $table->string('tipo_conflicto', 100)->nullable();
+            $table->string('lugar_conflicto', 150)->nullable();
+
             $table->text('descripcion')->nullable();
-            $table->text('accion_tomada')->nullable();
+            $table->text('acuerdos_previos')->nullable();
 
             $table->unsignedBigInteger('estado_id')->nullable();
             $table->boolean('confidencial')->default(0);
@@ -31,10 +38,14 @@ return new class extends Migration
             $table->foreign('establecimiento_id')->references('id')->on('establecimientos')
                 ->onUpdate('cascade')->onDelete('restrict');
 
-            $table->foreign('denunciante_id')->references('id')->on('funcionarios')
+            $table->foreign('funcionario_1_id')->references('id')->on('funcionarios')
                 ->onUpdate('cascade')->onDelete('restrict');
 
-            $table->foreign('denunciado_id')->references('id')->on('funcionarios')
+            $table->foreign('funcionario_2_id')->references('id')->on('funcionarios')
+                ->onUpdate('cascade')->onDelete('restrict');
+
+            // REGISTRADO POR → USUARIOS
+            $table->foreign('registrado_por_id')->references('id')->on('usuarios')
                 ->onUpdate('cascade')->onDelete('restrict');
 
             $table->foreign('estado_id')->references('id')->on('estados_conflicto_funcionario')
