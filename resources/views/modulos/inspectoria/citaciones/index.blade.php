@@ -1,150 +1,210 @@
 @extends('layouts.app')
 
-@section('title', 'Citaciones de Apoderados')
+@section('title', 'Citaciones a Apoderados')
 
 @section('content')
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div class="mb-3 mb-md-0">
-        <h1 class="page-title">Citaciones de Apoderados</h1>
-        <p class="text-muted">Gestión y seguimiento de citaciones a apoderados</p>
+        <h1 class="page-title">Citaciones a Apoderados</h1>
+        <p class="text-muted">Registro general de citaciones realizadas por Inspectoría</p>
     </div>
+
     <div>
-        <a href="/modulos/citaciones/create" class="btn btn-primary">
+        <a href="{{ route('inspectoria.citaciones.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>
-            Nueva Citación
+            Registrar Citación
         </a>
     </div>
 </div>
 
 <div class="card card-table">
+
+    {{-- FILTROS --}}
     <div class="card-header">
-        <div class="row g-3">
-            <div class="col-12 col-md-4">
-                <input type="text" class="form-control" placeholder="Buscar por apoderado o alumno...">
+        <form method="GET" action="{{ route('inspectoria.citaciones.index') }}">
+            <div class="row g-3">
+
+                {{-- Filtro por alumno --}}
+                <div class="col-12 col-md-4">
+
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control"
+                               id="inputAlumnoSeleccionado"
+                               value="{{ $alumnoSeleccionado->nombre_completo ?? '' }}"
+                               placeholder="Seleccione un alumno..."
+                               readonly>
+
+                        <button type="button"
+                                class="btn btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalBuscarAlumno">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="alumno_id" id="alumno_id"
+                           value="{{ request('alumno_id') }}">
+                </div>
+
+                {{-- Modal Alumno --}}
+                @include('modulos.inspectoria.partials.modal-buscar-alumno')
+
+                {{-- Estado --}}
+                <div class="col-12 col-md-3">
+                    <select name="estado" class="form-select">
+                        <option value="">Estado</option>
+                        @foreach($estados as $e)
+                            <option value="{{ $e->id }}"
+                                {{ request('estado') == $e->id ? 'selected' : '' }}>
+                                {{ $e->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Fecha --}}
+                <div class="col-12 col-md-3">
+                    <input type="date"
+                           name="fecha"
+                           value="{{ request('fecha') }}"
+                           class="form-control">
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <button class="btn btn-secondary w-100">
+                        <i class="bi bi-funnel me-2"></i>Filtrar
+                    </button>
+                </div>
+
             </div>
-            <div class="col-12 col-md-3">
-                <select class="form-select">
-                    <option value="">Todos los estados</option>
-                    <option>Pendiente</option>
-                    <option>Confirmada</option>
-                    <option>Realizada</option>
-                    <option>Cancelada</option>
-                </select>
-            </div>
-            <div class="col-12 col-md-3">
-                <input type="date" class="form-control" placeholder="Fecha">
-            </div>
-            <div class="col-12 col-md-2">
-                <button class="btn btn-secondary w-100">
-                    <i class="bi bi-funnel me-2"></i>Filtrar
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
+
+    {{-- TABLA --}}
     <div class="card-body">
+        @if($citaciones->count() == 0)
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-info-circle fs-2"></i>
+                <p class="mt-2">No hay citaciones registradas</p>
+            </div>
+        @else
+
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover align-middle">
                 <thead>
                     <tr>
                         <th>Fecha</th>
-                        <th>Hora</th>
-                        <th>Apoderado</th>
-                        <th>Alumno</th>
+                        <th>Alumno / Curso</th>
+                        <th>Apoderado Citado</th>
                         <th>Motivo</th>
                         <th>Estado</th>
+                        <th>Funcionario</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
-                    <tr>
-                        <td>10/11/2025</td>
-                        <td>15:00</td>
-                        <td>Rosa Fernández</td>
-                        <td>Javier Fernández - 3° Básico A</td>
-                        <td>Rendimiento académico</td>
-                        <td><span class="badge bg-warning">Pendiente</span></td>
-                        <td class="table-actions">
-                            <a href="/modulos/citaciones/1" class="btn btn-sm btn-info" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/modulos/citaciones/1/edit" class="btn btn-sm btn-primary" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>11/11/2025</td>
-                        <td>16:30</td>
-                        <td>Luis Morales</td>
-                        <td>Camila Morales - 5° Básico B</td>
-                        <td>Conducta</td>
-                        <td><span class="badge bg-info">Confirmada</span></td>
-                        <td class="table-actions">
-                            <a href="/modulos/citaciones/2" class="btn btn-sm btn-info" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/modulos/citaciones/2/edit" class="btn btn-sm btn-primary" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>12/11/2025</td>
-                        <td>14:00</td>
-                        <td>Patricia Rojas</td>
-                        <td>Diego Rojas - 7° Básico C</td>
-                        <td>Asistencia</td>
-                        <td><span class="badge bg-warning">Pendiente</span></td>
-                        <td class="table-actions">
-                            <a href="/modulos/citaciones/3" class="btn btn-sm btn-info" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/modulos/citaciones/3/edit" class="btn btn-sm btn-primary" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>05/11/2025</td>
-                        <td>15:30</td>
-                        <td>Jorge Silva</td>
-                        <td>Valentina Silva - 2° Medio A</td>
-                        <td>Orientación vocacional</td>
-                        <td><span class="badge bg-success">Realizada</span></td>
-                        <td class="table-actions">
-                            <a href="/modulos/citaciones/4" class="btn btn-sm btn-info" title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/modulos/citaciones/4/edit" class="btn btn-sm btn-primary" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
+                    @foreach($citaciones as $c)
+                        <tr>
+
+                            {{-- Fecha --}}
+                            <td>
+                                {{ \Carbon\Carbon::parse($c->fecha_citacion)->format('d/m/Y H:i') }}
+                            </td>
+
+                            {{-- Alumno --}}
+                            <td>
+                                {{ $c->alumno->nombre_completo }}<br>
+                                <small class="text-muted">
+                                    {{ $c->alumno->curso->nombre ?? '' }}
+                                </small>
+                            </td>
+
+                            {{-- Apoderado --}}
+                            <td>
+                                @if($c->apoderado)
+                                    {{ $c->apoderado->nombre_completo }}<br>
+                                    <small class="text-muted">Apoderado registrado</small>
+                                @else
+                                    <span class="text-muted">No registrado</span>
+                                @endif
+                            </td>
+
+                            {{-- Motivo resumido --}}
+                            <td>
+                                @if($c->motivo)
+                                    <span title="{{ $c->motivo }}">
+                                        {{ \Illuminate\Support\Str::limit($c->motivo, 50) }}
+                                    </span>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
+
+                            {{-- Estado --}}
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary">
+                                    {{ $c->estado->nombre }}
+                                </span>
+                            </td>
+
+                            {{-- Funcionario --}}
+                            <td>
+                                {{ $c->funcionario->nombre_completo }}
+                            </td>
+
+                            {{-- Acciones --}}
+                            <td class="table-actions">
+
+                                <a href="{{ route('inspectoria.citaciones.show', $c) }}"
+                                   class="btn btn-sm btn-info"
+                                   title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                <a href="{{ route('inspectoria.citaciones.edit', $c) }}"
+                                   class="btn btn-sm btn-primary"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                            </td>
+
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
+
+        {{-- Paginación --}}
+        <div class="mt-3">
+            {{ $citaciones->links() }}
+        </div>
+
+        @endif
     </div>
-    <div class="card-footer">
-        <nav>
-            <ul class="pagination mb-0 justify-content-center">
-                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
-            </ul>
-        </nav>
-    </div>
+
 </div>
+
 @endsection
+
+
+{{-- JS Selección Alumno --}}
+<script>
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('seleccionar-alumno')) {
+
+        let id = e.target.dataset.id;
+        let nombre = e.target.dataset.nombre;
+
+        document.getElementById('alumno_id').value = id;
+        document.getElementById('inputAlumnoSeleccionado').value = nombre;
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('modalBuscarAlumno')
+        ).hide();
+    }
+});
+</script>

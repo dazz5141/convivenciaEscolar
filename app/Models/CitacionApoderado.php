@@ -46,4 +46,9 @@ class CitacionApoderado extends Model
     {
         return $query->where('establecimiento_id', $id);
     }
+
+    public function getFechaFormateadaAttribute()
+    {
+        return \Carbon\Carbon::parse($this->fecha_citacion)->format('d/m/Y H:i');
+    }
 }

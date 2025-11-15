@@ -3,91 +3,146 @@
 @section('title', 'Editar Citación')
 
 @section('content')
+
 <div class="page-header">
-    <h1 class="page-title">Editar Citación</h1>
-    <p class="text-muted">Modificar información de la citación</p>
+    <h1 class="page-title">Editar Citación a Apoderado</h1>
 </div>
 
-<form action="/modulos/citaciones/1" method="POST">
+<form action="{{ route('inspectoria.citaciones.update', $citacion) }}" method="POST">
+    @csrf
+    @method('PUT')
+
+    {{-- =========================================================
+         SECCIÓN 1: ALUMNO (NO EDITABLE)
+    ========================================================== --}}
     <div class="form-section">
-        <h5 class="form-section-title">Información de la Citación</h5>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label for="alumno" class="form-label">Alumno <span class="text-danger">*</span></label>
-                <select class="form-select" id="alumno" name="alumno" required>
-                    <option value="">Seleccione un alumno</option>
-                    <option selected>Juan Pérez Soto - 3° Básico A</option>
-                    <option>María González López - 5° Básico B</option>
-                    <option>Pedro Soto Ramírez - 7° Básico C</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label for="apoderado" class="form-label">Apoderado <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="apoderado" name="apoderado" value="Rosa Fernández" required>
-            </div>
-            <div class="col-md-4">
-                <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" id="fecha" name="fecha" value="2025-11-10" required>
-            </div>
-            <div class="col-md-4">
-                <label for="hora" class="form-label">Hora <span class="text-danger">*</span></label>
-                <input type="time" class="form-control" id="hora" name="hora" value="15:00" required>
-            </div>
-            <div class="col-md-4">
-                <label for="duracion" class="form-label">Duración (minutos)</label>
-                <input type="number" class="form-control" id="duracion" name="duracion" value="30">
-            </div>
-            <div class="col-md-6">
-                <label for="motivo" class="form-label">Motivo <span class="text-danger">*</span></label>
-                <select class="form-select" id="motivo" name="motivo" required>
-                    <option value="">Seleccione un motivo</option>
-                    <option selected>Rendimiento académico</option>
-                    <option>Conducta</option>
-                    <option>Asistencia</option>
-                    <option>Orientación</option>
-                    <option>Otro</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label for="responsable" class="form-label">Responsable <span class="text-danger">*</span></label>
-                <select class="form-select" id="responsable" name="responsable" required>
-                    <option value="">Seleccione responsable</option>
-                    <option>Inspector General</option>
-                    <option selected>Orientador</option>
-                    <option>Profesor Jefe</option>
-                    <option>Director</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label for="estado" class="form-label">Estado <span class="text-danger">*</span></label>
-                <select class="form-select" id="estado" name="estado" required>
-                    <option value="">Seleccione estado</option>
-                    <option selected>Pendiente</option>
-                    <option>Confirmada</option>
-                    <option>Realizada</option>
-                    <option>Cancelada</option>
-                </select>
-            </div>
-            <div class="col-12">
-                <label for="observaciones" class="form-label">Observaciones</label>
-                <textarea class="form-control" id="observaciones" name="observaciones" rows="3">Revisar notas del primer semestre.</textarea>
-            </div>
+        <h5 class="form-section-title">Alumno citado</h5>
+
+        <p class="fw-bold">
+            {{ $citacion->alumno->nombre_completo }}<br>
+            <small class="text-muted">{{ $citacion->alumno->curso->nombre ?? '' }}</small>
+        </p>
+    </div>
+
+
+    {{-- =========================================================
+         SECCIÓN 2: APODERADO (EDITABLE CON MODAL)
+    ========================================================== --}}
+    <div class="form-section mt-4">
+        <h5 class="form-section-title">Apoderado citado (opcional)</h5>
+
+        <button type="button"
+                class="btn btn-outline-primary mb-3"
+                data-bs-toggle="modal"
+                data-bs-target="#modalBuscarApoderado">
+            <i class="bi bi-search"></i> Cambiar Apoderado
+        </button>
+
+        <input type="hidden" name="apoderado_id" id="apoderado_id" value="{{ $citacion->apoderado_id }}">
+
+        <p class="fw-bold" id="textoApoderadoSeleccionado">
+            {{ $citacion->apoderado->nombre_completo ?? 'No se seleccionó apoderado' }}
+        </p>
+
+        <small class="text-muted">Si lo deja en blanco, la citación queda sin apoderado asociado.</small>
+    </div>
+
+
+    {{-- =========================================================
+         SECCIÓN 3: FECHA Y HORA (EDITABLE)
+    ========================================================== --}}
+    <div class="form-section mt-4">
+        <h5 class="form-section-title">Fecha y hora de la citación</h5>
+
+        <div class="col-md-4">
+            <label class="form-label">Fecha y hora *</label>
+            <input type="datetime-local"
+                   class="form-control"
+                   name="fecha_citacion"
+                   value="{{ \Carbon\Carbon::parse($citacion->fecha_citacion)->format('Y-m-d\TH:i') }}"
+                   required>
         </div>
     </div>
 
-    <div class="d-flex gap-2 flex-wrap">
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save me-2"></i>
-            Guardar Cambios
-        </button>
-        <a href="/modulos/citaciones" class="btn btn-secondary">
-            <i class="bi bi-x-circle me-2"></i>
-            Cancelar
-        </a>
-        <button type="button" class="btn btn-danger ms-auto" data-confirm-delete>
-            <i class="bi bi-trash me-2"></i>
-            Eliminar
-        </button>
+
+    {{-- =========================================================
+         SECCIÓN 4: ESTADO
+    ========================================================== --}}
+    <div class="form-section mt-4">
+        <h5 class="form-section-title">Estado de la citación</h5>
+
+        <select name="estado_id" class="form-select" required>
+            @foreach ($estados as $e)
+                <option value="{{ $e->id }}"
+                    {{ $citacion->estado_id == $e->id ? 'selected' : '' }}>
+                    {{ $e->nombre }}
+                </option>
+            @endforeach
+        </select>
     </div>
+
+
+    {{-- =========================================================
+         SECCIÓN 5: MOTIVO
+    ========================================================== --}}
+    <div class="form-section mt-4">
+        <h5 class="form-section-title">Motivo</h5>
+
+        <textarea name="motivo"
+                  class="form-control"
+                  rows="3">{{ $citacion->motivo }}</textarea>
+    </div>
+
+
+    {{-- =========================================================
+         SECCIÓN 6: OBSERVACIONES
+    ========================================================== --}}
+    <div class="form-section mt-4">
+        <h5 class="form-section-title">Observaciones</h5>
+
+        <textarea name="observaciones"
+                  class="form-control"
+                  rows="3">{{ $citacion->observaciones }}</textarea>
+    </div>
+
+
+    {{-- =========================================================
+         BOTONES
+    ========================================================== --}}
+    <div class="d-flex gap-2 mt-4">
+        <button class="btn btn-primary">
+            <i class="bi bi-save me-2"></i> Guardar Cambios
+        </button>
+
+        <a href="{{ route('inspectoria.citaciones.index') }}" class="btn btn-secondary">
+            <i class="bi bi-x-circle me-2"></i> Cancelar
+        </a>
+    </div>
+
 </form>
+
+
+{{-- MODAL APODERADO --}}
+@include('modulos.inspectoria.partials.modal-buscar-apoderado')
+
+
+{{-- JS SELECCIÓN DE APODERADO --}}
+<script>
+document.addEventListener('click', function(e) {
+
+    if (e.target.classList.contains('seleccionar-apoderado')) {
+
+        let id = e.target.dataset.id;
+        let nombre = e.target.dataset.nombre;
+
+        document.getElementById('apoderado_id').value = id;
+        document.getElementById('textoApoderadoSeleccionado').textContent = nombre;
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('modalBuscarApoderado')
+        ).hide();
+    }
+});
+</script>
+
 @endsection

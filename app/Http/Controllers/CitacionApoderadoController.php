@@ -15,6 +15,8 @@ class CitacionApoderadoController extends Controller
      */
     public function index()
     {
+        $estados = EstadoCitacion::orderBy('nombre')->get();
+
         $citaciones = CitacionApoderado::with([
                 'alumno.curso',
                 'apoderado',
@@ -25,7 +27,7 @@ class CitacionApoderadoController extends Controller
             ->orderBy('fecha_citacion', 'desc')
             ->paginate(15);
 
-        return view('modulos.inspectoria.citaciones.index', compact('citaciones'));
+        return view('modulos.inspectoria.citaciones.index', compact('citaciones', 'estados'));
     }
 
     /**
@@ -128,8 +130,20 @@ class CitacionApoderadoController extends Controller
      */
     private function validarEstablecimiento($modelo)
     {
-        if ($modelo->establecimiento_id != session('establecimiento_id')) {
-            abort(403, 'Acceso no autorizado.');
+        $establecimientoSesion = session('establecimiento_id');
+        $establecimientoModelo = $modelo->establecimiento_id ?? null;
+
+        if (!$establecimientoModelo) {
+            if (app()->environment('local')) {
+                \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
+                return;
+            } else {
+                abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
+            }
+        }
+
+        if ($establecimientoModelo != $establecimientoSesion) {
+            abort(403, 'Acceso denegado: el registro pertenece a otro establecimiento.');
         }
     }
 }
