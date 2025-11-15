@@ -87,9 +87,14 @@ class AlumnoController extends Controller
             'comuna_id' => 'nullable|exists:comunas,id',
         ]);
 
+        // Crear alumno SIN apoderados todavía
         $alumno = Alumno::create($request->except('apoderados'));
 
-        // refrescar para obtener relaciones recién creadas
+        // ASIGNAR ESTABLECIMIENTO DEL SISTEMA
+        $alumno->establecimiento_id = session('establecimiento_id');
+        $alumno->save();
+
+        // Refrescar relaciones
         $alumno->refresh();
 
         // Registrar matrícula inicial en historial

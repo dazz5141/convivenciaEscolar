@@ -347,9 +347,9 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         Route::get('/retiros', [RetiroAnticipadoController::class, 'index'])->name('retiros.index');
         Route::get('/retiros/create', [RetiroAnticipadoController::class, 'create'])->name('retiros.create');
         Route::post('/retiros', [RetiroAnticipadoController::class, 'store'])->name('retiros.store');
-        Route::get('/retiros/{retiro}', [RetiroAnticipadoController::class, 'show'])->name('retiros.show');
         Route::get('/retiros/{retiro}/edit', [RetiroAnticipadoController::class, 'edit'])->name('retiros.edit');
         Route::put('/retiros/{retiro}', [RetiroAnticipadoController::class, 'update'])->name('retiros.update');
+        Route::get('/retiros/{retiro}', [RetiroAnticipadoController::class, 'show'])->name('retiros.show');
 
 
         /*

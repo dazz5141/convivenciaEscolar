@@ -20,6 +20,16 @@ return new class extends Migration
             $table->string('motivo', 255)->nullable();
 
             $table->unsignedBigInteger('apoderado_id')->nullable();  // quien retira
+
+            // =====================================================
+            // CAMPOS NUEVOS (MODO HÍBRIDO)
+            // =====================================================
+            $table->string('nombre_retira')->nullable();
+            $table->string('run_retira', 20)->nullable();
+            $table->string('parentesco_retira', 50)->nullable();
+            $table->string('telefono_retira', 20)->nullable();
+            // =====================================================
+
             $table->unsignedBigInteger('entregado_por');             // funcionario
 
             $table->text('observaciones')->nullable();

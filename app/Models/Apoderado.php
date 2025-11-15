@@ -22,7 +22,7 @@ class Apoderado extends Model
         'region_id',
         'provincia_id',
         'comuna_id',
-        'establecimiento_id',   // ✅ FALTABA ESTO
+        'establecimiento_id',   
         'activo'
     ];
 
@@ -55,5 +55,10 @@ class Apoderado extends Model
     public function comuna()
     {
         return $this->belongsTo(Comuna::class, 'comuna_id');
+    }
+
+    public function getNombreCompletoAttribute()
+    {
+        return "{$this->nombre} {$this->apellido_paterno} {$this->apellido_materno}";
     }
 }

@@ -1,98 +1,112 @@
-<div class="modal fade" id="modalBuscarApoderado" tabindex="-1" aria-labelledby="modalBuscarApoderadoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
+<div class="modal fade" id="modalBuscarApoderado" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
 
-            {{-- Header --}}
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalBuscarApoderadoLabel">
-                    <i class="bi bi-people-fill me-2"></i> Buscar Apoderado
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
+      <div class="modal-header">
+        <h5 class="modal-title">Buscar Apoderado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
 
-            {{-- Body --}}
-            <div class="modal-body">
+      <div class="modal-body">
 
-                {{-- Campo de búsqueda --}}
-                <div class="mb-3">
-                    <label class="form-label">Buscar por RUN o Nombre</label>
-                    <input type="text" id="inputBuscarApoderado" class="form-control" placeholder="Ej: 11.111.111-1, Juan, Pérez...">
-                </div>
+        <input type="text"
+               id="inputBuscarApoderado"
+               class="form-control mb-3"
+               placeholder="Buscar por RUN, nombre o apellido...">
 
-                {{-- Tabla de resultados --}}
-                <div class="table-responsive">
-                    <table class="table table-hover" id="tablaApoderados">
-                        <thead>
-                            <tr>
-                                <th>RUN</th>
-                                <th>Nombre completo</th>
-                                <th>Teléfono</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{-- Se llena dinámicamente con JS --}}
-                        </tbody>
-                    </table>
-                </div>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>RUN</th>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th></th>
+            </tr>
+          </thead>
 
-            </div>
+          <tbody id="resultadoApoderados">
+            <tr>
+              <td colspan="4" class="text-center">
+                Ingrese un criterio de búsqueda.
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-            {{-- Footer --}}
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle me-1"></i> Cerrar
-                </button>
-            </div>
+      </div>
 
-        </div>
     </div>
+  </div>
 </div>
 
-{{-- Script --}}
 <script>
-document.getElementById('inputBuscarApoderado').addEventListener('keyup', function () {
+// ============================================================
+// BÚSQUEDA AJAX DE APODERADOS (API INTERNA)
+// ============================================================
+document.getElementById('inputBuscarApoderado').addEventListener('keyup', () => {
 
-    let busqueda = this.value.trim();
+    let q = document.getElementById('inputBuscarApoderado').value;
 
-    if (busqueda.length < 2) {
-        document.querySelector('#tablaApoderados tbody').innerHTML = '';
-        return;
-    }
+    if (q.length < 2) return;
 
-    fetch(`/api/buscar/apoderados?q=${busqueda}`)
-        .then(response => response.json())
+    fetch('/api-interna/buscar/apoderados?q=' + q)
+        .then(res => res.json())
         .then(data => {
 
-            let tbody = document.querySelector('#tablaApoderados tbody');
-            tbody.innerHTML = '';
+            let html = "";
+
+            if (data.length === 0) {
+                document.getElementById('resultadoApoderados').innerHTML =
+                    `<tr><td colspan="4" class="text-center">Sin resultados.</td></tr>`;
+                return;
+            }
 
             data.forEach(ap => {
 
-                let row = `
+                html += `
                     <tr>
                         <td>${ap.run}</td>
                         <td>${ap.nombre_completo}</td>
-                        <td>${ap.telefono}</td>
+                        <td>${ap.telefono ?? '-'}</td>
                         <td>
-                            <button class="btn btn-primary btn-sm"
-                                onclick="seleccionarApoderado(${ap.id}, '${ap.nombre_completo}')">
-                                <i class="bi bi-check2"></i>
+                            <button class="btn btn-sm btn-success seleccionar-apoderado"
+                                data-id="${ap.id}"
+                                data-nombre="${ap.nombre_completo}"
+                                data-run="${ap.run}"
+                                data-telefono="${ap.telefono ?? ''}">
                                 Seleccionar
                             </button>
                         </td>
                     </tr>
                 `;
-
-                tbody.innerHTML += row;
             });
+
+            document.getElementById('resultadoApoderados').innerHTML = html;
         });
 });
 
-// ESTA FUNCIÓN LA DEFINES EN CADA FORMULARIO QUE USE EL MODAL
-// function seleccionarApoderado(id, nombre) {
-//     document.getElementById('apoderado_id').value = id;
-//     document.getElementById('apoderado_nombre').value = nombre;
-//     bootstrap.Modal.getInstance(document.getElementById('modalBuscarApoderado')).hide();
-// }
+
+// ============================================================
+// SELECCIÓN DEL APODERADO DESDE EL MODAL
+// ============================================================
+document.addEventListener('click', function(e){
+
+    if (e.target.classList.contains('seleccionar-apoderado')) {
+
+        let id = e.target.dataset.id;
+        let nombre = e.target.dataset.nombre;
+        let run = e.target.dataset.run;
+        let telefono = e.target.dataset.telefono;
+
+        // Función que deberás definir en la vista create/edit
+        if (typeof agregarApoderadoSeleccionado === 'function') {
+            agregarApoderadoSeleccionado(id, nombre, run, telefono);
+        }
+
+        // Cierra el modal
+        bootstrap.Modal.getInstance(
+            document.getElementById('modalBuscarApoderado')
+        ).hide();
+    }
+});
 </script>

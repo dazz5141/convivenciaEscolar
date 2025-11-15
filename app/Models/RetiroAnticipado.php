@@ -16,7 +16,11 @@ class RetiroAnticipado extends Model
         'fecha',
         'hora',
         'motivo',
-        'apoderado_id',
+        'apoderado_id',          
+        'nombre_retira',        
+        'run_retira',
+        'parentesco_retira',
+        'telefono_retira',
         'entregado_por',
         'observaciones',
         'establecimiento_id'
