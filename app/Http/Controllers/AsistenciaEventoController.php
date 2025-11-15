@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AsistenciaEvento;
 use App\Models\TipoAsistencia;
@@ -10,19 +9,51 @@ use Illuminate\Support\Facades\Auth;
 
 class AsistenciaEventoController extends Controller
 {
+    const TIPO_ATRASO = 1; // ID del tipo "Atraso"
+
     /**
-     * Listado de registros de asistencia / atrasos
+     * Listado de asistencia / atrasos
      */
-    public function index()
+    public function index(Request $request)
     {
         $establecimiento = session('establecimiento_id');
 
-        $eventos = AsistenciaEvento::with(['alumno.curso', 'tipo', 'funcionario'])
-            ->delColegio($establecimiento)
-            ->orderBy('fecha', 'desc')
-            ->paginate(15);
+        // Filtros dinámicos
+        $query = AsistenciaEvento::with(['alumno.curso', 'tipo', 'funcionario'])
+            ->delColegio($establecimiento);
 
-        return view('modulos.inspectoria.asistencia.index', compact('eventos'));
+        // Filtro por alumno
+        if ($request->filled('alumno_id')) {
+            $query->where('alumno_id', $request->alumno_id);
+        }
+
+        // Filtro por tipo de asistencia
+        if ($request->filled('tipo_id')) {
+            $query->where('tipo_id', $request->tipo_id);
+        }
+
+        // Filtro por fecha
+        if ($request->filled('fecha')) {
+            $query->where('fecha', $request->fecha);
+        }
+
+        $eventos = $query->orderBy('fecha', 'desc')
+                        ->orderBy('hora', 'desc')
+                        ->paginate(15);
+
+        // Para mostrar el nombre en el buscador
+        $alumnoSeleccionado = $request->filled('alumno_id')
+            ? \App\Models\Alumno::find($request->alumno_id)
+            : null;
+
+        // Lista de tipos (Atraso, Inasistencia, Justificada, Retiro Anticipado)
+        $tipos = \App\Models\TipoAsistencia::orderBy('nombre')->get();
+
+        return view('modulos.inspectoria.asistencia.index', compact(
+            'eventos',
+            'tipos',
+            'alumnoSeleccionado'
+        ));
     }
 
     /**
@@ -36,16 +67,24 @@ class AsistenciaEventoController extends Controller
     }
 
     /**
-     * Guardar nuevo evento de asistencia
+     * Guardar nuevo evento
      */
     public function store(Request $request)
     {
         $request->validate([
             'fecha'      => 'required|date',
-            'hora'       => 'nullable|date_format:H:i',
             'tipo_id'    => 'required|exists:tipos_asistencia,id',
             'alumno_id'  => 'required|exists:alumnos,id',
+            'hora'       => 'nullable|date_format:H:i',
+            'observaciones' => 'nullable|string'
         ]);
+
+        // Si es ATRASO → hora OBLIGATORIA
+        if ($request->tipo_id == self::TIPO_ATRASO) {
+            $request->validate([
+                'hora' => 'required|date_format:H:i'
+            ]);
+        }
 
         AsistenciaEvento::create([
             'fecha'              => $request->fecha,
@@ -59,11 +98,11 @@ class AsistenciaEventoController extends Controller
 
         return redirect()
             ->route('inspectoria.asistencia.index')
-            ->with('success', 'Registro de asistencia guardado.');
+            ->with('success', 'Registro de asistencia ingresado correctamente.');
     }
 
     /**
-     * Ver detalle de un registro de asistencia
+     * Mostrar detalle de un evento
      */
     public function show(AsistenciaEvento $evento)
     {
@@ -85,41 +124,69 @@ class AsistenciaEventoController extends Controller
     }
 
     /**
-     * Actualizar evento de asistencia
+     * Actualizar evento
      */
     public function update(Request $request, AsistenciaEvento $evento)
     {
         $this->validarEstablecimiento($evento);
 
+        // Validación base
         $request->validate([
-            'hora'          => 'nullable|date_format:H:i',
             'tipo_id'       => 'required|exists:tipos_asistencia,id',
-            'observaciones' => 'nullable|string',
+            'hora'          => 'nullable',
+            'observaciones' => 'nullable|string'
         ]);
 
-        // Campos NO editables:
-        // - fecha
-        // - alumno_id
-        // - registrado_por
+        // Normalizar hora (acepta "08:10:00" y lo convierte a "08:10")
+        $hora = null;
+        if ($request->hora) {
+            try {
+                $hora = \Carbon\Carbon::parse($request->hora)->format('H:i');
+            } catch (\Exception $e) {
+                return back()
+                    ->withErrors(['hora' => 'Formato de hora inválido'])
+                    ->withInput();
+            }
+        }
 
+        // Validación especial SOLO si es ATRASO
+        if ($request->tipo_id == self::TIPO_ATRASO && !$hora) {
+            return back()
+                ->withErrors(['hora' => 'La hora es obligatoria para los atrasos.'])
+                ->withInput();
+        }
+
+        // Guardar cambios
         $evento->update([
-            'hora'          => $request->hora,
             'tipo_id'       => $request->tipo_id,
+            'hora'          => $hora,
             'observaciones' => $request->observaciones,
         ]);
 
         return redirect()
             ->route('inspectoria.asistencia.index')
-            ->with('success', 'Registro actualizado.');
+            ->with('success', 'Registro actualizado correctamente.');
     }
 
     /**
-     * Validar que pertenezca al establecimiento actual
+     * Verifica que el registro pertenezca al establecimiento actual
      */
     private function validarEstablecimiento($modelo)
     {
-        if ($modelo->establecimiento_id != session('establecimiento_id')) {
-            abort(403, 'No autorizado para ver este registro.');
+        $establecimientoSesion = session('establecimiento_id');
+        $establecimientoModelo = $modelo->establecimiento_id ?? null;
+
+        if (!$establecimientoModelo) {
+            if (app()->environment('local')) {
+                \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
+                return;
+            } else {
+                abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
+            }
+        }
+
+        if ($establecimientoModelo != $establecimientoSesion) {
+            abort(403, 'Acceso denegado: el registro pertenece a otro establecimiento.');
         }
     }
 }

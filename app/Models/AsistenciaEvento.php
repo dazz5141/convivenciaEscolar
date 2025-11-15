@@ -40,4 +40,9 @@ class AsistenciaEvento extends Model
     {
         return $query->where('establecimiento_id', $id);
     }
+
+    public function getCursoTextoAttribute()
+    {
+        return $this->alumno->curso->nombre ?? '—';
+    }
 }
