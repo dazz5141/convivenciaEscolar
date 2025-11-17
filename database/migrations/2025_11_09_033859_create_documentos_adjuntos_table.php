@@ -25,6 +25,13 @@ return new class extends Migration
             // Subido por funcionario
             $table->unsignedBigInteger('subido_por');
 
+            // Estado lógico (vigente = 1, invalidado = 0)
+            $table->boolean('activo')->default(true);
+
+            // Auditoría de invalidación
+            $table->unsignedBigInteger('invalidado_por')->nullable();
+            $table->timestamp('invalidado_en')->nullable();
+
             // Timestamps estándar
             $table->timestamps();
 

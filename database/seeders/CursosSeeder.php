@@ -13,8 +13,7 @@ class CursosSeeder extends Seeder
 
         // Año actual y próximo año académico
         $anios = [
-            date('Y'),
-            date('Y') + 1
+            date('Y')
         ];
 
         // Niveles de enseñanza básica y media

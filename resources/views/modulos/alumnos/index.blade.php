@@ -73,7 +73,7 @@
                         <td>{{ $al->curso->nombre }}</td>
                         <td>
                             @foreach($al->apoderados as $ap)
-                                <span class="badge bg-info">{{ $ap->nombre }} ({{ $ap->pivot->tipo }})</span>
+                                <span class="badge bg-info"> {{ $ap->nombre_completo }} ({{ $ap->pivot->tipo }})</span>
                             @endforeach
                         </td>
                         <td>

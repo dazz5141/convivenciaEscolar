@@ -6,7 +6,6 @@ use App\Models\DenunciaLeyKarin;
 use App\Models\DocumentoAdjunto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class LeyKarinDocumentoController extends Controller
 {
@@ -20,7 +19,9 @@ class LeyKarinDocumentoController extends Controller
             abort(403, 'Acceso denegado.');
         }
 
-        $documentos = DocumentoAdjunto::where('entidad', DenunciaLeyKarin::class)
+        // Solo documentos activos
+        $documentos = DocumentoAdjunto::where('activo', 1)
+            ->where('entidad_type', DenunciaLeyKarin::class)
             ->where('entidad_id', $denuncia->id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -49,37 +50,61 @@ class LeyKarinDocumentoController extends Controller
         $ruta = $file->store("documentos/leykarin/{$denuncia->id}", 'public');
 
         DocumentoAdjunto::create([
-            'entidad'            => DenunciaLeyKarin::class,
+            'entidad_type'       => DenunciaLeyKarin::class,
             'entidad_id'         => $denuncia->id,
             'nombre_archivo'     => $file->getClientOriginalName(),
             'ruta_archivo'       => "storage/" . $ruta,
-            'subido_por'         => Auth::user()->funcionario_id, 
+            'subido_por'         => Auth::user()->funcionario_id,
             'establecimiento_id' => session('establecimiento_id'),
+            'activo'             => 1,
         ]);
 
         return redirect()
-            ->route('leykarin.denuncias.documentos.index', $denuncia)
+            ->route('leykarin.documentos.index', $denuncia)
             ->with('success', 'Documento adjuntado correctamente.');
     }
 
 
     /**
-     * Eliminar documento.
+     * DESHABILITAR DOCUMENTO (invalidar)
      */
-    public function destroy(DocumentoAdjunto $documento)
+    public function disable($id)
     {
-        // Seguridad
+        $documento = DocumentoAdjunto::findOrFail($id);
+
+        // Seguridad multicolegio
         if ($documento->establecimiento_id != session('establecimiento_id')) {
             abort(403);
         }
 
-        // Borrar archivo físico
-        if ($documento->ruta_archivo && file_exists(public_path($documento->ruta_archivo))) {
-            unlink(public_path($documento->ruta_archivo));
+        $documento->update([
+            'activo'         => 0,
+            'invalidado_por' => Auth::user()->funcionario_id,
+            'invalidado_en'  => now(),
+        ]);
+
+        return back()->with('success', 'Documento invalidado correctamente.');
+    }
+
+
+    /**
+     * HABILITAR DOCUMENTO (opcional)
+     */
+    public function enable($id)
+    {
+        $documento = DocumentoAdjunto::findOrFail($id);
+
+        // Seguridad multicolegio
+        if ($documento->establecimiento_id != session('establecimiento_id')) {
+            abort(403);
         }
 
-        $documento->delete();
+        $documento->update([
+            'activo'         => 1,
+            'invalidado_por' => null,
+            'invalidado_en'  => null,
+        ]);
 
-        return back()->with('success', 'Documento eliminado correctamente.');
+        return back()->with('success', 'Documento habilitado nuevamente.');
     }
 }

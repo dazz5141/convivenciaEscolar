@@ -429,14 +429,15 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         | DOCUMENTOS DE DENUNCIAS LEY KARIN
         |--------------------------------------------------------------------------
         */
-        Route::get('{denuncia}/documentos', [LeyKarinDocumentoController::class, 'index'])->name('documentos.index');
-        Route::post('{denuncia}/documentos', [LeyKarinDocumentoController::class, 'store'])->name('leykarin.denuncias.documentos.store');
-        Route::delete('documentos/{documento}', [LeyKarinDocumentoController::class, 'destroy'])->name('documentos.destroy');
+        Route::get('/{denuncia}/documentos', [LeyKarinDocumentoController::class, 'index'])->name('documentos.index');
+        Route::post('/{denuncia}/documentos', [LeyKarinDocumentoController::class, 'store'])->name('documentos.store');
+        Route::put('/documentos/{id}/deshabilitar', [LeyKarinDocumentoController::class, 'disable'])->name('documentos.disable');
+        Route::put('/documentos/{id}/habilitar', [LeyKarinDocumentoController::class, 'enable'])->name('documentos.enable');
     });
 
     /*
     |--------------------------------------------------------------------------
-    | DUMMY ROUTES (SOLO LOS QUE AÚN NO EXISTEN)
+    | DUMMY ROUTES 
     |--------------------------------------------------------------------------
     */
 
@@ -456,6 +457,5 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
     // ADMIN
     crudDummy('roles', 'roles');
     crudDummy('auditoria', 'auditoria');
-    crudDummy('documentos', 'documentos');
 
 });

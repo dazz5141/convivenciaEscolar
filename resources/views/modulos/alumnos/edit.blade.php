@@ -41,7 +41,7 @@
             <div class="col-md-4">
                 <label class="form-label">Fecha de Nacimiento</label>
                 <input type="date" name="fecha_nacimiento" class="form-control"
-                       value="{{ $alumno->fecha_nacimiento }}">
+                       value="{{ $alumno->fecha_nacimiento ? $alumno->fecha_nacimiento->format('Y-m-d') : '' }}">
             </div>
 
             <div class="col-md-4">
@@ -139,7 +139,7 @@
             <div class="col-md-4">
                 <label class="form-label">Fecha de Ingreso</label>
                 <input type="date" name="fecha_ingreso" class="form-control"
-                       value="{{ $alumno->fecha_ingreso }}">
+                       value="{{ $alumno->fecha_ingreso ? $alumno->fecha_ingreso->format('Y-m-d') : '' }}">
             </div>
 
         </div>

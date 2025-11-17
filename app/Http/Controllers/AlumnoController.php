@@ -90,10 +90,6 @@ class AlumnoController extends Controller
         // Crear alumno SIN apoderados todavía
         $alumno = Alumno::create($request->except('apoderados'));
 
-        // ASIGNAR ESTABLECIMIENTO DEL SISTEMA
-        $alumno->establecimiento_id = session('establecimiento_id');
-        $alumno->save();
-
         // Refrescar relaciones
         $alumno->refresh();
 

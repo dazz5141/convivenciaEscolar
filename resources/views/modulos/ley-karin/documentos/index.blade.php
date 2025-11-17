@@ -25,7 +25,7 @@
     </div>
 
     <div class="card-body">
-        <form action="{{ route('leykarin.denuncias.documentos.store', $denuncia) }}" 
+        <form action="{{ route('leykarin.documentos.store', $denuncia->id) }}"
               method="POST" 
               enctype="multipart/form-data">
 
@@ -105,29 +105,33 @@
                                 <i class="bi bi-box-arrow-down"></i>
                             </a>
 
-                            {{-- Eliminar --}}
-                            <button class="btn btn-sm btn-outline-danger" 
+                            {{-- Invalidar documento --}}
+                            <button class="btn btn-sm btn-outline-warning"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#modalEliminarDocumento{{ $doc->id }}">
-                                <i class="bi bi-trash"></i>
+                                    data-bs-target="#modalInvalidarDocumento{{ $doc->id }}">
+                                <i class="bi bi-slash-circle"></i>
                             </button>
 
                         </td>
                     </tr>
 
-                    {{-- Modal eliminación --}}
-                    <div class="modal fade" id="modalEliminarDocumento{{ $doc->id }}" tabindex="-1">
+                    {{-- Modal invalidación --}}
+                    <div class="modal fade" id="modalInvalidarDocumento{{ $doc->id }}" tabindex="-1">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
 
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Eliminar Documento</h5>
+                                    <h5 class="modal-title">Invalidar Documento</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
 
                                 <div class="modal-body">
-                                    ¿Está seguro que desea eliminar este documento?<br>
+                                    ¿Está seguro que desea invalidar este documento?<br>
                                     <strong>{{ $doc->nombre_archivo }}</strong>
+                                    <br><br>
+                                    <small class="text-muted">
+                                        El archivo no se eliminará del servidor, pero quedará marcado como inactivo.
+                                    </small>
                                 </div>
 
                                 <div class="modal-footer">
@@ -135,13 +139,13 @@
                                         Cancelar
                                     </button>
 
-                                    <form action="{{ route('leykarin.denuncias.documentos.destroy', $doc) }}"
-                                          method="POST">
+                                    <form action="{{ route('leykarin.documentos.disable', $doc->id) }}"
+                                        method="POST">
                                         @csrf
-                                        @method('DELETE')
+                                        @method('PUT')
 
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="bi bi-trash me-2"></i>Eliminar
+                                        <button type="submit" class="btn btn-warning">
+                                            <i class="bi bi-slash-circle me-2"></i> Invalidar
                                         </button>
                                     </form>
                                 </div>

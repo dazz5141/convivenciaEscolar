@@ -23,7 +23,7 @@
         </a>
 
         {{-- Adjuntar documentos --}}
-        <a href="{{ route('documentos.index', $denuncia) }}" class="btn btn-info">
+        <a href="{{ route('leykarin.documentos.index', $denuncia) }}" class="btn btn-info">
             <i class="bi bi-paperclip me-2"></i> Documentos Adjuntos
         </a>
 

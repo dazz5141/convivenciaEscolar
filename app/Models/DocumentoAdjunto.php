@@ -12,7 +12,7 @@ class DocumentoAdjunto extends Model
     protected $table = 'documentos_adjuntos';
 
     protected $fillable = [
-        'entidad',
+        'entidad_type',
         'entidad_id',
         'nombre_archivo',
         'ruta_archivo',
