@@ -27,6 +27,7 @@ use App\Http\Controllers\RetiroAnticipadoController;
 use App\Http\Controllers\ConflictoFuncionarioController;
 use App\Http\Controllers\ConflictoApoderadoController;
 use App\Http\Controllers\DenunciaLeyKarinController;
+use App\Http\Controllers\LeyKarinDocumentoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -400,6 +401,37 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         Route::get('/conflictos-funcionarios/{conflictoFuncionario}/edit', [ConflictoFuncionarioController::class, 'edit'])->name('conflictos-funcionarios.edit');
         Route::put('/conflictos-funcionarios/{conflictoFuncionario}', [ConflictoFuncionarioController::class, 'update'])->name('conflictos-funcionarios.update');
 
+        /*
+        |--------------------------------------------------------------------------
+        | CONFLICTO ENTRE APODERADOS Y FUNCIONARIOS
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/conflictos-apoderados', [ConflictoApoderadoController::class, 'index'])->name('conflictos-apoderados.index');
+        Route::get('/conflictos-apoderados/create', [ConflictoApoderadoController::class, 'create'])->name('conflictos-apoderados.create');
+        Route::post('/conflictos-apoderados', [ConflictoApoderadoController::class, 'store'])->name('conflictos-apoderados.store');
+        Route::get('/conflictos-apoderados/{conflictoApoderado}', [ConflictoApoderadoController::class, 'show'])->name('conflictos-apoderados.show');
+        Route::get('/conflictos-apoderados/{conflictoApoderado}/edit', [ConflictoApoderadoController::class, 'edit'])->name('conflictos-apoderados.edit');
+        Route::put('/conflictos-apoderados/{conflictoApoderado}', [ConflictoApoderadoController::class, 'update'])->name('conflictos-apoderados.update');
+    
+        /*
+        |--------------------------------------------------------------------------
+        | DENUNCIAS LEY KARIN
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/denuncias', [DenunciaLeyKarinController::class, 'index'])->name('denuncias.index');
+        Route::get('/denuncias/create', [DenunciaLeyKarinController::class, 'create'])->name('denuncias.create');
+        Route::post('/denuncias', [DenunciaLeyKarinController::class, 'store'])->name('denuncias.store');
+        Route::get('/denuncias/{denuncia}', [DenunciaLeyKarinController::class, 'show'])->name('denuncias.show');
+        Route::get('/denuncias/{denuncia}/edit', [DenunciaLeyKarinController::class, 'edit'])->name('denuncias.edit');
+        Route::put('/denuncias/{denuncia}', [DenunciaLeyKarinController::class, 'update'])->name('denuncias.update');
+
+        /*--------------------------------------------------------------------------
+        | DOCUMENTOS DE DENUNCIAS LEY KARIN
+        |--------------------------------------------------------------------------
+        */
+        Route::get('{denuncia}/documentos', [LeyKarinDocumentoController::class, 'index'])->name('documentos.index');
+        Route::post('{denuncia}/documentos', [LeyKarinDocumentoController::class, 'store'])->name('leykarin.denuncias.documentos.store');
+        Route::delete('documentos/{documento}', [LeyKarinDocumentoController::class, 'destroy'])->name('documentos.destroy');
     });
 
     /*
@@ -418,8 +450,6 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
     }
 
     // PRINCIPALES
-    crudDummy('conflicto-apoderado', 'conflicto-apoderado');
-
     crudDummy('derivaciones', 'derivaciones');
     crudDummy('medidas-restaurativas', 'medidas-restaurativas');
 

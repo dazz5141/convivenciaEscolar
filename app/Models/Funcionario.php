@@ -26,6 +26,8 @@ class Funcionario extends Model
         'activo'
     ];
 
+    protected $appends = ['nombre_completo'];
+
     public function cargo()
     {
         return $this->belongsTo(Cargo::class);

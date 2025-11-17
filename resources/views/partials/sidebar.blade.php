@@ -102,11 +102,11 @@
 
             <ul class="submenu-items">
 
-                {{-- <li>
-                <a href="{{ route('leykarin.conflictos-apoderados.index') }}">
-                    <i class="bi bi-people"></i> Conflictos Apoderados
-                </a>
-            </li> --}}
+                <li>
+                    <a href="{{ route('leykarin.conflictos-apoderados.index') }}">
+                        <i class="bi bi-people"></i> Conflictos Apoderados
+                    </a>
+                </li>
 
                 <li>
                     <a href="{{ route('leykarin.conflictos-funcionarios.index') }}">
@@ -114,11 +114,11 @@
                     </a>
                 </li>
 
-                {{-- <li>
+                <li>
                     <a href="{{ route('leykarin.denuncias.index') }}">
                         <i class="bi bi-exclamation-triangle"></i> Denuncias Ley Karin
                     </a>
-                </li> --}}
+                </li>
 
             </ul>
         </li>

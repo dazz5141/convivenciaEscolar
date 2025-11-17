@@ -12,16 +12,29 @@ class DenunciaLeyKarin extends Model
     protected $table = 'denuncias_ley_karin';
 
     protected $fillable = [
+        'establecimiento_id',
+        'registrado_por_id',
+        'fecha_denuncia',
+        'descripcion',
+
+        // Polimórfico
         'conflictable_type',
         'conflictable_id',
+
+        // Datos generales
         'es_victima',
         'confidencial',
-        'tipo_acoso',
-        'tipo_laboral',
-        'tipo_violencia',
+
+        // NUEVO: FK tipo
+        'tipo_denuncia_id',
+
+        // Denunciante
         'denunciante_nombre',
         'denunciante_cargo',
         'denunciante_area',
+        'denunciante_rut',
+
+        // Víctima
         'victima_nombre',
         'victima_rut',
         'victima_direccion',
@@ -29,9 +42,14 @@ class DenunciaLeyKarin extends Model
         'victima_region',
         'victima_telefono',
         'victima_email',
+
+        // Denunciado
         'denunciado_nombre',
         'denunciado_cargo',
         'denunciado_area',
+        'denunciado_rut',
+
+        // Otros campos legales
         'jerarquia',
         'es_jefatura_inmediata',
         'trabaja_directamente',
@@ -55,8 +73,18 @@ class DenunciaLeyKarin extends Model
         return $this->morphTo();
     }
 
-    public function tipos()
+    public function tipo()
     {
-        return $this->hasMany(DenunciaLeyKarinTipo::class, 'denuncia_id');
+        return $this->belongsTo(TipoDenunciaLeyKarin::class, 'tipo_denuncia_id');
+    }
+
+    public function documentos()
+    {
+        return $this->morphMany(DocumentoAdjunto::class, 'entidad');
+    }
+
+    public function registradoPor()
+    {
+        return $this->belongsTo(Funcionario::class, 'registrado_por_id');
     }
 }

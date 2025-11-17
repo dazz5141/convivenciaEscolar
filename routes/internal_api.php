@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProvinciaController;
 use App\Http\Controllers\ComunaController;
+use App\Models\ConflictoFuncionario;
+use App\Models\ConflictoApoderado;
 use App\Models\Alumno;
 use App\Models\Funcionario;
 use App\Models\Apoderado;
@@ -170,4 +172,101 @@ Route::get('/buscar/profesionales-pie', function (Request $request) {
         });
 
     return response()->json($profesionales);
+});
+
+Route::get('/buscar/conflictos', function (Request $request) {
+
+    $q = trim($request->query('q', ''));
+    $establecimientoId = session('establecimiento_id');
+
+    if (strlen($q) < 2) {
+        return response()->json(collect()); // siempre colección
+    }
+
+    // =========================================================================
+    // 1) CONFLICTOS ENTRE FUNCIONARIOS
+    // =========================================================================
+    $confFunc = ConflictoFuncionario::with(['funcionario1', 'funcionario2'])
+        ->where('establecimiento_id', $establecimientoId)
+        ->where(function ($query) use ($q) {
+
+            $query->where('lugar_conflicto', 'like', "%{$q}%")
+                  ->orWhere('descripcion', 'like', "%{$q}%")
+
+                  // funcionario 1
+                  ->orWhereHas('funcionario1', function ($q2) use ($q) {
+                      $q2->where('nombre', 'like', "%{$q}%")
+                         ->orWhere('apellido_paterno', 'like', "%{$q}%")
+                         ->orWhere('apellido_materno', 'like', "%{$q}%")
+                         ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$q}%"]);
+                  })
+
+                  // funcionario 2
+                  ->orWhereHas('funcionario2', function ($q3) use ($q) {
+                      $q3->where('nombre', 'like', "%{$q}%")
+                         ->orWhere('apellido_paterno', 'like', "%{$q}%")
+                         ->orWhere('apellido_materno', 'like', "%{$q}%")
+                         ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$q}%"]);
+                  });
+        })
+        ->take(15)
+        ->get()
+        ->map(function ($c) {
+            return [
+                'tipo'        => 'Conflicto entre Funcionarios',
+                'type'        => 'App\\Models\\ConflictoFuncionario',
+                'id'          => $c->id,
+                'denunciante' => optional($c->funcionario1)->nombre_completo ?? '—',
+                'denunciado'  => optional($c->funcionario2)->nombre_completo ?? '—',
+            ];
+        });
+
+
+    // =========================================================================
+    // 2) CONFLICTOS APODERADO - FUNCIONARIO
+    // =========================================================================
+    $confApo = ConflictoApoderado::with(['apoderado', 'funcionario'])
+        ->where('establecimiento_id', $establecimientoId)
+        ->where(function ($query) use ($q) {
+
+            $query->where('lugar_conflicto', 'like', "%{$q}%")
+                  ->orWhere('descripcion', 'like', "%{$q}%")
+
+                  // apoderado
+                  ->orWhereHas('apoderado', function ($q2) use ($q) {
+                      $q2->where('nombre', 'like', "%{$q}%")
+                         ->orWhere('apellido_paterno', 'like', "%{$q}%")
+                         ->orWhere('apellido_materno', 'like', "%{$q}%")
+                         ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$q}%"]);
+                  })
+
+                  // funcionario
+                  ->orWhereHas('funcionario', function ($q3) use ($q) {
+                      $q3->where('nombre', 'like', "%{$q}%")
+                         ->orWhere('apellido_paterno', 'like', "%{$q}%")
+                         ->orWhere('apellido_materno', 'like', "%{$q}%")
+                         ->orWhereRaw("CONCAT(nombre, ' ', apellido_paterno, ' ', apellido_materno) LIKE ?", ["%{$q}%"]);
+                  });
+        })
+        ->take(15)
+        ->get()
+        ->map(function ($c) {
+            return [
+                'tipo'        => 'Conflicto Apoderado - Funcionario',
+                'type'        => 'App\\Models\\ConflictoApoderado',
+                'id'          => $c->id,
+                'denunciante' => optional($c->apoderado)->nombre_completo ?? '—',
+                'denunciado'  => optional($c->funcionario)->nombre_completo ?? '—',
+            ];
+        });
+
+    // =========================================================================
+    // UNIR AMBOS RESULTADOS COMO COLECCIÓN
+    // =========================================================================
+    $resultado = collect()
+        ->merge($confFunc)
+        ->merge($confApo)
+        ->values();
+
+    return response()->json($resultado);
 });

@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('documentos_adjuntos', function (Blueprint $table) {
             $table->id();
 
-            // Relación polimórfica
-            $table->string('entidad', 120);        // Ej: "bitacora_incidentes"
+            // Relación polimórfica correcta
+            $table->string('entidad_type', 120);
             $table->unsignedBigInteger('entidad_id');
 
             // Multicolegio
@@ -28,20 +28,20 @@ return new class extends Migration
             // Timestamps estándar
             $table->timestamps();
 
-            // Índices optimizados
-            $table->index(['entidad', 'entidad_id'], 'idx_docs_polimorfico');
+            // Índices
+            $table->index(['entidad_type', 'entidad_id'], 'idx_docs_polimorfico');
             $table->index('establecimiento_id', 'idx_docs_est');
 
-            // FKs
+            // Foreign keys
             $table->foreign('subido_por')
-                  ->references('id')->on('funcionarios')
-                  ->cascadeOnUpdate()
-                  ->restrictOnDelete();
+                ->references('id')->on('funcionarios')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
 
             $table->foreign('establecimiento_id')
-                  ->references('id')->on('establecimientos')
-                  ->cascadeOnUpdate()
-                  ->nullOnDelete();
+                ->references('id')->on('establecimientos')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
         });
     }
 
