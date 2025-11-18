@@ -17,32 +17,44 @@
             </a>
         </li>
 
-        <li>
-            <a href="/modulos/bitacora">
-                <i class="bi bi-journal-text"></i>
-                <span>Bitácora Incidentes</span>
-            </a>
-        </li>
+        <!-- ============================== -->
+        <!--      CONVIVENCIA ESCOLAR      -->
+        <!-- ============================== -->
 
-        <li>
-            <a href="/modulos/seguimiento-emocional">
-                <i class="bi bi-heart-pulse"></i>
-                <span>Seguimiento Emocional</span>
+        <li class="submenu" data-key="convivencia">
+            <a href="#" class="submenu-toggle">
+                <i class="bi bi-people-fill"></i>
+                <span>Convivencia Escolar</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
             </a>
-        </li>
 
-        <li>
-            <a href="/modulos/medidas-restaurativas">
-                <i class="bi bi-patch-check"></i>
-                <span>Medidas Restaurativas</span>
-            </a>
-        </li>
+            <ul class="submenu-items">
 
-        <li>
-            <a href="/modulos/derivaciones">
-                <i class="bi bi-arrow-right-circle"></i>
-                <span>Derivaciones</span>
-            </a>
+                <li>
+                    <a href="{{ route('convivencia.bitacora.index') }}">
+                        <i class="bi bi-journal-text"></i> Bitácora Incidentes
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('convivencia.seguimiento.index') }}">
+                        <i class="bi bi-heart-pulse"></i> Seguimiento Emocional
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('convivencia.medidas.index') }}">
+                        <i class="bi bi-patch-check"></i> Medidas Restaurativas
+                    </a>
+                </li>
+
+                {{--<li>
+                    <a href="{{ route('convivencia.derivaciones.index') }}">
+                        <i class="bi bi-arrow-right-circle"></i> Derivaciones
+                    </a>
+                </li>--}}
+
+            </ul>
         </li>
 
         <!-- ============================== -->

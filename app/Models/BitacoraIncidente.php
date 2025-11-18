@@ -18,7 +18,6 @@ class BitacoraIncidente extends Model
         'accion_realizada',
         'reportado_por',
         'estado_id',
-        'seguimiento_id',
         'establecimiento_id',
         'curso_id'
     ];
@@ -90,8 +89,7 @@ class BitacoraIncidente extends Model
     // Documentos adjuntos (relación polimórfica)
     public function documentos()
     {
-        return $this->hasMany(DocumentoAdjunto::class, 'entidad_id')
-                    ->where('entidad', 'bitacora_incidentes');
+        return $this->morphMany(DocumentoAdjunto::class, 'entidad');
     }
 
     // ---------------------------------------------------

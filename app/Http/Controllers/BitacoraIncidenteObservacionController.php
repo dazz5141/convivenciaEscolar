@@ -25,7 +25,7 @@ class BitacoraIncidenteObservacionController extends Controller
         ]);
 
         return redirect()
-            ->route('bitacora.show', $id)
+            ->route('convivencia.bitacora.show', $id)
             ->with('success', 'Observación agregada correctamente.');
     }
 }

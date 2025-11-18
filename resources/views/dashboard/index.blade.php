@@ -113,7 +113,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Incidentes Recientes</h5>
-                <a href="/modulos/bitacora" class="btn btn-sm btn-primary">Ver Todos</a>
+                <a href="{{ route('convivencia.bitacora.index') }}" class="btn btn-sm btn-primary">Ver Todos</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">

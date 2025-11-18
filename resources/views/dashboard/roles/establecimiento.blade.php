@@ -190,7 +190,7 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Últimos incidentes</h5>
-        <a href="{{ route('bitacora.index') }}" class="btn btn-sm btn-primary">Ver bitácora</a>
+        <a href="{{ route('convivencia.bitacora.index') }}" class="btn btn-sm btn-primary">Ver bitácora</a>
     </div>
     <div class="card-body p-0">
         @if($ultimosIncidentes->count())

@@ -10,12 +10,12 @@
         <p class="text-muted">Modificar la información del seguimiento emocional registrado</p>
     </div>
 
-    <a href="{{ route('seguimiento.show', $seguimiento->id) }}" class="btn btn-secondary">
+    <a href="{{ route('convivencia.seguimiento.show', $seguimiento->id) }}" class="btn btn-secondary">
         <i class="bi bi-arrow-left me-2"></i> Volver
     </a>
 </div>
 
-<form action="{{ route('seguimiento.update', $seguimiento->id) }}" method="POST">
+<form action="{{ route('convivencia.seguimiento.update', $seguimiento->id) }}" method="POST">
     @csrf
     @method('PUT')
 
@@ -146,7 +146,7 @@
             <i class="bi bi-save me-2"></i> Guardar Cambios
         </button>
 
-        <a href="{{ route('seguimiento.index') }}" class="btn btn-secondary">
+        <a href="{{ route('convivencia.seguimiento.index') }}" class="btn btn-secondary">
             <i class="bi bi-x-circle me-2"></i> Cancelar
         </a>
     </div>

@@ -10,8 +10,10 @@ use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\BitacoraIncidenteController;
 use App\Http\Controllers\BitacoraIncidenteObservacionController;
+use App\Http\Controllers\BitacoraDocumentoController;
 use App\Http\Controllers\SeguimientoEmocionalController;
 use App\Http\Controllers\SeguimientoEmocionalObservacionController;
+use App\Http\Controllers\MedidaRestaurativaController;
 use App\Http\Controllers\ProfesionalPieController;
 use App\Http\Controllers\EstudiantePieController;
 use App\Http\Controllers\IntervencionPieController;
@@ -197,35 +199,70 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | MÓDULO BITÁCORA DE INCIDENTES
+    | MÓDULO CONVIVENCIA ESCOLAR
     |--------------------------------------------------------------------------
     */
+    Route::prefix('modulos/convivencia-escolar')->name('convivencia.')->group(function () {
 
-    Route::prefix('modulos/bitacora')->group(function () {
-        Route::get('/', [BitacoraIncidenteController::class, 'index'])->name('bitacora.index');
-        Route::get('/create', [BitacoraIncidenteController::class, 'create'])->name('bitacora.create');
-        Route::post('/', [BitacoraIncidenteController::class, 'store'])->name('bitacora.store');
-        Route::get('/{id}', [BitacoraIncidenteController::class, 'show'])->name('bitacora.show');
-        Route::get('/{id}/edit', [BitacoraIncidenteController::class, 'edit'])->name('bitacora.edit');
-        Route::put('/{id}', [BitacoraIncidenteController::class, 'update'])->name('bitacora.update');
-        Route::post('bitacora/{id}/observaciones',[BitacoraIncidenteObservacionController::class, 'store'])->name('bitacora.observaciones.store');
-    });
+        /*
+        |--------------------------------------------------------------------------
+        | BITÁCORA DE INCIDENTES
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('bitacora')->name('bitacora.')->group(function () {
+            Route::get('/', [BitacoraIncidenteController::class, 'index'])->name('index');
+            Route::get('/crear', [BitacoraIncidenteController::class, 'create'])->name('create');
+            Route::post('/', [BitacoraIncidenteController::class, 'store'])->name('store');
+            Route::get('/{id}', [BitacoraIncidenteController::class, 'show'])->name('show');
+            Route::get('/{id}/editar', [BitacoraIncidenteController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [BitacoraIncidenteController::class, 'update'])->name('update');
+            Route::post('/{id}/observaciones', [BitacoraIncidenteObservacionController::class, 'store'])->name('observaciones.store');
 
-    /*
-    |--------------------------------------------------------------------------
-    | MÓDULO SEGUIMIENTO EMOCIONAL
-    |--------------------------------------------------------------------------
-    */
+            /*
+            |--------------------------------------------------------------------------
+            | DOCUMENTOS – BITÁCORA DE INCIDENTES
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('{incidente}/documentos')->name('documentos.')->group(function () {
+                Route::get('/', [BitacoraDocumentoController::class, 'index'])->name('index');
+                Route::post('/', [BitacoraDocumentoController::class, 'store'])->name('store');
+                Route::put('/{id}/deshabilitar', [BitacoraDocumentoController::class, 'disable'])->name('disable');
+                Route::put('/{id}/habilitar', [BitacoraDocumentoController::class, 'enable'])->name('enable');
+            });
+        });
 
-    Route::prefix('modulos/seguimiento-emocional')->middleware(['auth', 'establecimiento'])->group(function () {
-        Route::get('/',           [SeguimientoEmocionalController::class, 'index'])->name('seguimiento.index');
-        Route::get('/crear',      [SeguimientoEmocionalController::class, 'create'])->name('seguimiento.create');
-        Route::post('/',          [SeguimientoEmocionalController::class, 'store'])->name('seguimiento.store');
-        Route::get('/{id}',       [SeguimientoEmocionalController::class, 'show'])->name('seguimiento.show');
-        Route::get('/{id}/edit',  [SeguimientoEmocionalController::class, 'edit'])->name('seguimiento.edit');
-        Route::put('/{id}',       [SeguimientoEmocionalController::class, 'update'])->name('seguimiento.update');
-        // Observaciones al seguimiento emocional
-        Route::post('/{id}/observaciones', [SeguimientoEmocionalObservacionController::class, 'store'])->name('seguimiento.observaciones.store');
+
+        /*
+        |--------------------------------------------------------------------------
+        | SEGUIMIENTO EMOCIONAL
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('seguimiento')->name('seguimiento.')->group(function () {
+            Route::get('/',           [SeguimientoEmocionalController::class, 'index'])->name('index');
+            Route::get('/crear',      [SeguimientoEmocionalController::class, 'create'])->name('create');
+            Route::post('/',          [SeguimientoEmocionalController::class, 'store'])->name('store');
+            Route::get('/{id}',       [SeguimientoEmocionalController::class, 'show'])->name('show');
+            Route::get('/{id}/editar',[SeguimientoEmocionalController::class, 'edit'])->name('edit');
+            Route::put('/{id}',       [SeguimientoEmocionalController::class, 'update'])->name('update');
+            Route::post('/{id}/observaciones', [SeguimientoEmocionalObservacionController::class, 'store'])->name('observaciones.store');
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MEDIDAS RESTAURATIVAS
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('medidas')->name('medidas.')->group(function () {
+
+            Route::get('/',          [MedidaRestaurativaController::class, 'index'])->name('index');
+            Route::get('/crear',     [MedidaRestaurativaController::class, 'create'])->name('create');
+            Route::post('/',         [MedidaRestaurativaController::class, 'store'])->name('store');
+            Route::get('/{id}',      [MedidaRestaurativaController::class, 'show'])->name('show');
+            Route::get('/{id}/editar',[MedidaRestaurativaController::class, 'edit'])->name('edit');
+            Route::put('/{id}',      [MedidaRestaurativaController::class, 'update'])->name('update');
+        });
+
     });
 
     /*
@@ -452,7 +489,6 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
     // PRINCIPALES
     crudDummy('derivaciones', 'derivaciones');
-    crudDummy('medidas-restaurativas', 'medidas-restaurativas');
 
     // ADMIN
     crudDummy('roles', 'roles');

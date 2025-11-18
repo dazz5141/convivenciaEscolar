@@ -10,12 +10,12 @@
         <p class="text-muted">Actualizar información del incidente registrado</p>
     </div>
 
-    <a href="{{ route('bitacora.show', $incidente->id) }}" class="btn btn-secondary">
+    <a href="{{ route('convivencia.bitacora.show', $incidente->id) }}" class="btn btn-secondary">
         <i class="bi bi-arrow-left me-2"></i> Volver
     </a>
 </div>
 
-<form action="{{ route('bitacora.update', $incidente->id) }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('convivencia.bitacora.update', $incidente->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -184,7 +184,7 @@
             <i class="bi bi-save me-2"></i> Guardar Cambios
         </button>
 
-        <a href="{{ route('bitacora.index') }}" class="btn btn-secondary">
+        <a href="{{ route('convivencia.bitacora.index') }}" class="btn btn-secondary">
             <i class="bi bi-x-circle me-2"></i> Cancelar
         </a>
     </div>

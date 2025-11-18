@@ -11,12 +11,17 @@
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
-        <a href="{{ route('seguimiento.edit', $seguimiento->id) }}" class="btn btn-primary">
+        <a href="{{ route('convivencia.seguimiento.edit', $seguimiento->id) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
 
-        <a href="{{ route('seguimiento.index') }}" class="btn btn-secondary">
+        <a href="{{ route('convivencia.seguimiento.index') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i> Volver
+        </a>
+
+        <a href="{{ route('convivencia.medidas.create', ['seguimiento_id' => $seguimiento->id]) }}"
+        class="btn btn-warning">
+            <i class="bi bi-emoji-smile me-2"></i> Registrar Medida Restaurativa
         </a>
     </div>
 </div>
@@ -172,7 +177,7 @@
             <div class="card-body">
 
                 {{-- FORMULARIO PARA AGREGAR OBSERVACIÓN --}}
-                <form action="{{ route('seguimiento.observaciones.store', $seguimiento->id) }}" method="POST" class="mb-3">
+                <form action="{{ route('convivencia.seguimiento.observaciones.store', $seguimiento->id) }}" method="POST" class="mb-3">
                     @csrf
 
                     <label class="form-label fw-bold">Agregar nueva observación</label>

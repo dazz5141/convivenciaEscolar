@@ -9,7 +9,7 @@
     <p class="text-muted">Registrar una evaluación emocional para un alumno</p>
 </div>
 
-<form action="{{ route('seguimiento.store') }}" method="POST">
+<form action="{{ route('convivencia.seguimiento.store') }}" method="POST">
     @csrf
 
 
@@ -118,7 +118,7 @@
             <i class="bi bi-save me-2"></i> Guardar Seguimiento
         </button>
 
-        <a href="{{ route('seguimiento.index') }}" class="btn btn-secondary">
+        <a href="{{ route('convivencia.seguimiento.index') }}" class="btn btn-secondary">
             <i class="bi bi-x-circle me-2"></i> Cancelar
         </a>
     </div>

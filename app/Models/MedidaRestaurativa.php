@@ -12,6 +12,7 @@ class MedidaRestaurativa extends Model
     protected $table = 'medidas_restaurativas';
 
     protected $fillable = [
+        'alumno_id',
         'incidente_id',
         'tipo_medida_id',
         'fecha_inicio',
@@ -21,6 +22,11 @@ class MedidaRestaurativa extends Model
         'observaciones',
         'establecimiento_id'
     ];
+
+    public function alumno()
+    {
+        return $this->belongsTo(Alumno::class);
+    }
 
     public function incidente()
     {

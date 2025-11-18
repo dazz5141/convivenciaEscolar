@@ -61,7 +61,7 @@ class BitacoraIncidenteController extends Controller
             ->orderBy('apellido_paterno')
             ->get();
 
-        return view('modulos.bitacora.index', compact('incidentes', 'cursos', 'estados', 'alumnos'));
+        return view('modulos.convivencia-escolar.bitacora.index', compact('incidentes', 'cursos', 'estados', 'alumnos'));
     }
 
     /**
@@ -71,7 +71,7 @@ class BitacoraIncidenteController extends Controller
     {
         $establecimientoId = session('establecimiento_id');
 
-        return view('modulos.bitacora.create', [
+        return view('modulos.convivencia-escolar.bitacora.create', [
             'alumnos' => Alumno::where('activo', 1)
                 ->whereHas('curso', fn($q) => $q->where('establecimiento_id', $establecimientoId))
                 ->orderBy('apellido_paterno')
@@ -142,31 +142,20 @@ class BitacoraIncidenteController extends Controller
                 ]);
             }
 
-            // Crear seguimiento emocional
-            $seguimiento = SeguimientoEmocional::create([
-                'alumno_id'          => $primerAlumno->id,
-                'fecha'              => $request->fecha,
-                'comentario'         => 'Seguimiento generado automáticamente.',
-                'evaluado_por'       => $request->reportado_por,
-                'establecimiento_id' => $establecimientoId,
-            ]);
-
-            // Asociarlo al incidente
-            $incidente->update([
-                'seguimiento_id' => $seguimiento->id,
-            ]);
-
             // Adjuntar documentos
             if ($request->hasFile('archivos')) {
+
                 foreach ($request->file('archivos') as $archivo) {
-                    $path = $archivo->store("incidentes/{$incidente->id}", 'public');
+
+                    // Guardado real del archivo
+                    $ruta = $archivo->store("documentos/bitacora/{$incidente->id}", 'public');
 
                     DocumentoAdjunto::create([
-                        'entidad'            => 'bitacora_incidentes',
+                        'entidad_type'       => BitacoraIncidente::class,
                         'entidad_id'         => $incidente->id,
                         'establecimiento_id' => $establecimientoId,
                         'nombre_archivo'     => $archivo->getClientOriginalName(),
-                        'ruta_archivo'       => $path,
+                        'ruta_archivo'       => "storage/" . $ruta,
                         'subido_por'         => Auth::user()->funcionario_id,
                     ]);
                 }
@@ -175,7 +164,7 @@ class BitacoraIncidenteController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('bitacora.index')
+                ->route('convivencia.bitacora.index')
                 ->with('success', 'Incidente registrado correctamente.');
 
         } catch (\Exception $e) {
@@ -204,7 +193,7 @@ class BitacoraIncidenteController extends Controller
             'observaciones.funcionario'
         ])->findOrFail($id);
 
-        return view('modulos.bitacora.show', compact('incidente'));
+        return view('modulos.convivencia-escolar.bitacora.show', compact('incidente'));
     }
 
     /**
@@ -222,7 +211,7 @@ class BitacoraIncidenteController extends Controller
         ->delColegio($establecimientoId)
         ->findOrFail($id);
 
-        return view('modulos.bitacora.edit', compact('incidente'));
+        return view('modulos.convivencia-escolar.bitacora.edit', compact('incidente'));
     }
 
     /**
@@ -304,11 +293,11 @@ class BitacoraIncidenteController extends Controller
                     $path = $archivo->store("incidentes/{$incidente->id}", 'public');
 
                     DocumentoAdjunto::create([
-                        'entidad'            => 'bitacora_incidentes',
+                        'entidad_type'       => BitacoraIncidente::class,
                         'entidad_id'         => $incidente->id,
                         'establecimiento_id' => $establecimientoId,
                         'nombre_archivo'     => $archivo->getClientOriginalName(),
-                        'ruta_archivo'       => $path,
+                        'ruta_archivo'       => "storage/" . $path,
                         'subido_por'         => Auth::user()->funcionario_id,
                     ]);
                 }
@@ -317,7 +306,7 @@ class BitacoraIncidenteController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('bitacora.index')
+                ->route('convivencia.bitacora.index')
                 ->with('success', 'Incidente actualizado correctamente.');
 
         } catch (\Exception $e) {

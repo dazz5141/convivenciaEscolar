@@ -46,7 +46,7 @@ class SeguimientoEmocionalController extends Controller
 
         $seguimientos = $query->paginate(20);
 
-        return view('modulos.seguimiento-emocional.index', [
+        return view('modulos.convivencia-escolar.seguimiento-emocional.index', [
             'seguimientos' => $seguimientos,
             'alumnos'      => Alumno::where('activo', 1)
                 ->whereHas('curso', fn($q) => $q->where('establecimiento_id', $establecimientoId))
@@ -65,7 +65,7 @@ class SeguimientoEmocionalController extends Controller
     {
         $establecimientoId = session('establecimiento_id');
 
-        return view('modulos.seguimiento-emocional.create', [
+        return view('modulos.convivencia-escolar.seguimiento-emocional.create', [
             'alumnos' => Alumno::where('activo', 1)
                 ->whereHas('curso', fn($q) => $q->where('establecimiento_id', $establecimientoId))
                 ->orderBy('apellido_paterno')->get(),
@@ -105,7 +105,7 @@ class SeguimientoEmocionalController extends Controller
         ]);
 
         return redirect()
-            ->route('seguimiento.index')
+            ->route('convivencia.seguimiento.index')
             ->with('success', 'Seguimiento emocional registrado correctamente.');
     }
 
@@ -123,7 +123,7 @@ class SeguimientoEmocionalController extends Controller
             'observaciones.funcionario'
         ])->findOrFail($id);
 
-        return view('modulos.seguimiento-emocional.show', compact('seguimiento'));
+        return view('modulos.convivencia-escolar.seguimiento-emocional.show', compact('seguimiento'));
     }
 
 
@@ -136,7 +136,7 @@ class SeguimientoEmocionalController extends Controller
 
         $establecimientoId = session('establecimiento_id');
 
-        return view('modulos.seguimiento-emocional.edit', [
+        return view('modulos.convivencia-escolar.seguimiento-emocional.edit', [
             'seguimiento' => $seguimiento,
             'alumnos' => Alumno::where('activo', 1)
                 ->whereHas('curso', fn($q) => $q->where('establecimiento_id', $establecimientoId))
@@ -178,7 +178,7 @@ class SeguimientoEmocionalController extends Controller
         ]);
 
         return redirect()
-            ->route('seguimiento.index')
+            ->route('convivencia.seguimiento.index')
             ->with('success', 'Seguimiento emocional actualizado correctamente.');
     }
 }

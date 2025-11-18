@@ -11,11 +11,12 @@ return new class extends Migration
         Schema::create('medidas_restaurativas', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('incidente_id');
+            $table->unsignedBigInteger('incidente_id')->nullable();
+            $table->unsignedBigInteger('alumno_id');
             $table->unsignedBigInteger('establecimiento_id');
 
             $table->unsignedBigInteger('tipo_medida_id');
-            $table->unsignedBigInteger('responsable_funcionario'); // funcionario encargado
+            $table->unsignedBigInteger('responsable_funcionario');
 
             $table->date('fecha_inicio')->nullable();
             $table->date('fecha_fin')->nullable();
@@ -25,8 +26,10 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // FKs
             $table->foreign('incidente_id')->references('id')->on('bitacora_incidentes')
+                ->onUpdate('cascade')->onDelete('set null');
+
+            $table->foreign('alumno_id')->references('id')->on('alumnos')
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->foreign('establecimiento_id')->references('id')->on('establecimientos')
@@ -41,7 +44,6 @@ return new class extends Migration
             $table->foreign('cumplimiento_estado_id')->references('id')->on('estados_cumplimiento')
                 ->onUpdate('cascade')->onDelete('restrict');
 
-            // Índices recomendados
             $table->index(['incidente_id', 'tipo_medida_id']);
             $table->index('establecimiento_id');
         });

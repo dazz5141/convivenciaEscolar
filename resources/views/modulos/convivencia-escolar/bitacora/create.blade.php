@@ -8,7 +8,7 @@
     <p class="text-muted">Registrar un nuevo incidente en la bitácora</p>
 </div>
 
-<form action="{{ route('bitacora.store') }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('convivencia.bitacora.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     {{-- =======================
@@ -100,7 +100,7 @@
             <i class="bi bi-save me-2"></i>Guardar Incidente
         </button>
 
-        <a href="/modulos/bitacora" class="btn btn-secondary">
+        <a href="{{ route('convivencia.bitacora.index') }}" class="btn btn-secondary">
             <i class="bi bi-x-circle me-2"></i>Cancelar
         </a>
     </div>
