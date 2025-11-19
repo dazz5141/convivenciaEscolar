@@ -23,6 +23,15 @@
         class="btn btn-warning">
             <i class="bi bi-emoji-smile me-2"></i> Registrar Medida Restaurativa
         </a>
+
+        <a href="{{ route('convivencia.derivaciones.create', [
+                'tipo_entidad' => 'seguimiento',
+                'entidad_id'   => $seguimiento->id,
+                'alumno_id'    => $seguimiento->alumno_id
+            ]) }}"
+            class="btn btn-warning">
+            <i class="bi bi-arrow-right-circle me-2"></i> Crear Derivación
+        </a>
     </div>
 </div>
 

@@ -30,6 +30,7 @@ use App\Http\Controllers\ConflictoFuncionarioController;
 use App\Http\Controllers\ConflictoApoderadoController;
 use App\Http\Controllers\DenunciaLeyKarinController;
 use App\Http\Controllers\LeyKarinDocumentoController;
+use App\Http\Controllers\DerivacionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -263,6 +264,21 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
             Route::put('/{id}',      [MedidaRestaurativaController::class, 'update'])->name('update');
         });
 
+        /*
+        |--------------------------------------------------------------------------
+        | DERIVACIONES – CONVIVENCIA ESCOLAR
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('derivaciones')->name('derivaciones.')->group(function () {
+
+            Route::get('/', [DerivacionController::class, 'index'])->name('index');
+            Route::get('/crear', [DerivacionController::class, 'create'])->name('create');
+            Route::post('/', [DerivacionController::class, 'store'])->name('store');
+            Route::get('/{derivacion}', [DerivacionController::class, 'show'])->name('show');
+            Route::get('/{derivacion}/editar', [DerivacionController::class, 'edit'])->name('edit');
+            Route::put('/{derivacion}', [DerivacionController::class, 'update'])->name('update');
+        });
+
     });
 
     /*
@@ -486,9 +502,6 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
             Route::view("/modulos/$base/ver", "modulos.$folder.show")->name("$base.show");
         }
     }
-
-    // PRINCIPALES
-    crudDummy('derivaciones', 'derivaciones');
 
     // ADMIN
     crudDummy('roles', 'roles');

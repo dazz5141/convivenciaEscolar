@@ -21,6 +21,16 @@
         <a href="{{ route('convivencia.medidas.edit', $medida->id) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+
+        {{-- Crear Derivación --}}
+        <a href="{{ route('convivencia.derivaciones.create', [
+                'tipo_entidad' => 'medida',
+                'entidad_id'   => $medida->id,
+                'alumno_id'    => $medida->alumno_id
+            ]) }}"
+            class="btn btn-warning">
+            <i class="bi bi-arrow-right-circle me-2"></i> Crear Derivación
+        </a>
     </div>
 </div>
 
