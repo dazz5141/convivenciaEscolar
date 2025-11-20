@@ -31,6 +31,11 @@ use App\Http\Controllers\ConflictoApoderadoController;
 use App\Http\Controllers\DenunciaLeyKarinController;
 use App\Http\Controllers\LeyKarinDocumentoController;
 use App\Http\Controllers\DerivacionController;
+use App\Http\Controllers\Reportes\DashboardReporteController;
+use App\Http\Controllers\Reportes\CursoReporteController;
+use App\Http\Controllers\Reportes\AlumnoReporteController;
+use App\Http\Controllers\Reportes\FuncionarioReporteController;
+use App\Http\Controllers\Reportes\EstablecimientoReporteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,6 +100,19 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         Route::view('/psicologo', 'dashboard.roles.psicologo')->name('dashboard.psicologo');
         Route::view('/asistente', 'dashboard.roles.asistente')->name('dashboard.asistente');
         Route::view('/convivencia', 'dashboard.roles.convivencia')->name('dashboard.convivencia');
+    });
+
+    /*--------------------------------------------------------------------------
+    | MÓDULO REPORTES
+    |--------------------------------------------------------------------------*/
+    Route::prefix('modulos/reportes')->name('reportes.')->middleware(['auth', 'establecimiento', 'reportes.role'])->group(function () {
+
+        Route::get('/dashboard', [DashboardReporteController::class, 'index'])->name('dashboard');
+
+        Route::get('/curso', [CursoReporteController::class, 'index'])->name('curso');
+        Route::get('/alumno', [AlumnoReporteController::class, 'index'])->name('alumno');
+        Route::get('/funcionario', [FuncionarioReporteController::class, 'index'])->name('funcionario');
+        Route::get('/establecimiento', [EstablecimientoReporteController::class, 'index'])->name('establecimiento');
     });
 
 

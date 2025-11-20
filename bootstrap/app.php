@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'rol'             => \App\Http\Middleware\RolMiddleware::class,
             'establecimiento' => \App\Http\Middleware\EstablecimientoMiddleware::class,
+            'reportes.role'     => \App\Http\Middleware\CheckReportesRole::class,
         ]);
 
     })
