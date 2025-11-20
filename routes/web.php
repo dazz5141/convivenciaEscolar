@@ -113,6 +113,9 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         Route::get('/alumno', [AlumnoReporteController::class, 'index'])->name('alumno');
         Route::get('/funcionario', [FuncionarioReporteController::class, 'index'])->name('funcionario');
         Route::get('/establecimiento', [EstablecimientoReporteController::class, 'index'])->name('establecimiento');
+
+        // Reporte PDF por establecimiento
+        Route::get('/establecimiento/pdf', [EstablecimientoReporteController::class, 'pdfProfesional'])->name('establecimiento.pdf');
     });
 
 

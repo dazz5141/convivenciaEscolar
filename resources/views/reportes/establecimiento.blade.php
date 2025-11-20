@@ -34,9 +34,16 @@
                     </option>
                 @endforeach
             </select>
-            <button class="btn btn-primary btn-sm">
+            <button type="submit" class="btn btn-primary" style="min-width: 140px;">
                 Ver reporte
             </button>
+
+            <a href="{{ route('reportes.establecimiento.pdf', ['establecimiento_id' => $establecimientoId]) }}"
+                class="btn btn-success"
+                target="_blank"
+                style="min-width: 140px;">
+                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+            </a>
         </form>
     @endif
 </div>

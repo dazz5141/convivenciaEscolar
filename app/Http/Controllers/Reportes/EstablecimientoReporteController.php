@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 // Modelos
 use App\Models\Establecimiento;
@@ -172,5 +173,61 @@ class EstablecimientoReporteController extends Controller
             'incidentesPorTipo',
             'rankingCursos'
         ));
+    }
+
+    /**
+     * Generar reporte PDF del establecimiento seleccionado.
+     */
+    public function pdfProfesional(Request $request)
+    {
+        $establecimientoId = $request->establecimiento_id;
+
+        if (!$establecimientoId) {
+            abort(404, "No se seleccionó un establecimiento.");
+        }
+
+        // Obtener datos
+        $establecimiento = Establecimiento::with(['dependencia', 'comuna'])
+            ->findOrFail($establecimientoId);
+
+        $totalCursos = Curso::where('establecimiento_id', $establecimientoId)->count();
+        $totalAlumnos = Alumno::whereHas('curso', fn($q) => $q->where('establecimiento_id', $establecimientoId))->count();
+        $totalFuncionarios = Funcionario::where('establecimiento_id', $establecimientoId)->count();
+
+        $totalIncidentes = BitacoraIncidente::where('establecimiento_id', $establecimientoId)->count();
+        $totalSeguimientos = SeguimientoEmocional::where('establecimiento_id', $establecimientoId)->count();
+        $totalDerivaciones = Derivacion::where('establecimiento_id', $establecimientoId)->count();
+        $totalMedidas = MedidaRestaurativa::where('establecimiento_id', $establecimientoId)->count();
+        $totalNovedades = NovedadInspectoria::where('establecimiento_id', $establecimientoId)->count();
+        $totalAccidentes = AccidenteEscolar::where('establecimiento_id', $establecimientoId)->count();
+
+        // Ranking cursos
+        $rankingCursos = BitacoraIncidente::where('bitacora_incidentes.establecimiento_id', $establecimientoId)
+            ->join('cursos', 'cursos.id', '=', 'bitacora_incidentes.curso_id')
+            ->select(
+                'cursos.id',
+                DB::raw("CONCAT(cursos.nivel,' ',cursos.letra) AS nombre_curso"),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('cursos.id', 'nombre_curso')
+            ->orderBy('total', 'desc')
+            ->limit(10)
+            ->get();
+
+        $pdf = \PDF::loadView('reportes.pdf.establecimiento-profesional', compact(
+            'establecimiento',
+            'totalCursos',
+            'totalAlumnos',
+            'totalFuncionarios',
+            'totalIncidentes',
+            'totalSeguimientos',
+            'totalDerivaciones',
+            'totalMedidas',
+            'totalNovedades',
+            'totalAccidentes',
+            'rankingCursos'
+        ))->setPaper('letter', 'portrait');
+
+        return $pdf->stream('Reporte_Establecimiento_'.$establecimiento->nombre.'.pdf');
     }
 }
