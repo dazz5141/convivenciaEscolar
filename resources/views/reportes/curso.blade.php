@@ -16,16 +16,27 @@
 {{-- ============================= --}}
 <form method="GET" action="{{ route('reportes.curso') }}" class="mb-4">
     <label class="form-label fw-bold">Selecciona un curso:</label>
-    <div class="input-group">
-        <select name="curso_id" class="form-select" required>
-            <option value="">— Seleccionar —</option>
-            @foreach($cursos as $c)
-                <option value="{{ $c->id }}" {{ request('curso_id') == $c->id ? 'selected' : '' }}>
-                    {{ $c->nombre }}
-                </option>
-            @endforeach
-        </select>
-        <button class="btn btn-primary">Generar Reporte</button>
+        <div class="d-flex align-items-center gap-2">
+
+        <div class="flex-grow-1">
+            <select name="curso_id" class="form-select" required>
+                <option value="">— Seleccionar —</option>
+                @foreach($cursos as $c)
+                    <option value="{{ $c->id }}" {{ request('curso_id') == $c->id ? 'selected' : '' }}>
+                        {{ $c->nombre }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalBuscarCurso">
+            Buscar
+        </button>
+
+        <button class="btn btn-primary">
+            Generar Reporte
+        </button>
+
     </div>
 </form>
 

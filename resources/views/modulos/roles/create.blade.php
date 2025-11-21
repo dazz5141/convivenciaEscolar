@@ -1,36 +1,38 @@
 @extends('layouts.app')
 
-@section('title', 'Crear Registro')
+@section('title', 'Crear Rol')
 
 @section('content')
+
 <div class="page-header">
-    <h1 class="page-title">Crear Nuevo Registro</h1>
+    <h1 class="page-title">Crear Nuevo Rol</h1>
 </div>
 
-<form action="/modulos/roles" method="POST">
-    <div class="form-section">
-        <h5 class="form-section-title">Información</h5>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" id="fecha" name="fecha" required>
+<form action="{{ route('roles.store') }}" method="POST">
+    @csrf
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <div class="mb-3">
+                <label class="form-label">Nombre del Rol *</label>
+                <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control" required>
+                @error('nombre') <span class="text-danger small">{{ $message }}</span> @enderror
             </div>
-            <div class="col-12">
-                <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
-                <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required></textarea>
-            </div>
+
         </div>
     </div>
 
-    <div class="d-flex gap-2 flex-wrap">
+    <div class="d-flex gap-2 flex-wrap mt-3">
         <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save me-2"></i>
-            Guardar
+            <i class="bi bi-save me-2"></i> Guardar
         </button>
-        <a href="/modulos/roles" class="btn btn-secondary">
-            <i class="bi bi-x-circle me-2"></i>
-            Cancelar
+
+        <a href="{{ route('roles.index') }}" class="btn btn-secondary">
+            <i class="bi bi-x-circle me-2"></i> Cancelar
         </a>
     </div>
+
 </form>
+
 @endsection

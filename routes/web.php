@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\RolController;
 use App\Http\Controllers\EstablecimientoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FuncionarioController;
@@ -217,6 +218,20 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
         Route::put('/{id}/deshabilitar', [ApoderadoController::class, 'disable'])->name('apoderados.disable');
         Route::put('/{id}/habilitar', [ApoderadoController::class, 'enable'])->name('apoderados.enable');
+    });
+    
+    /*
+    |--------------------------------------------------------------------------
+    | MÓDULO ROLES
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('modulos/roles')->name('roles.')->middleware(['auth', 'establecimiento'])->group(function () {
+
+        Route::get('/', [RolController::class, 'index'])->name('index');
+        Route::get('/create', [RolController::class, 'create'])->name('create');
+        Route::post('/', [RolController::class, 'store'])->name('store');
+        Route::get('/{rol}/edit', [RolController::class, 'edit'])->name('edit');
+        Route::put('/{rol}', [RolController::class, 'update'])->name('update');
     });
 
     /*
@@ -525,7 +540,6 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
     }
 
     // ADMIN
-    crudDummy('roles', 'roles');
     crudDummy('auditoria', 'auditoria');
 
 });
