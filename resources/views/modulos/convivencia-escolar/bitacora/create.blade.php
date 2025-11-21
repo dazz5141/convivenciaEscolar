@@ -8,6 +8,8 @@
     <p class="text-muted">Registrar un nuevo incidente en la bitácora</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('convivencia.bitacora.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 

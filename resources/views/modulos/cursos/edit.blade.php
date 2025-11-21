@@ -7,6 +7,8 @@
     <h1 class="page-title">Editar Curso</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('cursos.update', $curso->id) }}" method="POST">
     @csrf
     @method('PUT')

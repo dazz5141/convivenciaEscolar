@@ -9,7 +9,7 @@
     <p class="text-muted">Actualizar datos de una derivación ya registrada</p>
 </div>
 
-
+@include('components.alerts')
 
 <form action="{{ route('convivencia.derivaciones.update', $derivacion->id) }}" method="POST">
     @csrf

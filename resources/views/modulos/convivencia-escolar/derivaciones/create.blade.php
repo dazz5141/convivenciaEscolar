@@ -9,6 +9,8 @@
     <p class="text-muted">Registrar una nueva derivación interna o externa</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('convivencia.derivaciones.store') }}" method="POST">
     @csrf
 

@@ -8,6 +8,8 @@
     <h1 class="page-title">Editar Citación a Apoderado</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('inspectoria.citaciones.update', $citacion) }}" method="POST">
     @csrf
     @method('PUT')

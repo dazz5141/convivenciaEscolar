@@ -8,6 +8,8 @@
     <p class="text-muted">Crear un curso para el establecimiento</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('cursos.store') }}" method="POST">
     @csrf
 

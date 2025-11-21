@@ -8,6 +8,8 @@
     <h1 class="page-title">Crear Nuevo Rol</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('roles.store') }}" method="POST">
     @csrf
 

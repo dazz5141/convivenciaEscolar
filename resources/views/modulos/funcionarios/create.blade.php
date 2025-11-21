@@ -8,6 +8,8 @@
     <h1 class="page-title">Crear Nuevo Funcionario</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('funcionarios.store') }}" method="POST">
     @csrf
 

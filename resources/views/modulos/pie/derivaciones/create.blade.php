@@ -9,6 +9,8 @@
     <p class="text-muted">Registrar una derivación asociada a un estudiante del Programa de Integración Escolar.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('pie.derivaciones.store') }}" method="POST">
     @csrf
 

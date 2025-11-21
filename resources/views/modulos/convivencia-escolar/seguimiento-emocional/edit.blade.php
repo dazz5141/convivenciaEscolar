@@ -15,6 +15,8 @@
     </a>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('convivencia.seguimiento.update', $seguimiento->id) }}" method="POST">
     @csrf
     @method('PUT')

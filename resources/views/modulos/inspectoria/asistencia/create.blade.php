@@ -11,6 +11,8 @@
     </p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('inspectoria.asistencia.store') }}" method="POST">
     @csrf
 

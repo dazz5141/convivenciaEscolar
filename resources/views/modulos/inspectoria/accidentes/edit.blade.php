@@ -8,6 +8,8 @@
     <h1 class="page-title">Editar Accidente Escolar</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('inspectoria.accidentes.update', $accidente) }}" method="POST">
     @csrf
     @method('PUT')

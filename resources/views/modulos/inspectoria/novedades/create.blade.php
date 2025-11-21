@@ -9,6 +9,8 @@
     <p class="text-muted">Ingrese la información correspondiente a la novedad registrada.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('inspectoria.novedades.store') }}" method="POST">
     @csrf
 

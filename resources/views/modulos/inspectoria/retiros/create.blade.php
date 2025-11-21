@@ -9,6 +9,8 @@
     <p class="text-muted">Complete la información correspondiente al retiro del alumno.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('inspectoria.retiros.store') }}" method="POST">
     @csrf
 

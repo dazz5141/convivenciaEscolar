@@ -9,6 +9,8 @@
     <p class="text-muted">Crear una acción restaurativa asociada a un incidente o directamente a un alumno.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('convivencia.medidas.store') }}" method="POST">
     @csrf
 

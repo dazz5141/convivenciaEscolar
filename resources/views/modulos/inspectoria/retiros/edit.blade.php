@@ -8,6 +8,8 @@
     <h1 class="page-title">Editar Retiro Anticipado</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('inspectoria.retiros.update', ['retiro' => $retiro->id]) }}" method="POST">
     @csrf
     @method('PUT')

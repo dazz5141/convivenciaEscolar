@@ -9,6 +9,8 @@
     <p class="text-muted">Crear un plan individual para un estudiante del Programa de Integración Escolar.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('pie.planes.store') }}" method="POST">
     @csrf
 

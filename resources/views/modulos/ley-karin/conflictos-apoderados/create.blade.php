@@ -9,6 +9,8 @@
     <p class="text-muted">Complete la información correspondiente al conflicto reportado.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('leykarin.conflictos-apoderados.store') }}" method="POST">
     @csrf
 

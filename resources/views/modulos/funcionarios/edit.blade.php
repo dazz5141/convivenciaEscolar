@@ -8,6 +8,8 @@
     <h1 class="page-title">Editar Funcionario</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('funcionarios.update', $funcionario->id) }}" method="POST">
     @csrf
     @method('PUT')

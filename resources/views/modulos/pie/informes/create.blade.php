@@ -9,6 +9,8 @@
     <p class="text-muted">Crear un informe asociado a un estudiante del Programa de Integración Escolar.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('pie.informes.store') }}" method="POST">
     @csrf
 

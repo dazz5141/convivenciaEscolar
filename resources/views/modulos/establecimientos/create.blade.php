@@ -8,6 +8,8 @@
     <h1 class="page-title">Crear Nuevo Establecimiento</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('establecimientos.store') }}" method="POST">
     @csrf
 

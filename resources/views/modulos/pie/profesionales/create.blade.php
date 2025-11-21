@@ -9,6 +9,8 @@
     <p class="text-muted">Asignar un funcionario al Programa de Integración Escolar</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('pie.profesionales.store') }}" method="POST">
     @csrf
 

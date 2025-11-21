@@ -9,6 +9,8 @@
     <p class="text-muted">Ingrese la información correspondiente a la citación.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('inspectoria.citaciones.store') }}" method="POST">
     @csrf
 

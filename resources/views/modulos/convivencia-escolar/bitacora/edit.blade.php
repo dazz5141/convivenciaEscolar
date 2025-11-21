@@ -15,6 +15,8 @@
     </a>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('convivencia.bitacora.update', $incidente->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')

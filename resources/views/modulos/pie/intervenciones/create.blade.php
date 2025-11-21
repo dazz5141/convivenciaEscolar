@@ -9,6 +9,8 @@
     <p class="text-muted">Registre una intervención realizada a un estudiante del Programa de Integración Escolar.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('pie.intervenciones.store') }}" method="POST">
     @csrf
 

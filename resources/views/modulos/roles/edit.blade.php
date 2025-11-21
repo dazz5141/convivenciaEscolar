@@ -8,6 +8,8 @@
     <h1 class="page-title">Editar Rol</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('roles.update', $rol->id) }}" method="POST">
     @csrf
     @method('PUT')

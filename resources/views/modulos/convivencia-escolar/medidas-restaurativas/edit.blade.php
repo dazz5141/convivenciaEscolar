@@ -8,6 +8,8 @@
     <h1 class="page-title">Editar Medida Restaurativa</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('convivencia.medidas.update', $medida->id) }}" method="POST">
     @csrf
     @method('PUT')

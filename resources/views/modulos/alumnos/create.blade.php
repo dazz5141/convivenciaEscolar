@@ -9,6 +9,8 @@
     <p class="text-muted">Registrar un nuevo estudiante</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('alumnos.store') }}" method="POST">
     @csrf
 

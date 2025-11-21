@@ -9,6 +9,8 @@
     <p class="text-muted">Complete la información del accidente ocurrido a un estudiante.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('inspectoria.accidentes.store') }}" method="POST">
     @csrf
 

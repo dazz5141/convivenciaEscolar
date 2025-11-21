@@ -9,6 +9,8 @@
     <p class="text-muted">Complete la información correspondiente a la denuncia ingresada.</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('leykarin.denuncias.store') }}" method="POST">
     @csrf
 

@@ -8,6 +8,8 @@
     <h1 class="page-title">Editar Conflicto con Apoderado</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('leykarin.conflictos-apoderados.update', $conflicto) }}" method="POST">
     @csrf
     @method('PUT')

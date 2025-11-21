@@ -8,6 +8,8 @@
     <h1 class="page-title">Crear Nuevo Apoderado</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('apoderados.store') }}" method="POST">
     @csrf
 

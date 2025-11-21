@@ -9,6 +9,8 @@
     <p class="text-muted">Registrar una evaluación emocional para un alumno</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('convivencia.seguimiento.store') }}" method="POST">
     @csrf
 

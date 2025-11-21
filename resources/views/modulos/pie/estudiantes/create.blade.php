@@ -9,6 +9,8 @@
     <p class="text-muted">Incorporar un alumno al Programa de Integración Escolar</p>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('pie.estudiantes.store') }}" method="POST">
     @csrf
 

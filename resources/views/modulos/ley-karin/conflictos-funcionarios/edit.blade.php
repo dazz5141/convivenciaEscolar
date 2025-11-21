@@ -8,6 +8,8 @@
     <h1 class="page-title">Editar Conflicto entre Funcionarios</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('leykarin.conflictos-funcionarios.update', $conflicto) }}" method="POST">
     @csrf
     @method('PUT')

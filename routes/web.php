@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\RolController;
+use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\EstablecimientoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FuncionarioController;
@@ -232,6 +233,21 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         Route::post('/', [RolController::class, 'store'])->name('store');
         Route::get('/{rol}/edit', [RolController::class, 'edit'])->name('edit');
         Route::put('/{rol}', [RolController::class, 'update'])->name('update');
+    });
+
+    /*-------------------------------------------------------------------------
+    | MÓDULO USUARIOS
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('modulos/usuarios')->name('usuarios.')->middleware(['auth', 'establecimiento'])->group(function () {
+
+        Route::get('/', [UsuarioController::class, 'index'])->name('index');
+        Route::get('/create', [UsuarioController::class, 'create'])->name('create');
+        Route::post('/', [UsuarioController::class, 'store'])->name('store');
+        Route::get('/{usuario}/edit', [UsuarioController::class, 'edit'])->name('edit');
+        Route::put('/{usuario}', [UsuarioController::class, 'update'])->name('update');
+        Route::put('/{usuario}/disable', [UsuarioController::class, 'disable'])->name('disable');
+        Route::put('/{usuario}/enable', [UsuarioController::class, 'enable'])->name('enable');
     });
 
     /*

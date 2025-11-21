@@ -8,6 +8,8 @@
     <h1 class="page-title">Editar Alumno</h1>
 </div>
 
+@include('components.alerts')
+
 <form action="{{ route('alumnos.update', $alumno->id) }}" method="POST">
     @csrf
     @method('PUT')
