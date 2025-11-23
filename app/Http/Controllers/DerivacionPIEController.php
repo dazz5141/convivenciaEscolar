@@ -71,6 +71,33 @@ class DerivacionPIEController extends Controller
             'estado'             => $request->estado,
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIONES – EQUIPO PIE
+        |--------------------------------------------------------------------------
+        */
+        $establecimientoId = session('establecimiento_id');
+
+        // Obtener profesionales PIE con usuario válido
+        $profesionales = ProfesionalPIE::where('establecimiento_id', $establecimientoId)
+            ->with('funcionario.usuario')
+            ->get();
+
+        foreach ($profesionales as $pro) {
+            if ($pro->funcionario && $pro->funcionario->usuario) {
+
+                Notificacion::create([
+                    'tipo'              => 'pie_derivacion',
+                    'mensaje'           => "Nueva derivación PIE registrada para estudiante ID {$request->estudiante_pie_id}.",
+                    'usuario_id'        => $pro->funcionario->usuario->id, // receptor
+                    'origen_id'         => $derivacion->id,
+                    'origen_model'      => DerivacionPIE::class,
+                    'establecimiento_id'=> $establecimientoId,
+                ]);
+
+            }
+        }
+
         return redirect()
             ->route('pie.derivaciones.index')
             ->with('success', 'Derivación registrada correctamente.');

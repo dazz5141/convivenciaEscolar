@@ -89,6 +89,33 @@ class InformePIEController extends Controller
             'contenido'          => $request->contenido,
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIÓN PROFESIONAL - INFORME PIE
+        |--------------------------------------------------------------------------
+        */
+
+        // obtener estudiante + profesional asignado
+        $estudiante = EstudiantePIE::with('profesional.funcionario.usuario')
+                        ->find($request->estudiante_pie_id);
+
+        if ($estudiante &&
+            $estudiante->profesional &&
+            $estudiante->profesional->funcionario &&
+            $estudiante->profesional->funcionario->usuario) {
+
+            $usuarioDestino = $estudiante->profesional->funcionario->usuario->id;
+
+            Notificacion::create([
+                'tipo'              => 'pie_informe',
+                'mensaje'           => "Nuevo informe PIE creado para el estudiante ID {$estudiante->id}.",
+                'usuario_id'        => $usuarioDestino,
+                'origen_id'         => $informe->id,
+                'origen_model'      => InformePIE::class,
+                'establecimiento_id'=> session('establecimiento_id'),
+            ]);
+        }
+
         return redirect()
             ->route('pie.informes.index')
             ->with('success', 'Informe registrado correctamente.');

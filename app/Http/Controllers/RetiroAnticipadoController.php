@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\RetiroAnticipado;
 use App\Models\Alumno;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
 
 class RetiroAnticipadoController extends Controller
@@ -103,9 +104,38 @@ class RetiroAnticipadoController extends Controller
             'entregado_por'      => Auth::user()->funcionario_id,
             'observaciones'      => $request->observaciones,
 
-            // 🔥 SOLUCIÓN REAL
             'establecimiento_id' => $alumno->curso->establecimiento_id,
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIONES AUTOMÁTICAS
+        |--------------------------------------------------------------------------
+        */
+
+        $establecimientoId = $alumno->curso->establecimiento_id;
+
+        // Roles que recibirán la notificación
+        $rolesDestino = [4, 5, 6]; // Inspector General, Inspector, Convivencia Escolar
+
+        $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
+            ->where('establecimiento_id', $establecimientoId)
+            ->where('activo', 1)
+            ->get();
+
+        if ($usuariosDestino->count() > 0) {
+
+            foreach ($usuariosDestino as $usuario) {
+                Notificacion::create([
+                    'usuario_id'         => $usuario->id,
+                    'origen_id'          => $retiro->id,
+                    'origen_model'       => RetiroAnticipado::class,
+                    'tipo'               => 'retiro_anticipado',
+                    'mensaje'            => "Retiro anticipado registrado para {$alumno->nombre_completo}.",
+                    'establecimiento_id' => $establecimientoId,
+                ]);
+            }
+        }
 
         return redirect()
             ->route('inspectoria.retiros.index')

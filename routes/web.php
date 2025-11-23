@@ -33,6 +33,7 @@ use App\Http\Controllers\ConflictoApoderadoController;
 use App\Http\Controllers\DenunciaLeyKarinController;
 use App\Http\Controllers\LeyKarinDocumentoController;
 use App\Http\Controllers\DerivacionController;
+use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\Reportes\DashboardReporteController;
 use App\Http\Controllers\Reportes\CursoReporteController;
 use App\Http\Controllers\Reportes\AlumnoReporteController;
@@ -538,6 +539,19 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
         Route::post('/{denuncia}/documentos', [LeyKarinDocumentoController::class, 'store'])->name('documentos.store');
         Route::put('/documentos/{id}/deshabilitar', [LeyKarinDocumentoController::class, 'disable'])->name('documentos.disable');
         Route::put('/documentos/{id}/habilitar', [LeyKarinDocumentoController::class, 'enable'])->name('documentos.enable');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | MÓDULO NOTIFICACIONES (Global del sistema)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('modulos/notificaciones')->name('notificaciones.')->group(function () {
+
+        Route::get('/', [NotificacionController::class, 'index'])->name('index');
+        Route::put('/{notificacion}/leer', [NotificacionController::class, 'marcarLeida'])->name('marcar-leida');
+        Route::put('/leer-todas', [NotificacionController::class, 'marcarTodas'])->name('marcar-todas');
     });
 
     /*

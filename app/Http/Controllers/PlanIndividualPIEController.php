@@ -69,6 +69,33 @@ class PlanIndividualPIEController extends Controller
             'evaluacion'         => $request->evaluacion,
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIÓN PROFESIONAL - PLAN INDIVIDUAL PIE
+        |--------------------------------------------------------------------------
+        */
+
+        // obtener estudiante + profesional asignado
+        $estudiante = EstudiantePIE::with('profesional.funcionario.usuario')
+                        ->find($request->estudiante_pie_id);
+
+        if ($estudiante &&
+            $estudiante->profesional &&
+            $estudiante->profesional->funcionario &&
+            $estudiante->profesional->funcionario->usuario) {
+
+            $usuarioDestino = $estudiante->profesional->funcionario->usuario->id;
+
+            Notificacion::create([
+                'tipo'              => 'pie_plan',
+                'mensaje'           => "Se ha creado un nuevo Plan Individual para el estudiante PIE ID {$estudiante->id}.",
+                'usuario_id'        => $usuarioDestino,
+                'origen_id'         => $plan->id,
+                'origen_model'      => PlanIndividualPIE::class,
+                'establecimiento_id'=> session('establecimiento_id'),
+            ]);
+        }
+
         return redirect()
             ->route('pie.planes.index')
             ->with('success', 'Plan individual registrado correctamente.');

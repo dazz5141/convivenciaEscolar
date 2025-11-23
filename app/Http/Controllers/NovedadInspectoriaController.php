@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\NovedadInspectoria;
 use App\Models\TipoNovedadInspectoria;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
 
 class NovedadInspectoriaController extends Controller
@@ -68,6 +69,42 @@ class NovedadInspectoriaController extends Controller
             'funcionario_id'     => Auth::user()->funcionario_id,
             'establecimiento_id' => session('establecimiento_id'),
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIONES AUTOMÁTICAS
+        |--------------------------------------------------------------------------
+        */
+
+        $establecimientoId = session('establecimiento_id');
+
+        // Roles que recibirán la notificación
+        $rolesDestino = [4, 5, 6]; // Inspector General, Inspector, Convivencia Escolar
+
+        // Usuarios del establecimiento con esos roles
+        $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
+            ->where('establecimiento_id', $establecimientoId)
+            ->where('activo', 1)
+            ->get();
+
+        if ($usuariosDestino->count() > 0) {
+
+            $alumno = $request->alumno_id
+                ? Alumno::find($request->alumno_id)->nombre_completo
+                : 'Sin alumno asignado';
+
+            foreach ($usuariosDestino as $usuario) {
+
+                Notificacion::create([
+                    'usuario_id'        => $usuario->id,
+                    'origen_id'         => $novedad->id,
+                    'origen_model'      => NovedadInspectoria::class,
+                    'tipo'              => 'novedad_inspectoria',
+                    'mensaje'           => "Nueva novedad registrada: {$alumno}",
+                    'establecimiento_id'=> $establecimientoId,
+                ]);
+            }
+        }
 
         return redirect()
             ->route('inspectoria.novedades.index')

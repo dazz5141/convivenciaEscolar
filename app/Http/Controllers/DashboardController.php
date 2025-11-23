@@ -64,7 +64,7 @@ class DashboardController extends Controller
         $ultimosIncidentes = BitacoraIncidente::delColegio($establecimientoId)
             ->latest()
             ->take(10)
-            ->with(['alumno', 'curso', 'estado'])
+            ->with(['alumnos', 'alumnos.curso', 'curso', 'estado'])
             ->get();
 
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Alumno;
 use App\Models\Curso;
 use App\Models\Funcionario;
+use App\Models\Usuario;
 use App\Models\BitacoraIncidente;
 use App\Models\BitacoraIncidenteAlumno;
 use App\Models\EstadoIncidente;
@@ -159,6 +160,33 @@ class BitacoraIncidenteController extends Controller
                         'subido_por'         => Auth::user()->funcionario_id,
                     ]);
                 }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | NOTIFICACIONES AUTOMÁTICAS – BITÁCORA INCIDENTE
+            |--------------------------------------------------------------------------
+            */
+
+            // DESTINATARIOS por rol
+            $rolesDestino = [3, 8]; 
+            // 3 = Inspector General
+            // 8 = Encargado de Convivencia Escolar
+
+            $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
+                ->where('establecimiento_id', $establecimientoId)
+                ->where('activo', 1)
+                ->get();
+
+            foreach ($usuariosDestino as $u) {
+                Notificacion::create([
+                    'usuario_id'        => $u->id,
+                    'origen_id'         => $incidente->id,
+                    'origen_model'      => BitacoraIncidente::class,
+                    'tipo'              => 'incidente',
+                    'mensaje'           => "Nuevo incidente reportado para {$primerAlumno->nombre_completo}.",
+                    'establecimiento_id'=> $establecimientoId,
+                ]);
             }
 
             DB::commit();

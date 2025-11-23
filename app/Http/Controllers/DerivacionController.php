@@ -7,6 +7,7 @@ use App\Models\Derivacion;
 use App\Models\BitacoraIncidente;
 use App\Models\SeguimientoEmocional;
 use App\Models\MedidaRestaurativa;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -90,6 +91,8 @@ class DerivacionController extends Controller
      */
     public function store(Request $request)
     {
+        $establecimientoId = session('establecimiento_id');
+
         $request->validate([
             'alumno_id'     => 'required|exists:alumnos,id',
             'tipo'          => 'required|string|max:50',
@@ -125,6 +128,53 @@ class DerivacionController extends Controller
             'registrado_por'     => Auth::user()->funcionario_id,
             'establecimiento_id' => session('establecimiento_id'),
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIONES AUTOMÁTICAS – DERIVACIONES
+        |--------------------------------------------------------------------------
+        | Destinatarios habituales:
+        | - Psicólogo
+        | - Asistente Social
+        | - Convivencia Escolar
+        |--------------------------------------------------------------------------
+        */
+
+        // Define roles destinatarios según la derivación
+        $rolesDestino = [];
+
+        // Ejemplo basado en tu arquitectura
+        if ($request->destino === 'Psicología') {
+            $rolesDestino[] = 6; // Psicólogo
+        }
+
+        if ($request->destino === 'Asistente Social') {
+            $rolesDestino[] = 7; // Asistente de Convivencia
+        }
+
+        // Siempre notificar a convivencia escolar
+        $rolesDestino[] = 8;
+
+        $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
+            ->where('establecimiento_id', $establecimientoId)
+            ->where('activo', 1)
+            ->get();
+
+        // Obtener alumno para el mensaje
+        $alumno = Alumno::find($request->alumno_id);    
+
+        $mensaje = "Nueva derivación para {$alumno->nombre_completo} hacia {$request->destino}.";
+
+        foreach ($usuariosDestino as $u) {
+            Notificacion::create([
+                'usuario_id'        => $u->id,
+                'origen_id'         => $derivacion->id,
+                'origen_model'      => Derivacion::class,
+                'tipo'              => 'derivacion',
+                'mensaje'           => $mensaje,
+                'establecimiento_id'=> $establecimientoId,
+            ]);
+        }
 
         return redirect()
             ->route('convivencia.derivaciones.index')

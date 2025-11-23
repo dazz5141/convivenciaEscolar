@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AsistenciaEvento;
 use App\Models\TipoAsistencia;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
 
 class AsistenciaEventoController extends Controller
@@ -95,6 +96,39 @@ class AsistenciaEventoController extends Controller
             'registrado_por'     => Auth::user()->funcionario_id,
             'establecimiento_id' => session('establecimiento_id'),
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIONES AUTOMÁTICAS – ASISTENCIA / ATRASOS
+        |--------------------------------------------------------------------------
+        */
+
+        // Roles destino (ajustable)
+        $rolesDestino = [3, 8]; 
+        // 3 = Inspector General
+        // 8 = Convivencia Escolar
+
+        $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
+            ->where('establecimiento_id', $establecimientoId)
+            ->where('activo', 1)
+            ->get();
+
+        // Definir mensaje
+        $tipoNombre = $asistencia->tipo->nombre ?? 'Evento';
+        $mensaje = ($request->tipo_id == self::TIPO_ATRASO)
+            ? "Atraso registrado para {$alumno->nombre_completo} a las {$request->hora}."
+            : "Nuevo registro de asistencia ({$tipoNombre}) para {$alumno->nombre_completo}.";
+
+        foreach ($usuariosDestino as $u) {
+            Notificacion::create([
+                'usuario_id'        => $u->id,
+                'origen_id'         => $asistencia->id,
+                'origen_model'      => AsistenciaEvento::class,
+                'tipo'              => 'asistencia',
+                'mensaje'           => $mensaje,
+                'establecimiento_id'=> $establecimientoId,
+            ]);
+        }
 
         return redirect()
             ->route('inspectoria.asistencia.index')

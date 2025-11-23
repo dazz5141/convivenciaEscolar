@@ -48,7 +48,6 @@
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>RBD</th>
                         <th>Nombre</th>
                         <th>Dirección</th>
@@ -60,7 +59,6 @@
                 <tbody>
                     @forelse ($establecimientos as $est)
                         <tr>
-                            <td>{{ $est->id }}</td>
                             <td>{{ $est->RBD }}</td>
                             <td>{{ $est->nombre }}</td>
                             <td>{{ $est->direccion }}</td>

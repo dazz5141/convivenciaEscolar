@@ -18,6 +18,7 @@ class RolesSeeder extends Seeder
             'Psicólogo',
             'Asistente de Aula',
             'Encargado Convivencia',
+            'UTP'
         ];
 
         foreach ($roles as $r) {

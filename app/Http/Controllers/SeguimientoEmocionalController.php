@@ -7,6 +7,7 @@ use App\Models\EstadoSeguimientoEmocional;
 use App\Models\NivelEmocional;
 use App\Models\Alumno;
 use App\Models\Funcionario;
+use App\Models\Usuario;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -103,6 +104,39 @@ class SeguimientoEmocionalController extends Controller
             'evaluado_por'       => $request->evaluado_por,
             'establecimiento_id' => session('establecimiento_id'),
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIONES AUTOMÁTICAS
+        |--------------------------------------------------------------------------
+        */
+
+        $establecimientoId = session('establecimiento_id');
+
+        // Roles que recibirán la notificación
+        $rolesDestino = [6, 7]; // Convivencia Escolar + Psicólogo
+
+        $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
+            ->where('establecimiento_id', $establecimientoId)
+            ->where('activo', 1)
+            ->get();
+
+        // Obtener alumno 
+        $alumno = Alumno::select('nombre', 'apellido_paterno', 'apellido_materno')->find($request->alumno_id);
+        $nombreAlumno = $alumno ? "{$alumno->nombre} {$alumno->apellido_paterno}" : 'Alumno';
+
+        if ($usuariosDestino->count() > 0) {
+            foreach ($usuariosDestino as $usuario) {
+                Notificacion::create([
+                    'usuario_id'         => $usuario->id,
+                    'origen_id'          => $seguimiento->id,
+                    'origen_model'       => SeguimientoEmocional::class,
+                    'tipo'               => 'seguimiento_emocional',
+                    'mensaje'            => "Nuevo seguimiento emocional registrado para {$nombreAlumno}.",
+                    'establecimiento_id' => $establecimientoId,
+                ]);
+            }
+        }
 
         return redirect()
             ->route('convivencia.seguimiento.index')

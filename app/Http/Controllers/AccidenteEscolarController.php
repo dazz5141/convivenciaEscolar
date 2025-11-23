@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\AccidenteEscolar;
 use App\Models\TipoAccidente;
 use App\Models\Alumno;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\Auth;
 
 class AccidenteEscolarController extends Controller
@@ -78,6 +79,8 @@ class AccidenteEscolarController extends Controller
             'atencion_inmediata'=> 'nullable|string',
             'derivacion_salud'  => 'nullable|string',
         ]);
+        
+        $establecimientoId = session('establecimiento_id');
 
         AccidenteEscolar::create([
             'fecha'              => $request->fecha,
@@ -90,6 +93,33 @@ class AccidenteEscolarController extends Controller
             'registrado_por' => Auth::user()->id,
             'establecimiento_id' => session('establecimiento_id'),
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIONES AUTOMÁTICAS – ACCIDENTES ESCOLARES
+        |--------------------------------------------------------------------------
+        */
+
+        // Roles destino (ajustables)
+        $rolesDestino = [3, 8]; 
+        // 3 = Inspector General
+        // 8 = Encargado de Convivencia Escolar
+
+        $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
+            ->where('establecimiento_id', $establecimientoId)
+            ->where('activo', 1)
+            ->get();
+
+        foreach ($usuariosDestino as $u) {
+            Notificacion::create([
+                'usuario_id'        => $u->id,
+                'origen_id'         => $accidente->id,
+                'origen_model'      => AccidenteEscolar::class,
+                'tipo'              => 'accidente',
+                'mensaje'           => "Nuevo accidente escolar registrado para {$alumno->nombre_completo}.",
+                'establecimiento_id'=> $establecimientoId,
+            ]);
+        }
 
         return redirect()
             ->route('inspectoria.accidentes.index')

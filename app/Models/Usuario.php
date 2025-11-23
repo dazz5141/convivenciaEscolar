@@ -44,6 +44,11 @@ class Usuario extends Authenticatable
         return $this->belongsTo(Establecimiento::class, 'establecimiento_id');
     }
 
+    public function notificaciones()
+    {
+        return $this->hasMany(Notificacion::class, 'usuario_id');
+    }
+
     public function auditorias()
     {
         return $this->hasMany(Auditoria::class, 'usuario_id');

@@ -81,6 +81,16 @@
                         </td>
 
                         <td class="text-end">
+
+                            {{-- Crear usuario solo si NO tiene --}}
+                            @if(!$f->usuario)
+                                <button class="btn btn-sm btn-secondary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#crearUsuarioModal{{ $f->id }}">
+                                    <i class="bi bi-person-plus"></i>
+                                </button>
+                            @endif
+
                             <a href="{{ route('funcionarios.show', $f->id) }}" class="btn btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
                             </a>
@@ -117,5 +127,74 @@
         @endif
     </div>
 </div>
+    {{-- ============================
+        MODALES PARA CREAR USUARIO
+    ============================ --}}
+    @foreach($funcionarios as $f)
+        <div class="modal fade" id="crearUsuarioModal{{ $f->id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            Crear Usuario — {{ $f->nombre }} {{ $f->apellido_paterno }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <form action="{{ route('usuarios.store') }}" method="POST">
+                        @csrf
+
+                        <div class="modal-body">
+
+                            {{-- ID del funcionario --}}
+                            <input type="hidden" name="funcionario_id" value="{{ $f->id }}">
+
+                            <div class="mb-3">
+                                <label class="form-label">Correo (opcional)</label>
+                                <input type="email" name="email" class="form-control"
+                                    placeholder="correo@colegio.cl">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Contraseña *</label>
+                                <input type="text" name="password" class="form-control" required
+                                    placeholder="Ingrese contraseña">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Rol del Usuario *</label>
+                                <select name="rol_id" class="form-select" required>
+                                    <option value="">— Seleccione —</option>
+
+                                    @foreach(\App\Models\Rol::orderBy('id')->get() as $r)
+
+                                        {{-- Admin General --}}
+                                        @if(auth()->user()->rol_id == 1)
+                                            <option value="{{ $r->id }}">{{ $r->nombre }}</option>
+
+                                        {{-- Admin del Colegio --}}
+                                        @elseif(auth()->user()->rol_id == 2 && $r->id != 1)
+                                            <option value="{{ $r->id }}">{{ $r->nombre }}</option>
+
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i> Crear Usuario
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    @endforeach
 
 @endsection

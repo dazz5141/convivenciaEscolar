@@ -112,6 +112,25 @@ class IntervencionPIEController extends Controller
             'detalle'              => $request->detalle,
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIÓN PROFESIONAL - INTERVENCIÓN PIE
+        |--------------------------------------------------------------------------
+        */
+        $profesional = ProfesionalPIE::with('funcionario.usuario')->find($request->profesional_id);
+
+        if ($profesional && $profesional->funcionario && $profesional->funcionario->usuario) {
+
+            Notificacion::create([
+                'tipo'              => 'pie_intervencion',
+                'mensaje'           => "Nueva intervención PIE registrada para el estudiante ID {$request->estudiante_pie_id}.",
+                'usuario_id'        => $profesional->funcionario->usuario->id, // DESTINATARIO
+                'origen_id'         => $intervencion->id,
+                'origen_model'      => IntervencionPIE::class,
+                'establecimiento_id'=> session('establecimiento_id'),
+            ]);
+        }
+
         return redirect()
             ->route('pie.intervenciones.index')
             ->with('success', 'Intervención registrada correctamente.');

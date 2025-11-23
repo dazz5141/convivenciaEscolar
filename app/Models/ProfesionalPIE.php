@@ -50,4 +50,9 @@ class ProfesionalPIE extends Model
 
         return "{$this->funcionario->apellido_paterno} {$this->funcionario->apellido_materno}, {$this->funcionario->nombre}";
     }
+
+    public function getUsuarioAttribute()
+    {
+        return $this->funcionario->usuario ?? null;
+    }
 }

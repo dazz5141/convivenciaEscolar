@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CitacionApoderado;
 use App\Models\EstadoCitacion;
+use App\Models\Usuario;
+use App\Models\Alumno;
 use Illuminate\Support\Facades\Auth;
 
 class CitacionApoderadoController extends Controller
@@ -54,6 +56,8 @@ class CitacionApoderadoController extends Controller
             'observaciones'  => 'nullable|string',
         ]);
 
+        $establecimientoId = session('establecimiento_id');
+
         CitacionApoderado::create([
             'alumno_id'          => $request->alumno_id,
             'apoderado_id'       => $request->apoderado_id,
@@ -62,8 +66,48 @@ class CitacionApoderadoController extends Controller
             'estado_id'          => $request->estado_id,
             'observaciones'      => $request->observaciones,
             'funcionario_id'     => Auth::user()->funcionario_id,
-            'establecimiento_id' => session('establecimiento_id'),
+            'establecimiento_id' => $establecimientoId,
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIONES AUTOMÁTICAS – CITACIONES
+        |--------------------------------------------------------------------------
+        |
+        | Destinos habituales:
+        | - Inspectoría
+        | - Convivencia Escolar
+        | - Inspector General
+        |--------------------------------------------------------------------------
+        */
+
+        // Obtener alumno (para usar nombre completo)
+        $alumno = Alumno::find($request->alumno_id);
+
+        // Roles destino (ajustables según tu estructura)
+        $rolesDestino = [3, 8]; 
+        // 3 = Inspector General
+        // 8 = Convivencia Escolar
+
+        $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
+            ->where('establecimiento_id', $establecimientoId)
+            ->where('activo', 1)
+            ->get();
+
+        // Mensaje profesional
+        $mensaje = "Nueva citación registrada para {$alumno->nombre_completo} "
+                . "con fecha {$request->fecha_citacion}.";
+
+        foreach ($usuariosDestino as $u) {
+            Notificacion::create([
+                'usuario_id'        => $u->id,
+                'origen_id'         => $citacion->id,
+                'origen_model'      => CitacionApoderado::class,
+                'tipo'              => 'citacion',
+                'mensaje'           => $mensaje,
+                'establecimiento_id'=> $establecimientoId,
+            ]);
+        }
 
         return redirect()
             ->route('inspectoria.citaciones.index')

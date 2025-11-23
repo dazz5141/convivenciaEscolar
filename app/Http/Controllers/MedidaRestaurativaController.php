@@ -8,6 +8,8 @@ use App\Models\EstadoCumplimiento;
 use App\Models\BitacoraIncidente;
 use App\Models\Funcionario;
 use App\Models\Alumno; 
+use App\Models\Usuario;
+use App\Models\Notificacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -145,7 +147,7 @@ class MedidaRestaurativaController extends Controller
 
 
         // Crear medida
-        MedidaRestaurativa::create([
+        $medida = MedidaRestaurativa::create([
             'alumno_id'              => $validated['alumno_id'],
             'incidente_id'           => $validated['incidente_id'] ?? null,
             'tipo_medida_id'         => $validated['tipo_medida_id'],
@@ -156,6 +158,33 @@ class MedidaRestaurativaController extends Controller
             'observaciones'          => $validated['observaciones'],
             'establecimiento_id'     => $establecimientoId,
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOTIFICACIÓN AUTOMÁTICA – MEDIDA RESTAURATIVA
+        |--------------------------------------------------------------------------
+        */
+
+        $responsableUsuario = Usuario::where('funcionario_id', $validated['responsable_id'])
+            ->where('activo', 1)
+            ->first();
+
+        if ($responsableUsuario) {
+
+            $alumno = Alumno::find($validated['alumno_id']);
+
+            $mensaje = "Se ha asignado una nueva medida restaurativa para el alumno "
+                    . "{$alumno->nombre} {$alumno->apellido_paterno}.";
+
+            Notificacion::create([
+                'usuario_id'        => $responsableUsuario->id,
+                'origen_id'         => $medida->id,
+                'origen_model'      => MedidaRestaurativa::class,
+                'tipo'              => 'medida_restaurativa',
+                'mensaje'           => $mensaje,
+                'establecimiento_id'=> $establecimientoId,
+            ]);
+        }
 
         return redirect()
             ->route('convivencia.medidas.index')
