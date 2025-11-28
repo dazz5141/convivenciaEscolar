@@ -4,15 +4,23 @@
 
 @section('content')
 
+{{-- PERMISO: VER ROLES --}}
+@if(!canAccess('roles', 'view'))
+    @php(abort(403, 'No tienes permisos para ver roles.'))
+@endif
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div class="mb-3 mb-md-0">
         <h1 class="page-title">Roles del Sistema</h1>
         <p class="text-muted">Administración completa de perfiles del sistema</p>
     </div>
 
-    <a href="{{ route('roles.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-circle me-2"></i> Nuevo Rol
-    </a>
+    {{-- PERMISO: CREAR ROLES --}}
+    @if(canAccess('roles', 'create'))
+        <a href="{{ route('roles.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i> Nuevo Rol
+        </a>
+    @endif
 </div>
 
 <div class="card card-table mt-3">
@@ -33,9 +41,14 @@
                         <td>{{ $r->nombre }}</td>
 
                         <td class="text-end">
-                            <a href="{{ route('roles.edit', $r->id) }}" class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
+
+                            {{-- PERMISO: EDITAR ROLES --}}
+                            @if(canAccess('roles', 'edit'))
+                                <a href="{{ route('roles.edit', $r->id) }}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                            @endif
+
                         </td>
                     </tr>
                     @endforeach

@@ -60,7 +60,8 @@ class PlanIndividualPIEController extends Controller
             EstudiantePIE::findOrFail($request->estudiante_pie_id)
         );
 
-        PlanIndividualPIE::create([
+        // Crear plan
+        $plan = PlanIndividualPIE::create([
             'establecimiento_id' => session('establecimiento_id'),
             'estudiante_pie_id'  => $request->estudiante_pie_id,
             'fecha_inicio'       => $request->fecha_inicio,
@@ -70,11 +71,12 @@ class PlanIndividualPIEController extends Controller
         ]);
 
         /*
-        |--------------------------------------------------------------------------
-        | NOTIFICACIÓN PROFESIONAL - PLAN INDIVIDUAL PIE
-        |--------------------------------------------------------------------------
+        |-----------------------------------------------------------------------
+        | NOTIFICACIÓN PROFESIONAL (DESACTIVADA)
+        |-----------------------------------------------------------------------
         */
 
+        /*
         // obtener estudiante + profesional asignado
         $estudiante = EstudiantePIE::with('profesional.funcionario.usuario')
                         ->find($request->estudiante_pie_id);
@@ -95,6 +97,7 @@ class PlanIndividualPIEController extends Controller
                 'establecimiento_id'=> session('establecimiento_id'),
             ]);
         }
+        */
 
         return redirect()
             ->route('pie.planes.index')
@@ -106,12 +109,10 @@ class PlanIndividualPIEController extends Controller
      */
     public function show($id)
     {
-        // Buscar manualmente el plan (evita el problema del model binding)
         $planIndividualPIE = PlanIndividualPIE::with([
             'estudiante.alumno.curso'
         ])->findOrFail($id);
 
-        // Validar que el plan pertenezca al establecimiento actual
         $this->validarEstablecimiento($planIndividualPIE);
 
         return view('modulos.pie.planes.show', compact('planIndividualPIE'));
@@ -129,9 +130,8 @@ class PlanIndividualPIEController extends Controller
             if (app()->environment('local')) {
                 \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
                 return;
-            } else {
-                abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
             }
+            abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
         }
 
         if ($establecimientoModelo != $establecimientoSesion) {

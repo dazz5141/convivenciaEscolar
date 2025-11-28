@@ -11,6 +11,11 @@
 
 @include('components.alerts')
 
+{{-- ============================================
+     SOLO ROLES CON PERMISO create EN ALUMNOS
+=============================================== --}}
+@crear('alumnos')
+
 <form action="{{ route('alumnos.store') }}" method="POST">
     @csrf
 
@@ -165,6 +170,8 @@
         </a>
     </div>
 </form>
+
+@endcrear {{-- FIN PERMISOS DE CREACIÓN --}}
 
 <!-- =============================================
      MODAL BUSCAR APODERADO

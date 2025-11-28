@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- =========================================================
+     PERMISO PARA EDITAR NOVEDADES
+========================================================= --}}
+@if(canAccess('novedades', 'edit'))
+
 <div class="page-header">
     <h1 class="page-title">Editar Novedad de Inspectoría</h1>
 </div>
@@ -31,8 +36,6 @@
         @endif
     </div>
 
-
-
     {{-- =========================================================
          SECCIÓN 2: TIPO DE NOVEDAD
     ========================================================== --}}
@@ -48,8 +51,6 @@
             @endforeach
         </select>
     </div>
-
-
 
     {{-- =========================================================
          SECCIÓN 3: INFORMACIÓN DE LA NOVEDAD
@@ -80,8 +81,6 @@
         </div>
     </div>
 
-
-
     {{-- =========================================================
          BOTONES
     ========================================================== --}}
@@ -96,5 +95,17 @@
     </div>
 
 </form>
+
+@else
+
+{{-- =========================================================
+     SIN PERMISOS
+========================================================= --}}
+<div class="alert alert-warning mt-4">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    No tienes permisos para editar novedades.
+</div>
+
+@endif
 
 @endsection

@@ -11,6 +11,8 @@ class Usuario extends Authenticatable
 
     protected $table = 'usuarios';
 
+    protected $appends = ['nombre_completo'];
+
     protected $fillable = [
         'email',
         'password',
@@ -66,5 +68,16 @@ class Usuario extends Authenticatable
         $am = $this->apellido_materno ?? '';
 
         return trim("$nombre $ap $am");
+    }
+
+    public function hasRole($roles)
+    {
+        // Si envías un array → revisa si el rol_id está dentro
+        if (is_array($roles)) {
+            return in_array($this->rol_id, $roles);
+        }
+
+        // Si envías un solo ID de rol
+        return $this->rol_id == $roles;
     }
 }

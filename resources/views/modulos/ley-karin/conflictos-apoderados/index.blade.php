@@ -4,31 +4,44 @@
 
 @section('content')
 
+{{-- ============================================================
+      PERMISO (solo alerta, no corta la vista)
+=============================================================== --}}
+@if(!canAccess('conflictos_apoderados', 'view'))
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-shield-lock-fill me-2"></i>
+        No tienes permisos para ver los conflictos entre apoderados.
+    </div>
+@endif
+
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div class="mb-3 mb-md-0">
         <h1 class="page-title">Conflictos entre Apoderados</h1>
         <p class="text-muted">Registro oficial de situaciones entre apoderados y funcionarios</p>
     </div>
-    <div>
+
+    {{-- BOTÓN CREAR --}}
+    @if(canAccess('conflictos_apoderados', 'create'))
         <a href="{{ route('leykarin.conflictos-apoderados.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>
             Registrar Conflicto
         </a>
-    </div>
+    @endif
 </div>
+
 
 <div class="card card-table">
 
-    <!-- ========================= -->
-    <!--          FILTROS          -->
-    <!-- ========================= -->
+    {{-- ========================= --}}
+    {{-- FILTROS --}}
+    {{-- ========================= --}}
     <div class="card-header">
         <form method="GET" action="{{ route('leykarin.conflictos-apoderados.index') }}">
             <div class="row g-3">
 
-                <!-- Buscar apoderado -->
+                {{-- BUSCAR APODERADO --}}
                 <div class="col-12 col-md-5">
-
                     <div class="input-group">
                         <input type="text"
                                id="inputApoderadoSeleccionado"
@@ -48,10 +61,9 @@
                     <input type="hidden" name="apoderado_id" id="apoderado_id" value="{{ request('apoderado_id') }}">
                 </div>
 
-                {{-- Modal buscar apoderado --}}
                 @include('modulos.ley-karin.partials.modal-buscar-apoderado')
 
-                <!-- Tipo de conflicto -->
+                {{-- TIPO --}}
                 <div class="col-12 col-md-3">
                     <input type="text"
                            name="tipo_conflicto"
@@ -60,15 +72,15 @@
                            value="{{ request('tipo_conflicto') }}">
                 </div>
 
-                <!-- Fecha -->
+                {{-- FECHA --}}
                 <div class="col-12 col-md-2">
                     <input type="date"
                            name="fecha"
-                           value="{{ request('fecha') }}"
-                           class="form-control">
+                           class="form-control"
+                           value="{{ request('fecha') }}">
                 </div>
 
-                <!-- Botón filtrar -->
+                {{-- BOTÓN --}}
                 <div class="col-12 col-md-2">
                     <button class="btn btn-secondary w-100">
                         <i class="bi bi-funnel me-2"></i>
@@ -80,12 +92,13 @@
         </form>
     </div>
 
-    <!-- ========================= -->
-    <!--           TABLA           -->
-    <!-- ========================= -->
+
+    {{-- ========================= --}}
+    {{-- TABLA --}}
+    {{-- ========================= --}}
     <div class="card-body">
 
-        @if($conflictos->count() == 0)
+        @if($conflictos->count() === 0)
 
             <div class="text-center text-muted py-4">
                 <i class="bi bi-info-circle fs-2"></i>
@@ -96,6 +109,7 @@
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
+
                 <thead>
                     <tr>
                         <th>Fecha</th>
@@ -110,36 +124,33 @@
                 </thead>
 
                 <tbody>
+
                 @foreach($conflictos as $c)
                     <tr>
 
-                        <!-- FECHA -->
+                        {{-- FECHA --}}
                         <td>{{ date('d/m/Y', strtotime($c->fecha)) }}</td>
 
-                        <!-- APODERADO -->
+                        {{-- APODERADO --}}
                         <td>
                             @if($c->apoderado_id)
-                                {{-- Apoderado interno --}}
                                 {{ $c->apoderado->nombre_completo }}
                                 <br>
                                 <small class="text-muted">{{ $c->apoderado->run }}</small>
                             @else
-                                {{-- Apoderado externo --}}
                                 {{ $c->apoderado_nombre ?? '—' }}
                                 <br>
                                 <small class="text-muted">{{ $c->apoderado_rut ?? '' }}</small>
                             @endif
                         </td>
 
-                        <!-- FUNCIONARIO -->
-                        <td>
-                            {{ $c->funcionario->nombre_completo ?? '—' }}
-                        </td>
+                        {{-- FUNCIONARIO --}}
+                        <td>{{ $c->funcionario->nombre_completo ?? '—' }}</td>
 
-                        <!-- TIPO -->
+                        {{-- TIPO --}}
                         <td>{{ $c->tipo_conflicto ?? '—' }}</td>
 
-                        <!-- ESTADO -->
+                        {{-- ESTADO --}}
                         <td>
                             @if($c->estado)
                                 <span class="badge bg-primary">{{ $c->estado->nombre }}</span>
@@ -152,12 +163,10 @@
                             @endif
                         </td>
 
-                        <!-- REGISTRADO POR -->
-                        <td>
-                            {{ $c->registradoPor->nombre_completo ?? '—' }}
-                        </td>
+                        {{-- REGISTRADO POR --}}
+                        <td>{{ $c->registradoPor->nombre_completo ?? '—' }}</td>
 
-                        <!-- CONFIDENCIAL -->
+                        {{-- CONFIDENCIAL --}}
                         <td>
                             @if($c->confidencial)
                                 <i class="bi bi-lock-fill text-danger"></i>
@@ -166,23 +175,32 @@
                             @endif
                         </td>
 
-                        <!-- ACCIONES -->
+                        {{-- ACCIONES --}}
                         <td class="table-actions">
-                            <a href="{{ route('leykarin.conflictos-apoderados.show', $c) }}"
-                               class="btn btn-sm btn-info"
-                               title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
 
-                            <a href="{{ route('leykarin.conflictos-apoderados.edit', $c) }}"
-                               class="btn btn-sm btn-primary"
-                               title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
+                            {{-- VER --}}
+                            @if(canAccess('conflictos_apoderados', 'view'))
+                                <a href="{{ route('leykarin.conflictos-apoderados.show', $c) }}"
+                                   class="btn btn-sm btn-info"
+                                   title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            @endif
+
+                            {{-- EDITAR --}}
+                            @if(canAccess('conflictos_apoderados', 'edit'))
+                                <a href="{{ route('leykarin.conflictos-apoderados.edit', $c) }}"
+                                   class="btn btn-sm btn-primary"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            @endif
+
                         </td>
 
                     </tr>
                 @endforeach
+
                 </tbody>
 
             </table>
@@ -201,14 +219,12 @@
 @endsection
 
 
-{{-- ===========================================
-      JS SELECCIÓN DE APODERADO
-============================================== --}}
+{{-- ========================= --}}
+{{-- JS SELECCIÓN APODERADO --}}
+{{-- ========================= --}}
 <script>
 document.addEventListener('click', function(e) {
-
     if (e.target.classList.contains('seleccionar-apoderado')) {
-
         let id = e.target.dataset.id;
         let nombre = e.target.dataset.nombre;
 

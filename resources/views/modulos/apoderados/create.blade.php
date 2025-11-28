@@ -10,6 +10,14 @@
 
 @include('components.alerts')
 
+{{-- 🔐 Permiso: crear apoderados --}}
+@if(!canAccess('apoderados','create'))
+    <div class="alert alert-danger">
+        No tienes permisos para crear apoderados.
+    </div>
+    @php return; @endphp
+@endif
+
 <form action="{{ route('apoderados.store') }}" method="POST">
     @csrf
 

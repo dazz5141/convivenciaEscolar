@@ -10,6 +10,7 @@
 
 @include('components.alerts')
 
+@crear('bitacora')
 <form action="{{ route('convivencia.bitacora.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
@@ -108,6 +109,7 @@
     </div>
 
 </form>
+@endcrear
 
 
 

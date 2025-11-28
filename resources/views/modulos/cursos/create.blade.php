@@ -10,6 +10,11 @@
 
 @include('components.alerts')
 
+{{-- =========================================================
+     Formulario (solo si tiene permiso)
+========================================================= --}}
+@if(canAccess('cursos', 'create'))
+
 <form action="{{ route('cursos.store') }}" method="POST">
     @csrf
 
@@ -49,4 +54,12 @@
         </a>
     </div>
 </form>
+
+@else
+{{-- Si no tiene permiso --}}
+<div class="alert alert-danger mt-4">
+    No tienes permiso para crear cursos.
+</div>
+@endif
+
 @endsection

@@ -9,7 +9,24 @@
     <p class="text-muted">Crear un plan individual para un estudiante del Programa de Integración Escolar.</p>
 </div>
 
+{{-- ============================================
+     ALERTAS
+============================================ --}}
 @include('components.alerts')
+
+
+{{-- ============================================
+     PERMISO — SI NO PUEDE CREAR, BLOQUEAMOS
+============================================ --}}
+@if(!canAccess('pie','create'))
+    <div class="alert alert-warning mt-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para crear planes individuales PIE.
+    </div>
+    @return
+@endif
+
+
 
 <form action="{{ route('pie.planes.store') }}" method="POST">
     @csrf
@@ -103,13 +120,14 @@
 
 
 {{-- ===========================
-    MODAL SOLO DE ALUMNO
+    MODAL — BUSCAR ESTUDIANTE PIE
 =========================== --}}
 @include('modulos.pie.partials.modal-buscar-estudiante-pie')
 
 
+
 {{-- ===========================
-    JS COMPATIBLE CON TUS PARTIALS
+    JS — SELECCIÓN DE ESTUDIANTE
 =========================== --}}
 <script>
 document.addEventListener('click', function(e) {

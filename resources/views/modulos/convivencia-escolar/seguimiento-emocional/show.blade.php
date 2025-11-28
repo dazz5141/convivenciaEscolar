@@ -11,27 +11,39 @@
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
+
+        {{-- EDITAR (solo roles con permiso edit en seguimientos) --}}
+        @editar('seguimientos')
         <a href="{{ route('convivencia.seguimiento.edit', $seguimiento->id) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+        @endeditar
 
+        {{-- VOLVER (visible para todos los roles) --}}
         <a href="{{ route('convivencia.seguimiento.index') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i> Volver
         </a>
 
+        {{-- REGISTRAR MEDIDA RESTAURATIVA (solo roles autorizados) --}}
+        @crear('medidas')
         <a href="{{ route('convivencia.medidas.create', ['seguimiento_id' => $seguimiento->id]) }}"
-        class="btn btn-warning">
+            class="btn btn-warning">
             <i class="bi bi-emoji-smile me-2"></i> Registrar Medida Restaurativa
         </a>
+        @endcrear
 
+        {{-- CREAR DERIVACIÓN (solo roles autorizados) --}}
+        @crear('derivaciones')
         <a href="{{ route('convivencia.derivaciones.create', [
                 'tipo_entidad' => 'seguimiento',
                 'entidad_id'   => $seguimiento->id,
                 'alumno_id'    => $seguimiento->alumno_id
             ]) }}"
-            class="btn btn-warning">
+           class="btn btn-warning">
             <i class="bi bi-arrow-right-circle me-2"></i> Crear Derivación
         </a>
+        @endcrear
+
     </div>
 </div>
 

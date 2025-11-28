@@ -4,6 +4,8 @@
 
 @section('content')
 
+@editar('seguimientos')
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap mb-3">
     <div>
         <h1 class="page-title">Editar Seguimiento #{{ $seguimiento->id }}</h1>
@@ -324,5 +326,7 @@ document.addEventListener('click', function(e){
 });
 
 </script>
+
+@endeditar
 
 @endsection

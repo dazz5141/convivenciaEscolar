@@ -17,13 +17,22 @@
             <i class="bi bi-arrow-left me-2"></i> Volver
         </a>
 
-        {{-- Editar --}}
+        {{-- =========================================================
+             PERMISO: SOLO PUEDE EDITAR QUIEN TIENE edit EN ATRASOS
+        ========================================================== --}}
+        @if(canAccess('atrasos', 'edit'))
         <a href="{{ route('inspectoria.asistencia.edit', $evento) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+        @endif
 
     </div>
 </div>
+
+{{-- =========================================================
+     PERMISO: SOLO PUEDE VER QUIEN TIENE view EN ATRASOS
+========================================================= --}}
+@if(canAccess('atrasos', 'view'))
 
 <div class="row g-4">
 
@@ -146,5 +155,7 @@
     </div>
 
 </div>
+
+@endif {{-- FIN PERMISO DE VIEW --}}
 
 @endsection

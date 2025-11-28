@@ -4,6 +4,17 @@
 
 @section('content')
 
+{{-- ============================================================
+      PERMISO: CREAR REGISTRO (solo muestra alerta)
+=============================================================== --}}
+@if(!canAccess('conflictos_apoderados', 'create'))
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-shield-lock-fill me-2"></i>
+        No tienes permisos para registrar conflictos entre apoderados.
+    </div>
+@endif
+
+
 <div class="page-header">
     <h1 class="page-title">Registrar Conflicto con Apoderado</h1>
     <p class="text-muted">Complete la información correspondiente al conflicto reportado.</p>
@@ -39,14 +50,14 @@
 
 
     {{-- =========================================================
-         SECCIÓN 2: APODERADO INVOLUCRADO (HÍBRIDO)
+         SECCIÓN 2: APODERADO INVOLUCRADO (INTERNO / EXTERNO)
     ========================================================== --}}
     <div class="form-section mt-4">
         <h5 class="form-section-title">Apoderado involucrado *</h5>
 
         <div class="row g-3">
 
-            {{-- SWITCH ENTRE INTERNO / EXTERNO --}}
+            {{-- TIPO APODERADO --}}
             <div class="col-md-12">
                 <label class="form-label fw-bold">Tipo de apoderado</label>
                 <select id="tipo_apoderado" class="form-select">
@@ -75,7 +86,7 @@
             <div class="col-md-12 d-none" id="div_apoderado_externo">
                 <label class="form-label">Nombre del apoderado *</label>
                 <input type="text" name="apoderado_nombre" class="form-control"
-                       placeholder="Nombre completo del apoderado">
+                    placeholder="Nombre completo del apoderado">
 
                 <label class="form-label mt-3">RUT del apoderado *</label>
                 <input type="text" name="apoderado_rut" class="form-control"
@@ -169,12 +180,15 @@
 </form>
 
 
-{{-- ERRORES --}}
+
+{{-- =========================================================
+    ERRORES
+========================================================= --}}
 @if ($errors->any())
 <div class="alert alert-danger mt-3">
     <ul class="mb-0">
         @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
+        <li>{{ $error }}</li>
         @endforeach
     </ul>
 </div>
@@ -226,7 +240,7 @@ document.addEventListener('click', function(e) {
 
 
 /* ===============================
-   Apoderado interno o externo
+   Apoderado interno vs externo
 ================================= */
 document.getElementById('tipo_apoderado').addEventListener('change', function() {
     let tipo = this.value;

@@ -4,6 +4,8 @@
 
 @section('content')
 
+@ver('bitacora')
+
 {{-- =========================================================
      ENCABEZADO
 ========================================================= --}}
@@ -21,15 +23,19 @@
         </a>
 
         {{-- Editar --}}
+        @editar('bitacora')
         <a href="{{ route('convivencia.bitacora.edit', $incidente->id) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+        @endeditar
 
         {{-- Crear seguimiento emocional --}}
+        @crear('seguimientos')
         <a href="{{ route('convivencia.seguimiento.create', ['alumno' => $incidente->alumno_principal_id, 'incidente' => $incidente->id]) }}"
             class="btn btn-warning">
                 <i class="bi bi-emoji-smile"></i> Crear Seguimiento Emocional
         </a>
+        @endcrear
 
     </div>
 </div>
@@ -270,6 +276,7 @@
             <div class="card-body">
 
                 {{-- Agregar --}}
+                @crear('bitacora')
                 <form action="{{ route('convivencia.bitacora.observaciones.store', $incidente->id) }}"
                       method="POST" class="mb-3">
                     @csrf
@@ -281,6 +288,7 @@
                         <i class="bi bi-plus-circle me-1"></i> Agregar
                     </button>
                 </form>
+                @endcrear
 
                 <hr>
 
@@ -306,5 +314,7 @@
     </div>
 
 </div>
+
+@endver
 
 @endsection

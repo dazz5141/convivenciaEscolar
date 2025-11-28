@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\AsistenciaEvento;
 use App\Models\TipoAsistencia;
 use App\Models\Usuario;
+use App\Models\Notificacion;
+use App\Models\Alumno;
 use Illuminate\Support\Facades\Auth;
 
 class AsistenciaEventoController extends Controller
@@ -17,6 +19,13 @@ class AsistenciaEventoController extends Controller
      */
     public function index(Request $request)
     {
+        // ---------------------------------------------------
+        // PERMISO: VER LISTADO
+        // ---------------------------------------------------
+        if (!canAccess('atrasos', 'view')) {
+            abort(403, 'No tiene permiso para ver asistencia.');
+        }
+
         $establecimiento = session('establecimiento_id');
 
         // Filtros dinámicos
@@ -44,11 +53,11 @@ class AsistenciaEventoController extends Controller
 
         // Para mostrar el nombre en el buscador
         $alumnoSeleccionado = $request->filled('alumno_id')
-            ? \App\Models\Alumno::find($request->alumno_id)
+            ? Alumno::find($request->alumno_id)
             : null;
 
         // Lista de tipos (Atraso, Inasistencia, Justificada, Retiro Anticipado)
-        $tipos = \App\Models\TipoAsistencia::orderBy('nombre')->get();
+        $tipos = TipoAsistencia::orderBy('nombre')->get();
 
         return view('modulos.inspectoria.asistencia.index', compact(
             'eventos',
@@ -62,6 +71,13 @@ class AsistenciaEventoController extends Controller
      */
     public function create()
     {
+        // ---------------------------------------------------
+        // PERMISO: CREAR EVENTO
+        // ---------------------------------------------------
+        if (!canAccess('atrasos', 'create')) {
+            abort(403, 'No tiene permiso para registrar asistencia.');
+        }
+
         $tipos = TipoAsistencia::orderBy('nombre')->get();
 
         return view('modulos.inspectoria.asistencia.create', compact('tipos'));
@@ -72,6 +88,13 @@ class AsistenciaEventoController extends Controller
      */
     public function store(Request $request)
     {
+        // ---------------------------------------------------
+        // PERMISO: CREAR EVENTO
+        // ---------------------------------------------------
+        if (!canAccess('atrasos', 'create')) {
+            abort(403, 'No tiene permiso para registrar asistencia.');
+        }
+
         $request->validate([
             'fecha'      => 'required|date',
             'tipo_id'    => 'required|exists:tipos_asistencia,id',
@@ -87,14 +110,20 @@ class AsistenciaEventoController extends Controller
             ]);
         }
 
-        AsistenciaEvento::create([
+        $establecimientoId = session('establecimiento_id');
+        $alumno = Alumno::find($request->alumno_id);
+
+        // ---------------------------------------------------
+        // CREAR EVENTO
+        // ---------------------------------------------------
+        $asistencia = AsistenciaEvento::create([
             'fecha'              => $request->fecha,
             'hora'               => $request->hora,
             'tipo_id'            => $request->tipo_id,
             'observaciones'      => $request->observaciones,
             'alumno_id'          => $request->alumno_id,
             'registrado_por'     => Auth::user()->funcionario_id,
-            'establecimiento_id' => session('establecimiento_id'),
+            'establecimiento_id' => $establecimientoId,
         ]);
 
         /*
@@ -103,18 +132,15 @@ class AsistenciaEventoController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        // Roles destino (ajustable)
-        $rolesDestino = [3, 8]; 
-        // 3 = Inspector General
-        // 8 = Convivencia Escolar
+        $rolesDestino = [3, 8]; // Inspector general + Convivencia
 
         $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
             ->where('establecimiento_id', $establecimientoId)
             ->where('activo', 1)
             ->get();
 
-        // Definir mensaje
         $tipoNombre = $asistencia->tipo->nombre ?? 'Evento';
+
         $mensaje = ($request->tipo_id == self::TIPO_ATRASO)
             ? "Atraso registrado para {$alumno->nombre_completo} a las {$request->hora}."
             : "Nuevo registro de asistencia ({$tipoNombre}) para {$alumno->nombre_completo}.";
@@ -140,6 +166,13 @@ class AsistenciaEventoController extends Controller
      */
     public function show(AsistenciaEvento $evento)
     {
+        // ---------------------------------------------------
+        // PERMISO: VER EVENTO
+        // ---------------------------------------------------
+        if (!canAccess('atrasos', 'view')) {
+            abort(403, 'No tiene permiso para ver asistencia.');
+        }
+
         $this->validarEstablecimiento($evento);
 
         return view('modulos.inspectoria.asistencia.show', compact('evento'));
@@ -150,6 +183,13 @@ class AsistenciaEventoController extends Controller
      */
     public function edit(AsistenciaEvento $evento)
     {
+        // ---------------------------------------------------
+        // PERMISO: EDITAR EVENTO
+        // ---------------------------------------------------
+        if (!canAccess('atrasos', 'edit')) {
+            abort(403, 'No tiene permiso para editar asistencia.');
+        }
+
         $this->validarEstablecimiento($evento);
 
         $tipos = TipoAsistencia::orderBy('nombre')->get();
@@ -162,6 +202,13 @@ class AsistenciaEventoController extends Controller
      */
     public function update(Request $request, AsistenciaEvento $evento)
     {
+        // ---------------------------------------------------
+        // PERMISO: EDITAR EVENTO
+        // ---------------------------------------------------
+        if (!canAccess('atrasos', 'edit')) {
+            abort(403, 'No tiene permiso para editar asistencia.');
+        }
+
         $this->validarEstablecimiento($evento);
 
         // Validación base

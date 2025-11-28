@@ -11,6 +11,18 @@
 
 @include('components.alerts')
 
+{{-- =========================================================
+     PERMISOS
+========================================================= --}}
+@if(!canAccess('documentos','create'))
+    <div class="alert alert-warning mt-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para registrar informes PIE.
+    </div>
+    @return
+@endif
+
+
 <form action="{{ route('pie.informes.store') }}" method="POST">
     @csrf
 
@@ -35,7 +47,7 @@
     </div>
 
     {{-- =============================
-        TIPO DE INFORME
+         TIPO DE INFORME
     ============================== --}}
     <div class="form-section mt-4">
         <h5 class="form-section-title">Tipo de Informe</h5>
@@ -78,32 +90,37 @@
         <button type="submit" class="btn btn-primary">
             <i class="bi bi-save me-2"></i> Guardar Informe
         </button>
+
         <a href="{{ route('pie.informes.index') }}" class="btn btn-secondary">
             <i class="bi bi-x-circle me-2"></i> Cancelar
         </a>
     </div>
 </form>
 
+
 {{-- ===========================
-     MODAL (MISMO QUE FUNCIONA)
+     MODAL
 =========================== --}}
 @include('modulos.pie.partials.modal-buscar-estudiante-pie')
 
 {{-- ===========================
-     JS SELECCIÓN (MISMO PATRÓN)
+     JS SELECCIÓN
 =========================== --}}
 <script>
 document.addEventListener('click', function(e) {
-    // Seleccionar Estudiante PIE desde el modal
+    // Seleccionar Estudiante PIE
     if (e.target.classList.contains('seleccionar-estudiante-pie')) {
         let id = e.target.dataset.id;
         let nombre = e.target.dataset.nombre;
         let curso = e.target.dataset.curso;
 
         document.getElementById('estudiante_pie_id').value = id;
-        document.getElementById('textoAlumnoSeleccionado').textContent = `${nombre} (${curso})`;
+        document.getElementById('textoAlumnoSeleccionado').textContent =
+            `${nombre} (${curso})`;
 
-        bootstrap.Modal.getInstance(document.getElementById('modalBuscarAlumnoPIE')).hide();
+        bootstrap.Modal.getInstance(
+            document.getElementById('modalBuscarAlumnoPIE')
+        ).hide();
     }
 });
 </script>

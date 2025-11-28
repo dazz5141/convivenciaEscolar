@@ -13,6 +13,13 @@ class CursoController extends Controller
      */
     public function index(Request $request)
     {
+        // ============================================
+        // PERMISO: VER LISTADO DE CURSOS
+        // ============================================
+        if (!canAccess('cursos', 'view')) {
+            abort(403, 'No tienes permiso para ver los cursos.');
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         $query = Curso::where('establecimiento_id', $establecimientoId);
@@ -56,6 +63,13 @@ class CursoController extends Controller
      */
     public function create()
     {
+        // ============================================
+        // PERMISO: CREAR CURSOS
+        // ============================================
+        if (!canAccess('cursos', 'create')) {
+            abort(403, 'No tienes permiso para crear cursos.');
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         return view('modulos.cursos.create', compact('establecimientoId'));
@@ -66,6 +80,13 @@ class CursoController extends Controller
      */
     public function store(Request $request)
     {
+        // ============================================
+        // PERMISO: GUARDAR CURSOS
+        // ============================================
+        if (!canAccess('cursos', 'create')) {
+            abort(403, 'No tienes permiso para crear cursos.');
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         $request->validate([
@@ -91,6 +112,13 @@ class CursoController extends Controller
      */
     public function show($id)
     {
+        // ============================================
+        // PERMISO: VER DETALLE DE CURSO
+        // ============================================
+        if (!canAccess('cursos', 'view')) {
+            abort(403, 'No tienes permiso para ver cursos.');
+        }
+
         $curso = Curso::with('alumnos')->findOrFail($id);
 
         return view('modulos.cursos.show', compact('curso'));
@@ -101,6 +129,13 @@ class CursoController extends Controller
      */
     public function edit($id)
     {
+        // ============================================
+        // PERMISO: EDITAR CURSOS
+        // ============================================
+        if (!canAccess('cursos', 'edit')) {
+            abort(403, 'No tienes permiso para editar cursos.');
+        }
+
         $curso = Curso::findOrFail($id);
 
         return view('modulos.cursos.edit', compact('curso'));
@@ -111,6 +146,13 @@ class CursoController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // ============================================
+        // PERMISO: ACTUALIZAR CURSOS
+        // ============================================
+        if (!canAccess('cursos', 'edit')) {
+            abort(403, 'No tienes permiso para editar cursos.');
+        }
+
         $curso = Curso::findOrFail($id);
 
         $request->validate([
@@ -134,6 +176,13 @@ class CursoController extends Controller
      */
     public function disable($id)
     {
+        // ============================================
+        // PERMISO: DESHABILITAR CURSOS
+        // ============================================
+        if (!canAccess('cursos', 'edit')) {
+            abort(403, 'No tienes permiso para deshabilitar cursos.');
+        }
+
         Curso::findOrFail($id)->update(['activo' => 0]);
 
         return redirect()->route('cursos.index')
@@ -145,6 +194,13 @@ class CursoController extends Controller
      */
     public function enable($id)
     {
+        // ============================================
+        // PERMISO: HABILITAR CURSOS
+        // ============================================
+        if (!canAccess('cursos', 'edit')) {
+            abort(403, 'No tienes permiso para habilitar cursos.');
+        }
+
         Curso::findOrFail($id)->update(['activo' => 1]);
 
         return redirect()->route('cursos.index')

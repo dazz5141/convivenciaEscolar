@@ -4,28 +4,43 @@
 
 @section('content')
 
+{{-- ============================================================
+      PERMISO (Solo mostrar alerta, no cortar la vista)
+============================================================= --}}
+@if(!canAccess('conflictos_funcionarios','view'))
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-shield-lock-fill me-2"></i>
+        No tienes permisos para ver los conflictos entre funcionarios.
+    </div>
+@endif
+
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div class="mb-3 mb-md-0">
         <h1 class="page-title">Conflictos entre Funcionarios</h1>
         <p class="text-muted">Registro oficial de situaciones conflictivas entre funcionarios</p>
     </div>
-    <div>
+
+    {{-- BOTÓN CREAR --}}
+    @if(canAccess('conflictos_funcionarios','create'))
         <a href="{{ route('leykarin.conflictos-funcionarios.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>
-            Registrar Conflicto
+            <i class="bi bi-plus-circle me-2"></i> Registrar Conflicto
         </a>
-    </div>
+    @endif
 </div>
+
 
 <div class="card card-table">
 
-    <!-- FILTROS -->
+    {{-- ============================================================
+            FILTROS
+    ============================================================ --}}
     <div class="card-header">
 
         <form method="GET" action="{{ route('leykarin.conflictos-funcionarios.index') }}">
             <div class="row g-3">
 
-                <!-- Buscar funcionario -->
+                {{-- Buscar funcionario --}}
                 <div class="col-12 col-md-5">
 
                     <div class="input-group">
@@ -47,10 +62,9 @@
                     <input type="hidden" name="funcionario_id" id="funcionario_id" value="{{ request('funcionario_id') }}">
                 </div>
 
-                {{-- Modal incluir --}}
                 @include('modulos.ley-karin.partials.modal-buscar-funcionario')
 
-                <!-- Tipo de conflicto -->
+                {{-- Tipo --}}
                 <div class="col-12 col-md-3">
                     <input type="text"
                            name="tipo_conflicto"
@@ -59,19 +73,18 @@
                            value="{{ request('tipo_conflicto') }}">
                 </div>
 
-                <!-- Fecha -->
+                {{-- Fecha --}}
                 <div class="col-12 col-md-2">
                     <input type="date"
                            name="fecha"
-                           value="{{ request('fecha') }}"
-                           class="form-control">
+                           class="form-control"
+                           value="{{ request('fecha') }}">
                 </div>
 
-                <!-- Botón filtrar -->
+                {{-- Botón --}}
                 <div class="col-12 col-md-2">
                     <button class="btn btn-secondary w-100">
-                        <i class="bi bi-funnel me-2"></i>
-                        Filtrar
+                        <i class="bi bi-funnel me-2"></i> Filtrar
                     </button>
                 </div>
 
@@ -80,7 +93,10 @@
 
     </div>
 
-    <!-- TABLA -->
+
+    {{-- ============================================================
+            TABLA
+    ============================================================ --}}
     <div class="card-body">
 
         @if($conflictos->count() == 0)
@@ -92,100 +108,111 @@
 
         @else
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Funcionarios</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Registrado por</th>
-                        <th>Confidencial</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Funcionarios</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Registrado por</th>
+                            <th>Confidencial</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                @foreach($conflictos as $c)
-                    <tr>
+                    <tbody>
+                    @foreach($conflictos as $c)
+                        <tr>
 
-                        <!-- FECHA -->
-                        <td>{{ date('d/m/Y', strtotime($c->fecha)) }}</td>
+                            {{-- Fecha --}}
+                            <td>{{ date('d/m/Y', strtotime($c->fecha)) }}</td>
 
-                        <!-- FUNCIONARIOS -->
-                        <td>
-                            {{ $c->funcionario1->nombre_completo ?? '—' }}
-                            <br>
-                            <small class="text-muted">vs {{ $c->funcionario2->nombre_completo ?? '—' }}</small>
-                        </td>
+                            {{-- Funcionarios --}}
+                            <td>
+                                {{ $c->funcionario1->nombre_completo ?? '—' }}
+                                <br>
+                                <small class="text-muted">vs {{ $c->funcionario2->nombre_completo ?? '—' }}</small>
+                            </td>
 
-                        <!-- TIPO -->
-                        <td>{{ $c->tipo_conflicto ?? '—' }}</td>
+                            {{-- Tipo --}}
+                            <td>{{ $c->tipo_conflicto ?? '—' }}</td>
 
-                        <!-- ESTADO -->
-                        <td>
-                            @if($c->estado)
-                                <span class="badge bg-primary">{{ $c->estado->nombre }}</span>
-                            @else
-                                <span class="badge bg-secondary">Sin estado</span>
-                            @endif
+                            {{-- Estado --}}
+                            <td>
+                                @if($c->estado)
+                                    <span class="badge bg-primary">{{ $c->estado->nombre }}</span>
+                                @else
+                                    <span class="badge bg-secondary">Sin estado</span>
+                                @endif
 
-                            @if($c->derivado_ley_karin)
-                                <span class="badge bg-danger ms-1">Ley Karin</span>
-                            @endif
-                        </td>
+                                @if($c->derivado_ley_karin)
+                                    <span class="badge bg-danger ms-1">Ley Karin</span>
+                                @endif
+                            </td>
 
-                        <!-- REGISTRADO POR -->
-                        <td>
-                            {{ $c->registradoPor->rol->nombre ?? '' }}
-                        </td>
+                            {{-- Registrado por --}}
+                            <td>
+                                {{ $c->registradoPor->funcionario->nombre_completo ?? '—' }}
+                            </td>
 
-                        <!-- CONFIDENCIAL -->
-                        <td>
-                            @if($c->confidencial)
-                                <i class="bi bi-lock-fill text-danger" title="Confidencial"></i>
-                            @else
-                                <i class="bi bi-unlock text-muted"></i>
-                            @endif
-                        </td>
+                            {{-- Confidencial --}}
+                            <td>
+                                @if($c->confidencial)
+                                    <i class="bi bi-lock-fill text-danger" title="Confidencial"></i>
+                                @else
+                                    <i class="bi bi-unlock text-muted"></i>
+                                @endif
+                            </td>
 
-                        <!-- ACCIONES -->
-                        <td class="table-actions">
-                            <a href="{{ route('leykarin.conflictos-funcionarios.show', $c) }}"
-                               class="btn btn-sm btn-info"
-                               title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                            {{-- Acciones --}}
+                            <td class="table-actions">
 
-                            <a href="{{ route('leykarin.conflictos-funcionarios.edit', $c) }}"
-                               class="btn btn-sm btn-primary"
-                               title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                        </td>
+                                {{-- Ver --}}
+                                @if(canAccess('conflictos_funcionarios','view'))
+                                    <a href="{{ route('leykarin.conflictos-funcionarios.show', $c) }}"
+                                       class="btn btn-sm btn-info"
+                                       title="Ver">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                @endif
 
-                    </tr>
-                @endforeach
-                </tbody>
+                                {{-- Editar --}}
+                                @if(canAccess('conflictos_funcionarios','edit'))
+                                    <a href="{{ route('leykarin.conflictos-funcionarios.edit', $c) }}"
+                                       class="btn btn-sm btn-primary"
+                                       title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                @endif
 
-            </table>
-        </div>
+                            </td>
 
-        {{-- PAGINACIÓN --}}
-        <div class="mt-3">
-            {{ $conflictos->links() }}
-        </div>
+                        </tr>
+                    @endforeach
+                    </tbody>
+
+                </table>
+            </div>
+
+            {{-- Paginación --}}
+            <div class="mt-3">
+                {{ $conflictos->links() }}
+            </div>
 
         @endif
 
     </div>
+
 </div>
 
 @endsection
 
 
-{{-- JS PARA SELECCIÓN DE FUNCIONARIO --}}
+{{-- ============================================================
+      JS MODAL SELECCIÓN FUNCIONARIO
+============================================================ --}}
 <script>
 document.addEventListener('click', function(e) {
 

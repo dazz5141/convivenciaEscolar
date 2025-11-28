@@ -4,31 +4,44 @@
 
 @section('content')
 
-    <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
-        <div>
-            <h1 class="page-title">Intervención PIE #{{ $intervencion->id }}</h1>
-            <p class="text-muted">Detalle completo de la intervención registrada</p>
-        </div>
-
-        <div class="d-flex gap-2 flex-wrap">
-            {{-- Volver --}}
-            <a href="{{ route('pie.intervenciones.index') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left me-2"></i> Volver
-            </a>
-
-            {{-- Historial --}}
-            <a href="{{ route('pie.historial.index', $intervencion->estudiante->id) }}" class="btn btn-primary">
-                <i class="bi bi-clock-history me-1"></i> Historial
-            </a>
-        </div>
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+    <div>
+        <h1 class="page-title">Intervención PIE #{{ $intervencion->id }}</h1>
+        <p class="text-muted">Detalle completo de la intervención registrada</p>
     </div>
 
+    <div class="d-flex gap-2 flex-wrap">
+
+        {{-- Volver --}}
+        <a href="{{ route('pie.intervenciones.index') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Volver
+        </a>
+
+        {{-- Historial --}}
+        <a href="{{ route('pie.historial.index', $intervencion->estudiante->id) }}" 
+           class="btn btn-primary">
+            <i class="bi bi-clock-history me-1"></i> Historial
+        </a>
+
+    </div>
+</div>
+
+{{-- =========================================================
+     PERMISOS
+========================================================= --}}
+@if(!canAccess('intervenciones','view'))
+    <div class="alert alert-warning mt-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para visualizar esta intervención PIE.
+    </div>
+    @return
+@endif
 
 
 <div class="row g-4">
 
     {{-- ============================================================
-         COLUMNA IZQUIERDA (PRINCIPAL)
+         COLUMNA PRINCIPAL
     ============================================================ --}}
     <div class="col-lg-8">
 
@@ -87,7 +100,9 @@
             <div class="detail-item">
                 <div class="detail-label">Diagnóstico PIE:</div>
                 <div class="detail-value">
-                    {!! $intervencion->estudiante->diagnostico ? nl2br(e($intervencion->estudiante->diagnostico)) : '<span class="text-muted">Sin información</span>' !!}
+                    {!! $intervencion->estudiante->diagnostico 
+                        ? nl2br(e($intervencion->estudiante->diagnostico)) 
+                        : '<span class="text-muted">Sin información</span>' !!}
                 </div>
             </div>
         </div>

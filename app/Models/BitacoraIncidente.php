@@ -22,6 +22,11 @@ class BitacoraIncidente extends Model
         'curso_id'
     ];
 
+    // CASTS DE CAMPOS
+    protected $casts = [
+        'fecha' => 'date',
+    ];
+
     // ---------------------------------------------------
     // RELACIONES PRINCIPALES
     // ---------------------------------------------------
@@ -103,5 +108,16 @@ class BitacoraIncidente extends Model
     public function observaciones()
     {
         return $this->hasMany(BitacoraIncidenteObservacion::class, 'incidente_id');
+    }
+
+    public function curso()
+    {
+        return $this->belongsTo(
+            Curso::class, 'curso_id');
+    }
+
+    public function establecimiento()
+    {
+        return $this->belongsTo(Establecimiento::class, 'establecimiento_id');
     }
 }

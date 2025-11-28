@@ -8,17 +8,22 @@ use App\Models\NivelEmocional;
 use App\Models\Alumno;
 use App\Models\Funcionario;
 use App\Models\Usuario;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SeguimientoEmocionalController extends Controller
 {
+
     /**
      * LISTADO + FILTROS
      */
     public function index(Request $request)
     {
+        // --- PERMISO ---
+        if (!canAccess('seguimientos', 'view')) {
+            abort(403);
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         $query = SeguimientoEmocional::with(['alumno.curso', 'evaluador', 'nivel'])
@@ -59,11 +64,17 @@ class SeguimientoEmocionalController extends Controller
     }
 
 
+
     /**
      * FORM CREATE
      */
     public function create()
     {
+        // --- PERMISO ---
+        if (!canAccess('seguimientos', 'create')) {
+            abort(403);
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         return view('modulos.convivencia-escolar.seguimiento-emocional.create', [
@@ -81,11 +92,17 @@ class SeguimientoEmocionalController extends Controller
     }
 
 
+
     /**
      * STORE
      */
     public function store(Request $request)
     {
+        // --- PERMISO ---
+        if (!canAccess('seguimientos', 'create')) {
+            abort(403);
+        }
+
         $request->validate([
             'alumno_id'         => 'required|exists:alumnos,id',
             'fecha'             => 'required|date',
@@ -106,36 +123,38 @@ class SeguimientoEmocionalController extends Controller
         ]);
 
         /*
-        |--------------------------------------------------------------------------
+        |------------------------------------------------------------------
         | NOTIFICACIONES AUTOMÁTICAS
-        |--------------------------------------------------------------------------
+        |------------------------------------------------------------------
         */
 
         $establecimientoId = session('establecimiento_id');
 
-        // Roles que recibirán la notificación
-        $rolesDestino = [6, 7]; // Convivencia Escolar + Psicólogo
+        // Roles que recibirán notificación
+        $rolesDestino = [6, 8]; // Psicólogo + Convivencia Escolar
 
         $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
             ->where('establecimiento_id', $establecimientoId)
             ->where('activo', 1)
             ->get();
 
-        // Obtener alumno 
-        $alumno = Alumno::select('nombre', 'apellido_paterno', 'apellido_materno')->find($request->alumno_id);
-        $nombreAlumno = $alumno ? "{$alumno->nombre} {$alumno->apellido_paterno}" : 'Alumno';
+        // Nombre del alumno
+        $alumno = Alumno::select('nombre', 'apellido_paterno')
+            ->find($request->alumno_id);
 
-        if ($usuariosDestino->count() > 0) {
-            foreach ($usuariosDestino as $usuario) {
-                Notificacion::create([
-                    'usuario_id'         => $usuario->id,
-                    'origen_id'          => $seguimiento->id,
-                    'origen_model'       => SeguimientoEmocional::class,
-                    'tipo'               => 'seguimiento_emocional',
-                    'mensaje'            => "Nuevo seguimiento emocional registrado para {$nombreAlumno}.",
-                    'establecimiento_id' => $establecimientoId,
-                ]);
-            }
+        $nombreAlumno = $alumno
+            ? "{$alumno->nombre} {$alumno->apellido_paterno}"
+            : 'Alumno';
+
+        foreach ($usuariosDestino as $usuario) {
+            Notificacion::create([
+                'usuario_id'         => $usuario->id,
+                'origen_id'          => $seguimiento->id,
+                'origen_model'       => SeguimientoEmocional::class,
+                'tipo'               => 'seguimiento_emocional',
+                'mensaje'            => "Nuevo seguimiento emocional registrado para {$nombreAlumno}.",
+                'establecimiento_id' => $establecimientoId,
+            ]);
         }
 
         return redirect()
@@ -144,11 +163,17 @@ class SeguimientoEmocionalController extends Controller
     }
 
 
+
     /**
      * SHOW
      */
     public function show($id)
     {
+        // --- PERMISO ---
+        if (!canAccess('seguimientos', 'view')) {
+            abort(403);
+        }
+
         $seguimiento = SeguimientoEmocional::with([
             'alumno.curso',
             'nivel',
@@ -161,17 +186,24 @@ class SeguimientoEmocionalController extends Controller
     }
 
 
+
     /**
      * EDIT
      */
     public function edit($id)
     {
+        // --- PERMISO ---
+        if (!canAccess('seguimientos', 'edit')) {
+            abort(403);
+        }
+
         $seguimiento = SeguimientoEmocional::findOrFail($id);
 
         $establecimientoId = session('establecimiento_id');
 
         return view('modulos.convivencia-escolar.seguimiento-emocional.edit', [
             'seguimiento' => $seguimiento,
+
             'alumnos' => Alumno::where('activo', 1)
                 ->whereHas('curso', fn($q) => $q->where('establecimiento_id', $establecimientoId))
                 ->orderBy('apellido_paterno')->get(),
@@ -186,11 +218,17 @@ class SeguimientoEmocionalController extends Controller
     }
 
 
+
     /**
      * UPDATE
      */
     public function update(Request $request, $id)
     {
+        // --- PERMISO ---
+        if (!canAccess('seguimientos', 'edit')) {
+            abort(403);
+        }
+
         $seguimiento = SeguimientoEmocional::findOrFail($id);
 
         $request->validate([
@@ -203,12 +241,12 @@ class SeguimientoEmocionalController extends Controller
         ]);
 
         $seguimiento->update([
-            'alumno_id'        => $request->alumno_id,
-            'fecha'            => $request->fecha,
+            'alumno_id'          => $request->alumno_id,
+            'fecha'              => $request->fecha,
             'nivel_emocional_id' => $request->nivel_emocional_id,
-            'estado_id'        => $request->estado_id,
-            'comentario'       => $request->comentario,
-            'evaluado_por'     => $request->evaluado_por,
+            'estado_id'          => $request->estado_id,
+            'comentario'         => $request->comentario,
+            'evaluado_por'       => $request->evaluado_por,
         ]);
 
         return redirect()

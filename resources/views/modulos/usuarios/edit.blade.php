@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- PERMISO --}}
+@if(!canAccess('usuarios', 'edit'))
+    @php(abort(403, 'No tienes permisos para editar usuarios.'))
+@endif
+
 <div class="page-header">
     <h1 class="page-title">Editar Usuario</h1>
 </div>

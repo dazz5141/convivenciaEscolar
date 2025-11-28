@@ -9,12 +9,16 @@
         <h1 class="page-title">Accidentes Escolares</h1>
         <p class="text-muted">Registro y seguimiento de accidentes escolares</p>
     </div>
-    <div>
-        <a href="{{ route('inspectoria.accidentes.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>
-            Registrar Accidente
-        </a>
-    </div>
+
+    {{-- BOTÓN CREAR CON PERMISO --}}
+    @if(canAccess('accidentes', 'create'))
+        <div>
+            <a href="{{ route('inspectoria.accidentes.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>
+                Registrar Accidente
+            </a>
+        </div>
+    @endif
 </div>
 
 <div class="card card-table">
@@ -28,7 +32,7 @@
                 <div class="col-12 col-md-5">
 
                     <div class="input-group">
-                        <input type="text" 
+                        <input type="text"
                                class="form-control"
                                id="inputAlumnoSeleccionado"
                                value="{{ $alumnoSeleccionado->nombre_completo ?? '' }}"
@@ -64,7 +68,7 @@
 
                 {{-- Fecha --}}
                 <div class="col-12 col-md-2">
-                    <input type="date" 
+                    <input type="date"
                            name="fecha"
                            value="{{ request('fecha') }}"
                            class="form-control">
@@ -121,27 +125,33 @@
                             </td>
 
                             <td>
-                                {{ 
-                                    $acc->funcionario?->nombre_completo 
-                                    ?? 
-                                    $acc->usuario?->nombre_completo 
-                                    ?? 
-                                    'Sin registro' 
+                                {{
+                                    $acc->funcionario?->nombre_completo
+                                    ??
+                                    $acc->usuario?->nombre_completo
+                                    ??
+                                    'Sin registro'
                                 }}
                             </td>
 
                             <td class="table-actions">
-                                <a href="{{ route('inspectoria.accidentes.show', $acc) }}" 
-                                   class="btn btn-sm btn-info" 
-                                   title="Ver">
-                                    <i class="bi bi-eye"></i>
-                                </a>
 
-                                <a href="{{ route('inspectoria.accidentes.edit', $acc) }}" 
-                                   class="btn btn-sm btn-primary" 
-                                   title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
+                                {{-- Ver --}}
+                                @if(canAccess('accidentes', 'view'))
+                                    <a href="{{ route('inspectoria.accidentes.show', $acc) }}"
+                                       class="btn btn-sm btn-info" title="Ver">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                @endif
+
+                                {{-- Editar --}}
+                                @if(canAccess('accidentes', 'create'))
+                                    <a href="{{ route('inspectoria.accidentes.edit', $acc) }}"
+                                       class="btn btn-sm btn-primary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                @endif
+
                             </td>
                         </tr>
                     @endforeach

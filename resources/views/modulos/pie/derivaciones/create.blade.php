@@ -4,6 +4,18 @@
 
 @section('content')
 
+{{-- ============================================================
+     PERMISO: CREAR
+============================================================ --}}
+@if(!canAccess('pie','create'))
+    <div class="alert alert-danger mt-3">
+        <i class="bi bi-x-circle me-2"></i>
+        No tienes permisos para registrar derivaciones PIE.
+    </div>
+    @return
+@endif
+
+
 <div class="page-header">
     <h1 class="page-title">Nueva Derivación PIE</h1>
     <p class="text-muted">Registrar una derivación asociada a un estudiante del Programa de Integración Escolar.</p>
@@ -32,8 +44,8 @@
         <p class="fw-bold" id="textoAlumnoSeleccionado" style="min-height: 22px;">
             No se ha seleccionado estudiante.
         </p>
-
     </div>
+
 
     {{-- =============================
         FECHA Y DESTINO
@@ -58,6 +70,7 @@
         </div>
     </div>
 
+
     {{-- =============================
         MOTIVO
     ============================== --}}
@@ -67,6 +80,7 @@
         <textarea name="motivo" class="form-control" rows="4"
                   placeholder="Describa el motivo de la derivación..." required></textarea>
     </div>
+
 
     {{-- =============================
         ESTADO
@@ -82,12 +96,16 @@
         </select>
     </div>
 
+
     {{-- BOTONES --}}
     <div class="d-flex gap-2 flex-wrap mt-4">
 
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save me-2"></i> Guardar Derivación
-        </button>
+        {{-- PERMISO: CREAR --}}
+        @if(canAccess('pie','create'))
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save me-2"></i> Guardar Derivación
+            </button>
+        @endif
 
         <a href="{{ url()->previous() }}" class="btn btn-secondary">
             <i class="bi bi-x-circle me-2"></i> Cancelar
@@ -97,10 +115,12 @@
 
 </form>
 
+
 {{-- ===========================
     MODAL SOLO DE ALUMNOS
 =========================== --}}
 @include('modulos.pie.partials.modal-buscar-estudiante-pie')
+
 
 {{-- ===========================
     JS PARA SELECCIÓN DE ALUMNO
@@ -115,9 +135,12 @@ document.addEventListener('click', function(e){
         let curso  = e.target.dataset.curso;
 
         document.getElementById('estudiante_pie_id').value = id;
-        document.getElementById('textoAlumnoSeleccionado').textContent =`${nombre} (${curso})`;
+        document.getElementById('textoAlumnoSeleccionado').textContent =
+            `${nombre} (${curso})`;
 
-        bootstrap.Modal.getInstance(document.getElementById('modalBuscarAlumnoPIE')).hide();
+        bootstrap.Modal.getInstance(
+            document.getElementById('modalBuscarAlumnoPIE')
+        ).hide();
     }
 
 });

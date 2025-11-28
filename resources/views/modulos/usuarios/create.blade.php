@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- PERMISO --}}
+@if(!canAccess('usuarios', 'create'))
+    @php(abort(403, 'No tienes permisos para crear usuarios.'))
+@endif
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div>
         <h1 class="page-title">Nuevo Usuario</h1>
@@ -166,7 +171,7 @@ document.addEventListener('click', function(e) {
 
         // Procesar nombre y apellidos
         let partes = nombreCompleto.trim().split(" ");
-        let nombre = partes.pop(); // último
+        let nombre = partes.pop();
         let apellidos = partes.join(" ").split(" ");
 
         document.getElementById('nombre').value = nombre;

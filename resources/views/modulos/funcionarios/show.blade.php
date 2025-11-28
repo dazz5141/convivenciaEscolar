@@ -1,5 +1,10 @@
 @extends('layouts.app')
 
+{{-- PERMISO --}}
+@if(!canAccess('funcionarios', 'view'))
+    @php(abort(403, 'No tienes permisos para ver funcionarios.'))
+@endif
+
 @section('title', 'Detalle del Funcionario')
 
 @section('content')
@@ -54,7 +59,7 @@
     <h5 class="form-section-title">Ubicación</h5>
 
     <div class="detail-item">
-    <div class="detail-label">Región:</div>
+        <div class="detail-label">Región:</div>
         <div class="detail-value">{{ $funcionario->region->nombre ?? '—' }}</div>
     </div>
 

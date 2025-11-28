@@ -10,6 +10,11 @@
 
 @include('components.alerts')
 
+{{-- =========================================================
+     PERMISO: SOLO QUIEN TIENE edit EN ATRASOS
+========================================================= --}}
+@if(canAccess('atrasos', 'edit'))
+
 <form action="{{ route('inspectoria.asistencia.update', $evento) }}" method="POST">
     @csrf
     @method('PUT')
@@ -103,5 +108,7 @@
     </div>
 
 </form>
+
+@endif {{-- FIN PERMISO --}}
 
 @endsection

@@ -36,6 +36,13 @@ class EstablecimientoReporteController extends Controller
         // Si es admin general (sin establecimiento_id), permitimos seleccionar por GET
         $establecimientoId = $user->establecimiento_id;
 
+        // ======================================================
+        //   PERMISO: VER REPORTE POR ESTABLECIMIENTO
+        // ======================================================
+        if (!canAccess('reporte_establecimiento', 'view')) {
+            abort(403, 'No tienes permisos para ver el reporte por alumno.');
+        }
+
         if (!$establecimientoId) {
             if ($request->filled('establecimiento_id')) {
                 $establecimientoId = (int) $request->establecimiento_id;

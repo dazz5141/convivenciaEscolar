@@ -86,15 +86,12 @@ class LoginController extends Controller
         $rol = Auth::user()->rol_id;
 
         return match ($rol) {
-            1 => route('dashboard.admin'),               // Administrador General
-            2 => route('dashboard.establecimiento'),     // Admin Establecimiento
-            3 => route('dashboard.inspector.general'),   // Inspector General
-            4 => route('dashboard.inspector'),           // Inspector
-            5 => route('dashboard.docente'),             // Profesor
-            6 => route('dashboard.psicologo'),           // Psicólogo
-            7 => route('dashboard.asistente'),           // Asistente
-            8 => route('dashboard.convivencia'),         // Encargado Convivencia
-            default => route('dashboard'),
+
+            1 => route('dashboard.admin'),              // Administrador General
+
+            2 => route('dashboard.establecimiento'),    // Admin Establecimiento
+
+            default => route('dashboard'),              // Cualquier otro rol
         };
     }
 }

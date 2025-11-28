@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- =========================================================
+     PERMISO: editar citaciones
+========================================================= --}}
+@if(canAccess('citaciones', 'edit'))
+
 <div class="page-header">
     <h1 class="page-title">Editar Citación a Apoderado</h1>
 </div>
@@ -40,7 +45,8 @@
             <i class="bi bi-search"></i> Cambiar Apoderado
         </button>
 
-        <input type="hidden" name="apoderado_id" id="apoderado_id" value="{{ $citacion->apoderado_id }}">
+        <input type="hidden" name="apoderado_id" id="apoderado_id"
+               value="{{ $citacion->apoderado_id }}">
 
         <p class="fw-bold" id="textoApoderadoSeleccionado">
             {{ $citacion->apoderado->nombre_completo ?? 'No se seleccionó apoderado' }}
@@ -51,7 +57,7 @@
 
 
     {{-- =========================================================
-         SECCIÓN 3: FECHA Y HORA (EDITABLE)
+         SECCIÓN 3: FECHA Y HORA
     ========================================================== --}}
     <div class="form-section mt-4">
         <h5 class="form-section-title">Fecha y hora de la citación</h5>
@@ -124,11 +130,13 @@
 </form>
 
 
-{{-- MODAL APODERADO --}}
+{{-- Modal Buscar Apoderado --}}
 @include('modulos.inspectoria.partials.modal-buscar-apoderado')
 
 
-{{-- JS SELECCIÓN DE APODERADO --}}
+{{-- =========================================================
+     JS Selección Apoderado
+========================================================= --}}
 <script>
 document.addEventListener('click', function(e) {
 
@@ -146,5 +154,15 @@ document.addEventListener('click', function(e) {
     }
 });
 </script>
+
+@else
+{{-- =========================================================
+     SIN PERMISO
+========================================================= --}}
+<div class="alert alert-warning mt-4">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    No tienes permisos para editar citaciones.
+</div>
+@endif
 
 @endsection

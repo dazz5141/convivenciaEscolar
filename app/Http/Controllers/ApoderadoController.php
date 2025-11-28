@@ -14,6 +14,11 @@ class ApoderadoController extends Controller
      */
     public function index(Request $request)
     {
+        // PERMISO: listar apoderados
+        if (!canAccess('apoderados', 'view')) {
+            abort(403);
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         $query = Apoderado::where('establecimiento_id', $establecimientoId);
@@ -40,6 +45,11 @@ class ApoderadoController extends Controller
      */
     public function create()
     {
+        // PERMISO: crear apoderado
+        if (!canAccess('apoderados', 'create')) {
+            abort(403);
+        }
+
         $regiones = Region::orderBy('nombre')->get();
 
         return view('modulos.apoderados.create', compact('regiones'));
@@ -50,6 +60,11 @@ class ApoderadoController extends Controller
      */
     public function store(Request $request)
     {
+        // PERMISO: guardar apoderado
+        if (!canAccess('apoderados', 'create')) {
+            abort(403);
+        }
+
         // -------------------------------------------
         // Asegurar establecimiento_id no nulo
         // -------------------------------------------
@@ -111,6 +126,11 @@ class ApoderadoController extends Controller
      */
     public function show($id)
     {
+        // PERMISO: ver apoderado
+        if (!canAccess('apoderados', 'view')) {
+            abort(403);
+        }
+
         $apoderado = Apoderado::with(['alumnos.curso', 'region', 'provincia', 'comuna'])
             ->findOrFail($id);
 
@@ -122,6 +142,11 @@ class ApoderadoController extends Controller
      */
     public function edit($id)
     {
+        // PERMISO: editar apoderado
+        if (!canAccess('apoderados', 'edit')) {
+            abort(403);
+        }
+
         $apoderado = Apoderado::findOrFail($id);
 
         $regiones = Region::orderBy('nombre')->get();
@@ -140,6 +165,11 @@ class ApoderadoController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // PERMISO: actualizar apoderado
+        if (!canAccess('apoderados', 'edit')) {
+            abort(403);
+        }
+
         $apoderado = Apoderado::findOrFail($id);
 
         $request->validate([
@@ -177,6 +207,11 @@ class ApoderadoController extends Controller
      */
     public function disable($id)
     {
+        // PERMISO: cambiar estado
+        if (!canAccess('apoderados', 'edit')) {
+            abort(403);
+        }
+
         $apoderado = Apoderado::findOrFail($id);
         $apoderado->update(['activo' => 0]);
 
@@ -189,6 +224,11 @@ class ApoderadoController extends Controller
      */
     public function enable($id)
     {
+        // PERMISO: cambiar estado
+        if (!canAccess('apoderados', 'edit')) {
+            abort(403);
+        }
+
         $apoderado = Apoderado::findOrFail($id);
         $apoderado->update(['activo' => 1]);
 

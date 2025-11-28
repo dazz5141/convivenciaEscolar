@@ -14,6 +14,11 @@ class UsuarioController extends Controller
     // LISTADO PRINCIPAL
     public function index(Request $request)
     {
+        // 🔒 PERMISO
+        if (!canAccess('usuarios', 'view')) {
+            abort(403, 'No tienes permisos para ver usuarios.');
+        }
+
         $query = Usuario::with(['rol', 'establecimiento', 'funcionario'])
             ->orderBy('id', 'asc');
 
@@ -51,6 +56,11 @@ class UsuarioController extends Controller
     // FORMULARIO CREAR
     public function create()
     {
+        // 🔒 PERMISO
+        if (!canAccess('usuarios', 'create')) {
+            abort(403, 'No tienes permisos para crear usuarios.');
+        }
+
         return view('modulos.usuarios.create', [
             'roles' => Rol::orderBy('id')->get(),
             'establecimientos' => Establecimiento::orderBy('nombre')->get()
@@ -60,6 +70,11 @@ class UsuarioController extends Controller
     // GUARDAR USUARIO
     public function store(Request $request)
     {
+        // 🔒 PERMISO
+        if (!canAccess('usuarios', 'create')) {
+            abort(403, 'No tienes permisos para crear usuarios.');
+        }
+
         $request->validate([
             'email' => 'nullable|email|max:255|unique:usuarios,email',
             'password' => 'required|min:6|max:255',
@@ -125,6 +140,11 @@ class UsuarioController extends Controller
     // FORMULARIO EDITAR
     public function edit(Usuario $usuario)
     {
+        // 🔒 PERMISO
+        if (!canAccess('usuarios', 'update')) {
+            abort(403, 'No tienes permisos para editar usuarios.');
+        }
+
         return view('modulos.usuarios.edit', [
             'usuario' => $usuario,
             'roles' => Rol::orderBy('id')->get(),
@@ -135,6 +155,11 @@ class UsuarioController extends Controller
     // ACTUALIZAR
     public function update(Request $request, Usuario $usuario)
     {
+        // 🔒 PERMISO
+        if (!canAccess('usuarios', 'update')) {
+            abort(403, 'No tienes permisos para actualizar usuarios.');
+        }
+
         $request->validate([
             'email' => "nullable|email|max:255|unique:usuarios,email,{$usuario->id}",
             'password' => 'nullable|min:6|max:255',
@@ -165,6 +190,11 @@ class UsuarioController extends Controller
 
     public function disable(Usuario $usuario)
     {
+        // 🔒 PERMISO
+        if (!canAccess('usuarios', 'delete')) {
+            abort(403, 'No tienes permisos para deshabilitar usuarios.');
+        }
+
         $usuario->update(['activo' => 0]);
 
         return redirect()->route('usuarios.index')
@@ -173,6 +203,11 @@ class UsuarioController extends Controller
 
     public function enable(Usuario $usuario)
     {
+        // 🔒 PERMISO
+        if (!canAccess('usuarios', 'delete')) {
+            abort(403, 'No tienes permisos para habilitar usuarios.');
+        }
+
         $usuario->update(['activo' => 1]);
 
         return redirect()->route('usuarios.index')

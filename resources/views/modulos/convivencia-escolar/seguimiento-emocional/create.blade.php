@@ -4,6 +4,8 @@
 
 @section('content')
 
+@crear('seguimientos')
+
 <div class="page-header mb-3">
     <h1 class="page-title">Nuevo Seguimiento Emocional</h1>
     <p class="text-muted">Registrar una evaluación emocional para un alumno</p>
@@ -298,5 +300,7 @@ document.addEventListener('click', function(e){
 });
 
 </script>
+
+@endcrear
 
 @endsection

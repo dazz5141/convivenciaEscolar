@@ -11,6 +11,13 @@
 
 @include('components.alerts')
 
+
+{{-- ============================================
+     PERMISO: SOLO PUEDE CREAR QUIEN TENGA
+     crear_accidente
+=============================================== --}}
+@canAccess('crear_accidente')
+
 <form action="{{ route('inspectoria.accidentes.store') }}" method="POST">
     @csrf
 
@@ -36,7 +43,6 @@
     </div>
 
 
-
     {{-- =========================================================
          SECCIÓN 2: TIPO DE ACCIDENTE
     ========================================================== --}}
@@ -50,7 +56,6 @@
             @endforeach
         </select>
     </div>
-
 
 
     {{-- =========================================================
@@ -111,7 +116,6 @@
     </div>
 
 
-
     {{-- =========================================================
          BOTONES
     ========================================================== --}}
@@ -130,7 +134,7 @@
 </form>
 
 
-
+{{-- Si hay errores --}}
 @if ($errors->any())
     <div class="alert alert-danger mt-3">
         <ul class="mb-0">
@@ -142,12 +146,10 @@
 @endif
 
 
-
 {{-- =========================================================
-     MODAL BUSCAR ALUMNO (ya existe en tu sistema)
+     MODAL BUSCAR ALUMNO
 ========================================================= --}}
 @include('modulos.inspectoria.partials.modal-buscar-alumno')
-
 
 
 {{-- =========================================================
@@ -176,5 +178,7 @@ document.addEventListener('click', function(e) {
     }
 });
 </script>
+
+@endcanAccess
 
 @endsection

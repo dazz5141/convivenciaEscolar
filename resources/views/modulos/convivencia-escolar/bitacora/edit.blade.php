@@ -4,6 +4,8 @@
 
 @section('content')
 
+@editar('bitacora')
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap mb-3">
     <div>
         <h1 class="page-title">Editar Incidente #{{ $incidente->id }}</h1>
@@ -193,6 +195,8 @@
 
 </form>
 
+@endeditar
+
 
 
 
@@ -272,17 +276,12 @@
 ================================================================================= --}}
 <script>
 
-// ======================================================
-// ELIMINAR ALUMNO EXISTENTE
-// ======================================================
 document.addEventListener('click', function (e) {
     if (e.target.closest('.btnQuitar')) {
 
-        // eliminamos la fila
         let fila = e.target.closest('tr');
         fila.remove();
 
-        // limpiamos inputs vacíos del DOM
         document.querySelectorAll('input[name="alumnos[]"]').forEach(i => {
             if (!i.value) i.closest('tr')?.remove();
         });
@@ -290,9 +289,6 @@ document.addEventListener('click', function (e) {
 });
 
 
-// ======================================================
-// FUNCIÓN DE BÚSQUEDA
-// ======================================================
 function buscar(url, inputId, resultadoId, tipo) {
     let q = document.getElementById(inputId).value;
 
@@ -334,9 +330,6 @@ function buscar(url, inputId, resultadoId, tipo) {
 }
 
 
-// ======================================================
-// EVENTOS PARA BUSCAR
-// ======================================================
 document.getElementById('inputBuscarAlumno').addEventListener('keyup', () => {
     buscar('/api-interna/buscar/alumnos', 'inputBuscarAlumno', 'resultadoAlumnos', 'alumno');
 });
@@ -346,9 +339,6 @@ document.getElementById('inputBuscarFuncionario').addEventListener('keyup', () =
 });
 
 
-// ======================================================
-// SELECCIONAR ALUMNO / FUNCIONARIO
-// ======================================================
 document.addEventListener('click', function(e){
 
     if (e.target.classList.contains('seleccionar')) {
@@ -358,12 +348,8 @@ document.addEventListener('click', function(e){
         let extra = e.target.dataset.extra;
         let tipo = e.target.dataset.tipo;
 
-        // ---------------------------
-        //      ALUMNO
-        // ---------------------------
         if (tipo === 'alumno') {
 
-            // **Evitar Duplicados**
             if (document.querySelector(`input[name="alumnos[]"][value="${id}"]`)) {
                 alert("Este alumno ya está agregado.");
                 return;
@@ -399,9 +385,6 @@ document.addEventListener('click', function(e){
         }
 
 
-        // ---------------------------
-        //      FUNCIONARIO
-        // ---------------------------
         if (tipo === 'funcionario') {
 
             document.getElementById('inputFuncionarioSeleccionado').value = id;

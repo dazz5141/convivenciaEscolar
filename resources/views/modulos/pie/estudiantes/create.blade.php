@@ -14,14 +14,21 @@
 <form action="{{ route('pie.estudiantes.store') }}" method="POST">
     @csrf
 
-    {{-- =======================
-        ALUMNO
-    ======================== --}}
+    {{-- =========================================================
+         PERMISOS
+    ========================================================== --}}
+    @if(canAccess('pie-estudiantes','create'))
+
+    {{-- =========================================================
+         SECCIÓN 1: ALUMNO
+    ========================================================== --}}
     <div class="form-section">
         <h5 class="form-section-title">Alumno</h5>
 
-        <button type="button" class="btn btn-outline-primary mb-3"
-                data-bs-toggle="modal" data-bs-target="#modalBuscarAlumno">
+        <button type="button"
+                class="btn btn-outline-primary mb-3"
+                data-bs-toggle="modal"
+                data-bs-target="#modalBuscarAlumno">
             <i class="bi bi-search"></i> Buscar Alumno
         </button>
 
@@ -32,40 +39,26 @@
         </p>
     </div>
 
-
-
-    {{-- =======================
-        PROFESIONAL PIE (Responsable)
-        *Este campo NO existe en la tabla estudiantes_pie
-        *Lo eliminamos para evitar inconsistencias
-    ======================== --}}
-    {{-- ELIMINADO --}}
-
-
-
-    {{-- =======================
-        INFORMACIÓN DEL PIE
-    ======================== --}}
+    {{-- =========================================================
+         SECCIÓN 2: INFORMACIÓN PIE
+    ========================================================== --}}
     <div class="form-section mt-4">
 
         <h5 class="form-section-title">Información del Estudiante PIE</h5>
 
         <div class="row g-3">
 
-            {{-- FECHA DE INGRESO (Obligatoria) --}}
             <div class="col-md-4">
-                <label class="form-label">Fecha de Ingreso al PIE *</label>
+                <label class="form-label">Fecha de Ingreso *</label>
                 <input type="date" name="fecha_ingreso" class="form-control" required>
             </div>
 
-            {{-- DIAGNÓSTICO --}}
             <div class="col-md-8">
                 <label class="form-label">Diagnóstico</label>
                 <input type="text" name="diagnostico" class="form-control"
-                       placeholder="Ej: TEL, Disfasia, dificultades...">
+                       placeholder="Ej: TEL, Disfasia, TEA...">
             </div>
 
-            {{-- OBSERVACIONES --}}
             <div class="col-12">
                 <label class="form-label">Observaciones</label>
                 <textarea name="observaciones" class="form-control" rows="3"
@@ -76,9 +69,9 @@
 
     </div>
 
-
-
-    {{-- BOTONES --}}
+    {{-- =========================================================
+         BOTONES
+    ========================================================== --}}
     <div class="d-flex gap-2 flex-wrap mt-4">
 
         <button class="btn btn-primary">
@@ -91,41 +84,42 @@
 
     </div>
 
+    @else
+        <div class="alert alert-warning mt-3">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            No tienes permisos para registrar estudiantes PIE.
+        </div>
+    @endif
+
 </form>
 
-
-
-{{-- ===========================
-    MODALES
-=========================== --}}
+{{-- =========================================================
+     MODALES
+========================================================= --}}
 @include('modulos.pie.partials.modal-buscar-alumno')
-@include('modulos.pie.partials.modal-buscar-funcionario')
 
-
-
-{{-- ===========================
-     JS DE SELECCIÓN
-=========================== --}}
+{{-- =========================================================
+     JS SELECCIÓN ALUMNO
+========================================================= --}}
 <script>
-
 document.addEventListener('click', function(e){
 
-    // Selección de alumno
     if (e.target.classList.contains('seleccionar-alumno')) {
 
-        let id = e.target.dataset.id;
+        let id     = e.target.dataset.id;
         let nombre = e.target.dataset.nombre;
-        let curso = e.target.dataset.curso;
+        let curso  = e.target.dataset.curso;
 
         document.getElementById('alumno_id').value = id;
         document.getElementById('textoAlumnoSeleccionado').textContent =
             `${nombre} (${curso})`;
 
-        bootstrap.Modal.getInstance(document.getElementById('modalBuscarAlumno')).hide();
+        bootstrap.Modal.getInstance(
+            document.getElementById('modalBuscarAlumno')
+        ).hide();
     }
 
 });
-
 </script>
 
 @endsection

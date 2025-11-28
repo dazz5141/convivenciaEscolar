@@ -4,6 +4,16 @@
 
 @section('content')
 
+{{-- ============================================================
+      PERMISO: VER
+============================================================== --}}
+@if(!canAccess('conflictos_funcionarios','view'))
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-shield-lock-fill me-2"></i>
+        No tienes permisos para ver detalles de conflictos entre funcionarios.
+    </div>
+@else
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div>
         <h1 class="page-title">Conflicto #{{ $conflicto->id }}</h1>
@@ -17,10 +27,12 @@
             <i class="bi bi-arrow-left me-2"></i> Volver
         </a>
 
-        {{-- Editar --}}
-        <a href="{{ route('leykarin.conflictos-funcionarios.edit', $conflicto) }}" class="btn btn-primary">
-            <i class="bi bi-pencil me-2"></i> Editar
-        </a>
+        {{-- Editar solo si tiene permiso --}}
+        @if(canAccess('conflictos_funcionarios','edit'))
+            <a href="{{ route('leykarin.conflictos-funcionarios.edit', $conflicto) }}" class="btn btn-primary">
+                <i class="bi bi-pencil me-2"></i> Editar
+            </a>
+        @endif
 
     </div>
 </div>
@@ -28,7 +40,7 @@
 <div class="row g-4">
 
     {{-- ============================================================
-         COLUMNA IZQUIERDA (Información principal)
+         COLUMNA IZQUIERDA — Información principal
     ============================================================ --}}
     <div class="col-lg-8">
 
@@ -43,7 +55,7 @@
                 </div>
             </div>
 
-            {{-- FUNCIONARIOS INVOLUCRADOS --}}
+            {{-- FUNCIONARIOS --}}
             <div class="detail-item">
                 <div class="detail-label">Funcionario denunciante:</div>
                 <div class="detail-value">
@@ -58,7 +70,7 @@
                 </div>
             </div>
 
-            {{-- TIPO DE CONFLICTO --}}
+            {{-- TIPO --}}
             <div class="detail-item">
                 <div class="detail-label">Tipo de conflicto:</div>
                 <div class="detail-value">
@@ -79,7 +91,7 @@
                 <div class="detail-label">Descripción detallada:</div>
                 <div class="detail-value">
                     {!! $conflicto->descripcion 
-                        ? nl2br(e($conflicto->descripcion)) 
+                        ? nl2br(e($conflicto->descripcion))
                         : '<span class="text-muted">Sin información disponible.</span>' !!}
                 </div>
             </div>
@@ -118,7 +130,7 @@
                 </div>
             </div>
 
-            {{-- DERIVADO LEY KARIN --}}
+            {{-- DERIVADO --}}
             <div class="detail-item">
                 <div class="detail-label">Derivado Ley Karin:</div>
                 <div class="detail-value">
@@ -130,15 +142,11 @@
                 </div>
             </div>
 
-            {{-- QUIÉN REGISTRA --}}
+            {{-- REGISTRADO POR --}}
             <div class="detail-item">
                 <div class="detail-label">Registrado por:</div>
                 <div class="detail-value">
-                    {{ $conflicto->registradoPor->nombre_completo ?? '—' }}
-                    <br>
-                    <span class="text-muted">
-                        {{ $conflicto->registradoPor->rol->nombre ?? '' }}
-                    </span>
+                    {{ $conflicto->registradoPor->nombre_completo ?? '—' }} {{ $conflicto->registradoPor->rol->nombre ?? '' }}
                 </div>
             </div>
 
@@ -147,7 +155,7 @@
     </div>
 
     {{-- ============================================================
-         COLUMNA DERECHA (Resumen general)
+         COLUMNA DERECHA — Resumen
     ============================================================ --}}
     <div class="col-lg-4">
 
@@ -185,21 +193,28 @@
                 <p class="mb-2">
                     <strong>Confidencial:</strong><br>
                     @if($conflicto->confidencial)
-                        <span class="text-danger"><i class="bi bi-lock-fill me-1"></i> Sí</span>
+                        <span class="text-danger">
+                            <i class="bi bi-lock-fill me-1"></i> Sí
+                        </span>
                     @else
-                        <span class="text-muted"><i class="bi bi-unlock me-1"></i> No</span>
+                        <span class="text-muted">
+                            <i class="bi bi-unlock me-1"></i> No
+                        </span>
                     @endif
                 </p>
 
                 <p class="mb-2">
                     <strong>Registrado por:</strong><br>
-                    {{ $conflicto->registradoPor->nombre_completo ?? '—' }}
+                    {{ $conflicto->registradoPor->nombre_completo ?? '—' }} {{ $conflicto->registradoPor->rol->nombre ?? '' }}
                 </p>
 
             </div>
         </div>
 
     </div>
+
 </div>
+
+@endif {{-- cierre permiso view --}}
 
 @endsection

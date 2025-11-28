@@ -9,17 +9,22 @@ use Illuminate\Support\Facades\Auth;
 
 class LeyKarinDocumentoController extends Controller
 {
-    /**
-     * Mostrar listado de documentos de una denuncia.
-     */
+    /* ================================================================
+       LISTADO DE DOCUMENTOS
+    ================================================================= */
     public function index(DenunciaLeyKarin $denuncia)
     {
-        // Seguridad multi-colegio
-        if ($denuncia->establecimiento_id != session('establecimiento_id')) {
-            abort(403, 'Acceso denegado.');
+        /* --- Permiso para VER documentos --- */
+        if (!canAccess('denuncias', 'view')) {
+            abort(403, 'No tienes permisos para ver documentos relacionados a denuncias.');
         }
 
-        // Solo documentos activos
+        /* --- Seguridad multi-colegio --- */
+        if ($denuncia->establecimiento_id != session('establecimiento_id')) {
+            abort(403, 'Acceso denegado. La denuncia pertenece a otro establecimiento.');
+        }
+
+        /* --- Solo documentos activos --- */
         $documentos = DocumentoAdjunto::where('activo', 1)
             ->where('entidad_type', DenunciaLeyKarin::class)
             ->where('entidad_id', $denuncia->id)
@@ -30,25 +35,33 @@ class LeyKarinDocumentoController extends Controller
     }
 
 
-    /**
-     * Subir documento a la denuncia.
-     */
+
+    /* ================================================================
+       SUBIR DOCUMENTO
+    ================================================================= */
     public function store(Request $request, DenunciaLeyKarin $denuncia)
     {
+        /* --- Permiso para CREAR/EDITAR documentos --- */
+        if (!canAccess('denuncias', 'edit')) {
+            abort(403, 'No tienes permisos para adjuntar documentos.');
+        }
+
+        /* --- Seguridad multi-colegio --- */
+        if ($denuncia->establecimiento_id != session('establecimiento_id')) {
+            abort(403, 'Acceso denegado.');
+        }
+
+        /* --- Validación de archivo --- */
         $request->validate([
             'archivo' => 'required|file|max:10240|mimes:pdf,jpg,jpeg,png,doc,docx',
         ]);
 
-        // seguridad
-        if ($denuncia->establecimiento_id != session('establecimiento_id')) {
-            abort(403);
-        }
-
         $file = $request->file('archivo');
 
-        // Guardado en /storage/app/public/documentos/leykarin/{id}/
+        /* --- Guardado físico --- */
         $ruta = $file->store("documentos/leykarin/{$denuncia->id}", 'public');
 
+        /* --- Registro en BD --- */
         DocumentoAdjunto::create([
             'entidad_type'       => DenunciaLeyKarin::class,
             'entidad_id'         => $denuncia->id,
@@ -65,16 +78,22 @@ class LeyKarinDocumentoController extends Controller
     }
 
 
-    /**
-     * DESHABILITAR DOCUMENTO (invalidar)
-     */
+
+    /* ================================================================
+       INVALIDAR DOCUMENTO (DESHABILITAR)
+    ================================================================= */
     public function disable($id)
     {
+        /* --- Permiso para EDITAR documentos --- */
+        if (!canAccess('denuncias', 'edit')) {
+            abort(403, 'No tienes permisos para invalidar documentos.');
+        }
+
         $documento = DocumentoAdjunto::findOrFail($id);
 
-        // Seguridad multicolegio
+        /* --- Seguridad multi-colegio --- */
         if ($documento->establecimiento_id != session('establecimiento_id')) {
-            abort(403);
+            abort(403, 'Acceso denegado.');
         }
 
         $documento->update([
@@ -87,16 +106,22 @@ class LeyKarinDocumentoController extends Controller
     }
 
 
-    /**
-     * HABILITAR DOCUMENTO (opcional)
-     */
+
+    /* ================================================================
+       HABILITAR DOCUMENTO (OPCIONAL)
+    ================================================================= */
     public function enable($id)
     {
+        /* --- Permiso para EDITAR documentos --- */
+        if (!canAccess('denuncias', 'edit')) {
+            abort(403, 'No tienes permisos para habilitar documentos.');
+        }
+
         $documento = DocumentoAdjunto::findOrFail($id);
 
-        // Seguridad multicolegio
+        /* --- Seguridad multi-colegio --- */
         if ($documento->establecimiento_id != session('establecimiento_id')) {
-            abort(403);
+            abort(403, 'Acceso denegado.');
         }
 
         $documento->update([

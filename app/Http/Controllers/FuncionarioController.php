@@ -18,6 +18,11 @@ class FuncionarioController extends Controller
 {
     public function index()
     {
+        // PERMISO
+        if (!canAccess('funcionarios_index', 'view')) {
+            abort(403, 'No tienes permiso para ver funcionarios.');
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         $funcionarios = Funcionario::where('establecimiento_id', $establecimientoId)
@@ -40,6 +45,11 @@ class FuncionarioController extends Controller
 
     public function create()
     {
+        // PERMISO
+        if (!canAccess('funcionarios_create', 'view')) {
+            abort(403, 'No tienes permiso para crear funcionarios.');
+        }
+
         return view('modulos.funcionarios.create', [
             'cargos'         => Cargo::all(),
             'tiposContrato'  => TipoContrato::all(),
@@ -50,48 +60,32 @@ class FuncionarioController extends Controller
 
     public function store(StoreFuncionarioRequest $request)
     {
+        // PERMISO
+        if (!canAccess('funcionarios_create', 'action')) {
+            abort(403, 'No tienes permiso para crear funcionarios.');
+        }
+
         $establecimientoId = session('establecimiento_id');
 
-        // Crear funcionario
-        $funcionario = Funcionario::create([
+        Funcionario::create([
             ...$request->validated(),
             'establecimiento_id' => $establecimientoId,
             'activo' => 1,
         ]);
 
-        // Buscar cargo
-        $cargo = $funcionario->cargo->nombre;
-
-        // Asignar rol automático desde config
-        $rolId = config("convivencia.roles_por_cargo.$cargo");
-
-        // Generar password automático
-        $password = strtolower(Str::slug($cargo)) . '123';
-
-        // Generar email automático
-        $dominio = config('convivencia.dominio_email');
-        $emailBase = strtolower(Str::slug($funcionario->nombre . '.' . $funcionario->apellido_paterno));
-        $email = $emailBase . '@' . $dominio;
-
-        // Crear usuario
-        Usuario::create([
-            'email'             => $email,
-            'password'          => Hash::make($password),
-            'rol_id'            => $rolId,
-            'funcionario_id'    => $funcionario->id,
-            'establecimiento_id'=> $establecimientoId,
-            'nombre'            => $funcionario->nombre,
-            'apellido_paterno'  => $funcionario->apellido_paterno,
-            'apellido_materno'  => $funcionario->apellido_materno,
-            'activo'            => 1,
-        ]);
-
-        return redirect()->route('funcionarios.index')->with('success', 'Funcionario y usuario creados correctamente.');
+        return redirect()
+            ->route('funcionarios.index')
+            ->with('success', 'Funcionario creado correctamente.');
     }
 
 
     public function edit($id)
     {
+        // PERMISO
+        if (!canAccess('funcionarios_edit', 'view')) {
+            abort(403, 'No tienes permiso para editar funcionarios.');
+        }
+
         $funcionario = Funcionario::findOrFail($id);
 
         $cargos = Cargo::all();
@@ -111,13 +105,24 @@ class FuncionarioController extends Controller
 
     public function update(UpdateFuncionarioRequest $request, Funcionario $funcionario)
     {
+        // PERMISO
+        if (!canAccess('funcionarios_edit', 'action')) {
+            abort(403, 'No tienes permiso para actualizar funcionarios.');
+        }
+
         $funcionario->update($request->validated());
 
         return redirect()->route('funcionarios.index')->with('success', 'Funcionario actualizado correctamente.');
     }
 
+
     public function show($id)
     {
+        // PERMISO
+        if (!canAccess('funcionarios_show', 'view')) {
+            abort(403, 'No tienes permiso para ver funcionarios.');
+        }
+
         $funcionario = Funcionario::findOrFail($id);
 
         return view('modulos.funcionarios.show', compact('funcionario'));
@@ -126,6 +131,11 @@ class FuncionarioController extends Controller
 
     public function disable($id)
     {
+        // PERMISO
+        if (!canAccess('funcionarios_edit', 'action')) {
+            abort(403, 'No tienes permiso para deshabilitar funcionarios.');
+        }
+
         $funcionario = Funcionario::findOrFail($id);
         $funcionario->update(['activo' => 0]);
 
@@ -137,8 +147,14 @@ class FuncionarioController extends Controller
         return redirect()->route('funcionarios.index')->with('success', 'Funcionario deshabilitado correctamente.');
     }
 
+
     public function enable($id)
     {
+        // PERMISO
+        if (!canAccess('funcionarios_edit', 'action')) {
+            abort(403, 'No tienes permiso para habilitar funcionarios.');
+        }
+
         $funcionario = Funcionario::findOrFail($id);
         $funcionario->update(['activo' => 1]);
 

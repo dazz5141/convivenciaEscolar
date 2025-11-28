@@ -9,9 +9,17 @@
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
+
+        {{-- ============================================
+             BOTÓN EDITAR (SOLO SI TIENE PERMISO)
+        ============================================ --}}
+        @if(canAccess('cursos', 'edit'))
         <a href="{{ route('cursos.edit', $curso->id) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+        @endif
+
+        {{-- BOTÓN VOLVER (SIEMPRE VISIBLE) --}}
         <a href="{{ route('cursos.index') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i> Volver
         </a>
@@ -63,4 +71,3 @@
 </div>
 
 @endsection
-

@@ -13,10 +13,15 @@
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
-        <a href="{{ route('apoderados.edit', $apoderado->id) }}" class="btn btn-primary">
-            <i class="bi bi-pencil me-2"></i> Editar
-        </a>
 
+        {{-- Botón EDITAR: solo si tiene permiso --}}
+        @if(canAccess('apoderados', 'edit'))
+            <a href="{{ route('apoderados.edit', $apoderado->id) }}" class="btn btn-primary">
+                <i class="bi bi-pencil me-2"></i> Editar
+            </a>
+        @endif
+
+        {{-- SIEMPRE puede volver --}}
         <a href="{{ route('apoderados.index') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i> Volver
         </a>
@@ -90,6 +95,8 @@
                             {{ $alumno->curso->nivel }} {{ $alumno->curso->letra }}
                         </span>
                     </div>
+
+                    {{-- Botón ver alumno SIEMPRE visible --}}
                     <a href="{{ route('alumnos.show', $alumno->id) }}"
                        class="btn btn-sm btn-outline-primary">
                         Ver Alumno

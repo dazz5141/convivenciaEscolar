@@ -10,12 +10,17 @@
         <p class="text-muted">Registro general de citaciones realizadas por Inspectoría</p>
     </div>
 
+    {{-- =====================================================
+         PERMISO: crear citación
+    ====================================================== --}}
+    @if(canAccess('citaciones', 'create'))
     <div>
         <a href="{{ route('inspectoria.citaciones.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>
             Registrar Citación
         </a>
     </div>
+    @endif
 </div>
 
 <div class="card card-table">
@@ -25,7 +30,7 @@
         <form method="GET" action="{{ route('inspectoria.citaciones.index') }}">
             <div class="row g-3">
 
-                {{-- Filtro por alumno --}}
+                {{-- Filtro Alumno --}}
                 <div class="col-12 col-md-4">
 
                     <div class="input-group">
@@ -48,7 +53,7 @@
                            value="{{ request('alumno_id') }}">
                 </div>
 
-                {{-- Modal Alumno --}}
+                {{-- Modal --}}
                 @include('modulos.inspectoria.partials.modal-buscar-alumno')
 
                 {{-- Estado --}}
@@ -85,10 +90,12 @@
     {{-- TABLA --}}
     <div class="card-body">
         @if($citaciones->count() == 0)
+
             <div class="text-center text-muted py-4">
                 <i class="bi bi-info-circle fs-2"></i>
                 <p class="mt-2">No hay citaciones registradas</p>
             </div>
+
         @else
 
         <div class="table-responsive">
@@ -110,9 +117,7 @@
                         <tr>
 
                             {{-- Fecha --}}
-                            <td>
-                                {{ \Carbon\Carbon::parse($c->fecha_citacion)->format('d/m/Y H:i') }}
-                            </td>
+                            <td>{{ \Carbon\Carbon::parse($c->fecha_citacion)->format('d/m/Y H:i') }}</td>
 
                             {{-- Alumno --}}
                             <td>
@@ -125,14 +130,13 @@
                             {{-- Apoderado --}}
                             <td>
                                 @if($c->apoderado)
-                                    {{ $c->apoderado->nombre_completo }}<br>
-                                    <small class="text-muted">Apoderado registrado</small>
+                                    {{ $c->apoderado->nombre_completo }}
                                 @else
                                     <span class="text-muted">No registrado</span>
                                 @endif
                             </td>
 
-                            {{-- Motivo resumido --}}
+                            {{-- Motivo --}}
                             <td>
                                 @if($c->motivo)
                                     <span title="{{ $c->motivo }}">
@@ -151,24 +155,26 @@
                             </td>
 
                             {{-- Funcionario --}}
-                            <td>
-                                {{ $c->funcionario->nombre_completo }}
-                            </td>
+                            <td>{{ $c->funcionario->nombre_completo }}</td>
 
-                            {{-- Acciones --}}
+                            {{-- ACCIONES --}}
                             <td class="table-actions">
 
+                                {{-- PERMISO: ver --}}
+                                @if(canAccess('citaciones', 'view'))
                                 <a href="{{ route('inspectoria.citaciones.show', $c) }}"
-                                   class="btn btn-sm btn-info"
-                                   title="Ver">
+                                   class="btn btn-sm btn-info">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                @endif
 
+                                {{-- PERMISO: editar --}}
+                                @if(canAccess('citaciones', 'edit'))
                                 <a href="{{ route('inspectoria.citaciones.edit', $c) }}"
-                                   class="btn btn-sm btn-primary"
-                                   title="Editar">
+                                   class="btn btn-sm btn-primary">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                @endif
 
                             </td>
 
@@ -178,7 +184,6 @@
             </table>
         </div>
 
-        {{-- Paginación --}}
         <div class="mt-3">
             {{ $citaciones->links() }}
         </div>
@@ -191,7 +196,7 @@
 @endsection
 
 
-{{-- JS Selección Alumno --}}
+{{-- JS selección alumno --}}
 <script>
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('seleccionar-alumno')) {

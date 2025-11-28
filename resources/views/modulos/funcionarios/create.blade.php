@@ -1,5 +1,10 @@
 @extends('layouts.app')
 
+{{-- PERMISO --}}
+@if(!canAccess('funcionarios_create', 'full'))
+    @php(abort(403, 'No tienes permisos para crear funcionarios.'))
+@endif
+
 @section('title', 'Crear Funcionario')
 
 @section('content')

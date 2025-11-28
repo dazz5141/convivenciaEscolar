@@ -11,15 +11,19 @@
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
+
         {{-- Volver --}}
         <a href="{{ route('inspectoria.accidentes.index') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i> Volver
         </a>
 
-        {{-- Editar --}}
-        <a href="{{ route('inspectoria.accidentes.edit', $accidente) }}" class="btn btn-primary">
-            <i class="bi bi-pencil me-2"></i> Editar
-        </a>
+        {{-- Editar (solo si tiene permiso) --}}
+        @canAccess('editar_accidente')
+            <a href="{{ route('inspectoria.accidentes.edit', $accidente) }}" class="btn btn-primary">
+                <i class="bi bi-pencil me-2"></i> Editar
+            </a>
+        @endcanAccess
+
     </div>
 </div>
 
@@ -79,11 +83,9 @@
             <div class="detail-item">
                 <div class="detail-label">Registrado por:</div>
                 <div class="detail-value">
-
                     {{ $accidente->funcionario->nombre_completo 
                         ?? $accidente->usuario->nombre_completo 
                         ?? 'No disponible' }}
-
                 </div>
             </div>
 

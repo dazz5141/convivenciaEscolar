@@ -10,10 +10,26 @@
         <p class="text-muted">Listado de derivaciones realizadas en el Programa de Integración Escolar.</p>
     </div>
 
-    <a href="{{ route('pie.derivaciones.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-circle me-2"></i> Nueva Derivación
-    </a>
+    {{-- =============================
+         PERMISO: CREAR
+    ============================== --}}
+    @if(canAccess('pie','create'))
+        <a href="{{ route('pie.derivaciones.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i> Nueva Derivación
+        </a>
+    @endif
 </div>
+
+{{-- =============================
+     PERMISO: VER
+============================= --}}
+@if(!canAccess('pie','view'))
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para ver las derivaciones PIE.
+    </div>
+    @return
+@endif
 
 
 {{-- =====================================
@@ -110,16 +126,22 @@
                         </td>
 
                         <td>
-                            <a href="{{ route('pie.derivaciones.show', $d->id) }}"
-                               class="btn btn-sm btn-info">
-                                <i class="bi bi-eye"></i>
-                            </a>
 
+                            {{-- PERMISO: VER --}}
+                            @if(canAccess('pie','view'))
+                                <a href="{{ route('pie.derivaciones.show', $d->id) }}"
+                                   class="btn btn-sm btn-info">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            @endif
+
+                            {{-- Ver en historial --}}
                             <a href="{{ route('pie.historial.show', ['tipo' => 'derivacion', 'id' => $d->id]) }}"
                                 class="btn btn-sm btn-secondary"
                                 title="Ver en historial">
                                 <i class="bi bi-clock-history"></i>
                             </a>
+
                         </td>
                     </tr>
 

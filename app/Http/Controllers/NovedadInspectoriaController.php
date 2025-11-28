@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\NovedadInspectoria;
 use App\Models\TipoNovedadInspectoria;
 use App\Models\Usuario;
+use App\Models\Alumno;
+use App\Models\Notificacion;
 use Illuminate\Support\Facades\Auth;
 
 class NovedadInspectoriaController extends Controller
@@ -15,6 +17,11 @@ class NovedadInspectoriaController extends Controller
      */
     public function index()
     {
+        // Permiso
+        if (!canAccess('novedades', 'view')) {
+            abort(403, 'No tienes permiso para ver novedades.');
+        }
+
         $establecimiento = session('establecimiento_id');
 
         $novedades = NovedadInspectoria::with([
@@ -38,6 +45,11 @@ class NovedadInspectoriaController extends Controller
      */
     public function create()
     {
+        // Permiso
+        if (!canAccess('novedades', 'create')) {
+            abort(403, 'No tienes permiso para registrar novedades.');
+        }
+
         $tipos = TipoNovedadInspectoria::orderBy('nombre')->get();
 
         return view('modulos.inspectoria.novedades.create', compact('tipos'));
@@ -48,6 +60,11 @@ class NovedadInspectoriaController extends Controller
      */
     public function store(Request $request)
     {
+        // Permiso
+        if (!canAccess('novedades', 'create')) {
+            abort(403, 'No tienes permiso para registrar novedades.');
+        }
+
         if (!$request->alumno_id) {
             $request->merge(['curso_id' => null]);
         }
@@ -60,7 +77,8 @@ class NovedadInspectoriaController extends Controller
             'curso_id'            => 'nullable|exists:cursos,id',
         ]);
 
-        NovedadInspectoria::create([
+        // Crear novedad
+        $n = NovedadInspectoria::create([
             'fecha'              => $request->fecha,
             'tipo_novedad_id'    => $request->tipo_novedad_id,
             'descripcion'        => $request->descripcion,
@@ -81,7 +99,7 @@ class NovedadInspectoriaController extends Controller
         // Roles que recibirán la notificación
         $rolesDestino = [4, 5, 6]; // Inspector General, Inspector, Convivencia Escolar
 
-        // Usuarios del establecimiento con esos roles
+        // Usuarios destino
         $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
             ->where('establecimiento_id', $establecimientoId)
             ->where('activo', 1)
@@ -89,18 +107,18 @@ class NovedadInspectoriaController extends Controller
 
         if ($usuariosDestino->count() > 0) {
 
-            $alumno = $request->alumno_id
+            $alumnoNombre = $request->alumno_id
                 ? Alumno::find($request->alumno_id)->nombre_completo
-                : 'Sin alumno asignado';
+                : 'Sin alumno asociado';
 
             foreach ($usuariosDestino as $usuario) {
 
                 Notificacion::create([
                     'usuario_id'        => $usuario->id,
-                    'origen_id'         => $novedad->id,
+                    'origen_id'         => $n->id,
                     'origen_model'      => NovedadInspectoria::class,
                     'tipo'              => 'novedad_inspectoria',
-                    'mensaje'           => "Nueva novedad registrada: {$alumno}",
+                    'mensaje'           => "Nueva novedad registrada: {$alumnoNombre}",
                     'establecimiento_id'=> $establecimientoId,
                 ]);
             }
@@ -116,6 +134,11 @@ class NovedadInspectoriaController extends Controller
      */
     public function show(NovedadInspectoria $novedad)
     {
+        // Permiso
+        if (!canAccess('novedades', 'view')) {
+            abort(403, 'No tienes permiso para ver novedades.');
+        }
+
         $this->validarEstablecimiento($novedad);
 
         return view('modulos.inspectoria.novedades.show', compact('novedad'));
@@ -126,6 +149,11 @@ class NovedadInspectoriaController extends Controller
      */
     public function edit(NovedadInspectoria $novedad)
     {
+        // Permiso
+        if (!canAccess('novedades', 'edit')) {
+            abort(403, 'No tienes permiso para editar novedades.');
+        }
+
         $this->validarEstablecimiento($novedad);
 
         $tipos = TipoNovedadInspectoria::orderBy('nombre')->get();
@@ -138,6 +166,11 @@ class NovedadInspectoriaController extends Controller
      */
     public function update(Request $request, NovedadInspectoria $novedad)
     {
+        // Permiso
+        if (!canAccess('novedades', 'edit')) {
+            abort(403, 'No tienes permiso para editar novedades.');
+        }
+
         $this->validarEstablecimiento($novedad);
 
         if (!$request->alumno_id) {

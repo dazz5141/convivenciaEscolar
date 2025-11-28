@@ -4,6 +4,18 @@
 
 @section('content')
 
+{{-- ============================================================
+     PERMISO: VER
+============================================================ --}}
+@if(!canAccess('pie','view'))
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para ver el historial PIE.
+    </div>
+    @return
+@endif
+
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap mb-3">
     <div>
         <h1 class="page-title">Historial PIE</h1>
@@ -18,7 +30,7 @@
 
 {{-- ============================
     INFORMACIÓN DEL ESTUDIANTE
-============================ --}}
+============================= --}}
 <div class="card mb-4">
     <div class="card-header">
         <h5 class="mb-0">Datos del Estudiante</h5>
@@ -52,7 +64,7 @@
 
 {{-- ============================
         LÍNEA DE TIEMPO
-============================ --}}
+============================= --}}
 <div class="card">
     <div class="card-header">
         <h5 class="mb-0">Línea de Tiempo PIE</h5>
@@ -149,7 +161,7 @@
 
 {{-- ============================
         ESTILO TIMELINE
-============================ --}}
+============================= --}}
 <style>
 .timeline { list-style: none; padding-left: 0; }
 .timeline-item { position: relative; padding-left: 20px; }

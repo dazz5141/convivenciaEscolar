@@ -4,6 +4,17 @@
 
 @section('content')
 
+{{-- =========================================================
+      PERMISO: EDITAR
+=========================================================== --}}
+@if(!canAccess('conflictos_apoderados','edit'))
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-shield-lock-fill me-2"></i>
+        No tienes permisos para editar conflictos entre apoderados.
+    </div>
+@endif
+
+
 <div class="page-header">
     <h1 class="page-title">Editar Conflicto con Apoderado</h1>
 </div>
@@ -62,16 +73,18 @@
     <div class="form-section mt-4">
         <h5 class="form-section-title">Registrado por</h5>
 
-        <p class="fw-bold">
+        <p class="fw-bold mb-1">
             {{ $conflicto->registradoPor->nombre_completo ?? '—' }}
-            <br>
-            <small class="text-muted">{{ $conflicto->registradoPor->rol->nombre ?? '' }}</small>
+        </p>
+
+        <p class="text-muted mb-0">
+            {{ $conflicto->registradoPor->rol->nombre ?? '' }}
         </p>
     </div>
 
 
     {{-- =========================================================
-         SECCIÓN 4: INFORMACIÓN DEL CONFLICTO
+         SECCIÓN 4: INFORMACIÓN EDITABLE DEL CONFLICTO
     ========================================================== --}}
     <div class="form-section mt-4">
         <h5 class="form-section-title">Información del Conflicto</h5>
@@ -89,7 +102,7 @@
 
             {{-- TIPO --}}
             <div class="col-md-8">
-                <label class="form-label">Tipo de conflicto *</label>
+                <label class="form-label">Tipo de conflicto <span class="text-danger">*</span></label>
                 <input type="text"
                        name="tipo_conflicto"
                        class="form-control"
@@ -110,7 +123,7 @@
 
             {{-- DESCRIPCIÓN --}}
             <div class="col-12">
-                <label class="form-label">Descripción del conflicto *</label>
+                <label class="form-label">Descripción del conflicto <span class="text-danger">*</span></label>
                 <textarea name="descripcion"
                           class="form-control"
                           rows="4"
@@ -167,9 +180,13 @@
          BOTONES
     ========================================================== --}}
     <div class="d-flex gap-2 mt-4">
-        <button class="btn btn-primary">
-            <i class="bi bi-save me-2"></i> Guardar Cambios
-        </button>
+
+        {{-- PERMISO: EDITAR --}}
+        @if(canAccess('conflictos_apoderados','edit'))
+            <button class="btn btn-primary">
+                <i class="bi bi-save me-2"></i> Guardar Cambios
+            </button>
+        @endif
 
         <a href="{{ route('leykarin.conflictos-apoderados.index') }}" class="btn btn-secondary">
             <i class="bi bi-x-circle me-2"></i> Cancelar

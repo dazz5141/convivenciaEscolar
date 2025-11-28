@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\RetiroAnticipado;
 use App\Models\Alumno;
 use App\Models\Usuario;
+use App\Models\Notificacion;
 use Illuminate\Support\Facades\Auth;
 
 class RetiroAnticipadoController extends Controller
@@ -76,22 +77,29 @@ class RetiroAnticipadoController extends Controller
                 ->withInput();
         }
 
-        // Si se selecciona apoderado → limpiar campos manuales
+        // Si selecciona apoderado → limpiar datos manuales
         if ($request->apoderado_id) {
-            $nombre = null;
-            $run = null;
+            $nombre     = null;
+            $run        = null;
             $parentesco = null;
-            $telefono = null;
+            $telefono   = null;
         } else {
+            // Sin apoderado → borrar ID y usar datos manuales
             $request->merge(['apoderado_id' => null]);
 
-            $nombre = $request->nombre_retira;
-            $run = $request->run_retira;
+            $nombre     = $request->nombre_retira;
+            $run        = $request->run_retira;
             $parentesco = $request->parentesco_retira;
-            $telefono = $request->telefono_retira;
+            $telefono   = $request->telefono_retira;
         }
 
-        RetiroAnticipado::create([
+        /*
+        |--------------------------------------------------------------------------
+        | CREAR RETIRO
+        |--------------------------------------------------------------------------
+        */
+
+        $retiro = RetiroAnticipado::create([
             'alumno_id'          => $request->alumno_id,
             'fecha'              => $request->fecha,
             'hora'               => $request->hora,
@@ -103,7 +111,6 @@ class RetiroAnticipadoController extends Controller
             'telefono_retira'    => $telefono,
             'entregado_por'      => Auth::user()->funcionario_id,
             'observaciones'      => $request->observaciones,
-
             'establecimiento_id' => $alumno->curso->establecimiento_id,
         ]);
 
@@ -115,26 +122,25 @@ class RetiroAnticipadoController extends Controller
 
         $establecimientoId = $alumno->curso->establecimiento_id;
 
-        // Roles que recibirán la notificación
-        $rolesDestino = [4, 5, 6]; // Inspector General, Inspector, Convivencia Escolar
+        $rolesDestino = [4, 5, 6]; 
+        // 4 = Inspector
+        // 5 = Inspector General
+        // 6 = Convivencia Escolar (si corresponde)
 
         $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
             ->where('establecimiento_id', $establecimientoId)
             ->where('activo', 1)
             ->get();
 
-        if ($usuariosDestino->count() > 0) {
-
-            foreach ($usuariosDestino as $usuario) {
-                Notificacion::create([
-                    'usuario_id'         => $usuario->id,
-                    'origen_id'          => $retiro->id,
-                    'origen_model'       => RetiroAnticipado::class,
-                    'tipo'               => 'retiro_anticipado',
-                    'mensaje'            => "Retiro anticipado registrado para {$alumno->nombre_completo}.",
-                    'establecimiento_id' => $establecimientoId,
-                ]);
-            }
+        foreach ($usuariosDestino as $usuario) {
+            Notificacion::create([
+                'usuario_id'         => $usuario->id,
+                'origen_id'          => $retiro->id,
+                'origen_model'       => RetiroAnticipado::class,
+                'tipo'               => 'retiro_anticipado',
+                'mensaje'            => "Retiro anticipado registrado para {$alumno->nombre_completo}.",
+                'establecimiento_id' => $establecimientoId,
+            ]);
         }
 
         return redirect()
@@ -181,14 +187,13 @@ class RetiroAnticipadoController extends Controller
     {
         $this->validarEstablecimiento($retiro);
 
-        // Convertir formato 05:00:00 → 05:00 antes de validar
+        // Normalizar hora      
         if ($request->hora) {
             $request->merge([
                 'hora' => substr($request->hora, 0, 5)
             ]);
         }
 
-        // Validación corregida
         $request->validate([
             'hora'               => 'required|date_format:H:i',
             'motivo'             => 'nullable|string|max:255',
@@ -200,21 +205,23 @@ class RetiroAnticipadoController extends Controller
             'observaciones'      => 'nullable|string',
         ]);
 
-        // Lógica híbrida
+        // Si usa apoderado → limpiar manuales
         if ($request->apoderado_id) {
+
             $request->merge([
                 'nombre_retira'     => null,
                 'run_retira'        => null,
                 'parentesco_retira' => null,
                 'telefono_retira'   => null,
             ]);
+
         } else {
+            // Caso manual → borrar apoderado
             $request->merge([
                 'apoderado_id' => null
             ]);
         }
 
-        // Actualizar
         $retiro->update($request->only([
             'hora',
             'motivo',

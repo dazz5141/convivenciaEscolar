@@ -4,6 +4,18 @@
 
 @section('content')
 
+{{-- =========================================================
+      PERMISO DE ACCESO
+========================================================= --}}
+@if(!canAccess('denuncias','view'))
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-shield-lock-fill me-2"></i>
+        No tienes permisos para ver documentos asociados a esta denuncia.
+    </div>
+    @php return; @endphp
+@endif
+
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div>
         <h1 class="page-title">Documentos de la Denuncia</h1>
@@ -16,12 +28,14 @@
     </a>
 </div>
 
+
 {{-- =========================================================
-     FORMULARIO PARA SUBIR ARCHIVOS
+     FORMULARIO PARA SUBIR ARCHIVOS (solo si tiene permiso)
 ========================================================= --}}
+@if(canAccess('denuncias','edit'))
 <div class="card mb-4 shadow-sm">
     <div class="card-header">
-        <h5 class="mb-0"><i class="bi bi-upload me-2"></i>Subir nuevo documento</h5>
+        <h5 class="mb-0"><i class="bi bi-upload me-2"></i> Subir nuevo documento</h5>
     </div>
 
     <div class="card-body">
@@ -51,9 +65,11 @@
             <button type="submit" class="btn btn-primary">
                 <i class="bi bi-cloud-upload me-2"></i> Subir Documento
             </button>
+
         </form>
     </div>
 </div>
+@endif
 
 
 {{-- =========================================================
@@ -61,7 +77,7 @@
 ========================================================= --}}
 <div class="card shadow-sm">
     <div class="card-header">
-        <h5 class="mb-0"><i class="bi bi-folder2-open me-2"></i>Documentos adjuntos</h5>
+        <h5 class="mb-0"><i class="bi bi-folder2-open me-2"></i> Documentos adjuntos</h5>
     </div>
 
     <div class="card-body">
@@ -105,17 +121,24 @@
                                 <i class="bi bi-box-arrow-down"></i>
                             </a>
 
-                            {{-- Invalidar documento --}}
+                            {{-- =====================================================
+                                 INVALIDAR DOCUMENTO (solo si tiene permiso)
+                            ===================================================== --}}
+                            @if(canAccess('denuncias','edit'))
                             <button class="btn btn-sm btn-outline-warning"
                                     data-bs-toggle="modal"
                                     data-bs-target="#modalInvalidarDocumento{{ $doc->id }}">
                                 <i class="bi bi-slash-circle"></i>
                             </button>
+                            @endif
 
                         </td>
                     </tr>
 
-                    {{-- Modal invalidación --}}
+                    {{-- =====================================================
+                         Modal de invalidación (solo si tiene permiso)
+                    ===================================================== --}}
+                    @if(canAccess('denuncias','edit'))
                     <div class="modal fade" id="modalInvalidarDocumento{{ $doc->id }}" tabindex="-1">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
@@ -153,6 +176,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     @endforeach
                 </tbody>

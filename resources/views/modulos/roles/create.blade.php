@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- PERMISO: CREAR ROLES --}}
+@if(!canAccess('roles', 'create'))
+    @php(abort(403, 'No tienes permisos para crear roles.'))
+@endif
+
 <div class="page-header">
     <h1 class="page-title">Crear Nuevo Rol</h1>
 </div>

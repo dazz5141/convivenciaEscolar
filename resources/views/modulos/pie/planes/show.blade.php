@@ -26,6 +26,19 @@
 </div>
 
 
+{{-- =========================================================
+     PERMISOS — BLOQUEAR ACCESO SI NO PUEDE VER
+========================================================= --}}
+@if(!canAccess('pie','view'))
+    <div class="alert alert-warning mt-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para ver la información de Planes Individuales PIE.
+    </div>
+    @return
+@endif
+
+
+
 <div class="row g-4">
 
     {{-- ===========================================
@@ -100,7 +113,7 @@
                 <div class="detail-value">
                     {!! $planIndividualPIE->estudiante?->diagnostico
                         ? nl2br(e($planIndividualPIE->estudiante?->diagnostico))
-                            : '<span class="text-muted">Sin diagnóstico registrado.</span>' !!}
+                        : '<span class="text-muted">Sin diagnóstico registrado.</span>' !!}
                 </div>
             </div>
         </div>

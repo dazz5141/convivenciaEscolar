@@ -8,11 +8,15 @@
         <h1 class="page-title">Gestión de Alumnos</h1>
         <p class="text-muted">Administración de estudiantes del establecimiento</p>
     </div>
+
+    {{-- SOLO ROLES CON PERMISO create EN ALUMNOS --}}
+    @crear('alumnos')
     <div>
         <a href="{{ route('alumnos.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i> Nuevo Alumno
         </a>
     </div>
+    @endcrear
 </div>
 
 <div class="card card-table">
@@ -81,33 +85,45 @@
                                 {{ $al->activo ? 'Activo' : 'Inactivo' }}
                             </span>
                         </td>
+
                         <td class="table-actions">
+
+                            {{-- VER — todos los roles con permiso view o view_course --}}
+                            @ver('alumnos')
                             <a href="{{ route('alumnos.show', $al->id) }}" class="btn btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
                             </a>
+                            @endver
 
+                            {{-- EDITAR --}}
+                            @editar('alumnos')
                             <a href="{{ route('alumnos.edit', $al->id) }}" class="btn btn-sm btn-primary">
                                 <i class="bi bi-pencil"></i>
                             </a>
+                            @endeditar
 
-                            @if($al->activo)
-                                <form action="{{ route('alumnos.disable', $al->id) }}" method="POST" class="d-inline">
-                                    @csrf @method('PUT')
-                                    <button class="btn btn-sm btn-warning" onclick="return confirm('Deshabilitar alumno?')">
-                                        <i class="bi bi-slash-circle"></i>
-                                    </button>
-                                </form>
-                            @else
-                                <form action="{{ route('alumnos.enable', $al->id) }}" method="POST" class="d-inline">
-                                    @csrf @method('PUT')
-                                    <button class="btn btn-sm btn-success" onclick="return confirm('Habilitar alumno?')">
-                                        <i class="bi bi-check-circle"></i>
-                                    </button>
-                                </form>
-                            @endif
+                            {{-- ACTIVAR / DESACTIVAR — solo roles con permiso disable --}}
+                            @desactivar('alumnos')
+                                @if($al->activo)
+                                    <form action="{{ route('alumnos.disable', $al->id) }}" method="POST" class="d-inline">
+                                        @csrf @method('PUT')
+                                        <button class="btn btn-sm btn-warning" onclick="return confirm('Deshabilitar alumno?')">
+                                            <i class="bi bi-slash-circle"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('alumnos.enable', $al->id) }}" method="POST" class="d-inline">
+                                        @csrf @method('PUT')
+                                        <button class="btn btn-sm btn-success" onclick="return confirm('Habilitar alumno?')">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            @enddesactivar
+
                         </td>
-                    </tr>
 
+                    </tr>
                     @empty
                     <tr>
                         <td colspan="6" class="text-center text-muted py-4">

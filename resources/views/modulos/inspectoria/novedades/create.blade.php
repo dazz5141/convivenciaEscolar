@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- =========================================================
+     PERMISO PARA CREAR NOVEDADES
+========================================================= --}}
+@if(canAccess('novedades', 'create'))
+
 <div class="page-header">
     <h1 class="page-title">Registrar Novedad de Inspectoría</h1>
     <p class="text-muted">Ingrese la información correspondiente a la novedad registrada.</p>
@@ -99,30 +104,8 @@
 
 </form>
 
-
-{{-- =========================================================
-     ERRORES
-========================================================= --}}
-@if ($errors->any())
-    <div class="alert alert-danger mt-3">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
-
-{{-- =========================================================
-     MODAL BUSCAR ALUMNO
-========================================================= --}}
 @include('modulos.inspectoria.partials.modal-buscar-alumno')
 
-
-{{-- =========================================================
-     JS DE SELECCIÓN DE ALUMNO
-========================================================= --}}
 <script>
 document.addEventListener('click', function(e) {
 
@@ -145,5 +128,17 @@ document.addEventListener('click', function(e) {
     }
 });
 </script>
+
+@else
+
+{{-- =========================================================
+     SIN PERMISOS
+========================================================= --}}
+<div class="alert alert-warning mt-4">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    No tienes permisos para registrar novedades.
+</div>
+
+@endif
 
 @endsection

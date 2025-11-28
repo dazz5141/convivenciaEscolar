@@ -18,9 +18,12 @@
         </a>
 
         {{-- Editar --}}
+        @if(canAccess('retiros','edit'))
         <a href="{{ route('inspectoria.retiros.edit', $retiro) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+        @endif
+
     </div>
 </div>
 

@@ -11,6 +11,11 @@
 
 @include('components.alerts')
 
+{{-- =========================================================
+     PERMISO: SOLO SI TIENE permiso create en retiros
+========================================================= --}}
+@if(canAccess('retiros', 'create'))
+
 <form action="{{ route('inspectoria.retiros.store') }}" method="POST">
     @csrf
 
@@ -37,7 +42,7 @@
 
     {{-- =========================================================
          SECCIÓN 2: PERSONA QUE RETIRA
-    ========================================================= --}}
+    ========================================================== --}}
     <div class="form-section mt-4">
 
         <h5 class="form-section-title">Persona que retira *</h5>
@@ -46,7 +51,7 @@
             Puede seleccionar un apoderado registrado o ingresar manualmente los datos del adulto que retira.
         </p>
 
-        {{-- BOTÓN ABRIR MODAL APO --}}
+        {{-- BOTÓN ABRIR MODAL APODERADO --}}
         <button type="button"
                 class="btn btn-outline-primary mb-3"
                 data-bs-toggle="modal"
@@ -190,6 +195,8 @@
     </div>
 
 </form>
+
+@endif {{-- FIN PERMISO --}}
 
 
 {{-- =========================================================

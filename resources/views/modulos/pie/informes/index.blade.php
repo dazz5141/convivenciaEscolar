@@ -10,10 +10,24 @@
         <p class="text-muted">Listado de informes generados para estudiantes PIE</p>
     </div>
 
+    @if(canAccess('documentos','create'))
     <a href="{{ route('pie.informes.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-circle me-2"></i> Nuevo Informe
     </a>
+    @endif
 </div>
+
+{{-- =========================================================
+     PERMISOS
+========================================================= --}}
+@if(!canAccess('documentos','view'))
+    <div class="alert alert-warning mt-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para ver los informes PIE.
+    </div>
+    @return
+@endif
+
 
 
 {{-- ============================
@@ -104,7 +118,7 @@
 
                         <td>
                             <a href="{{ route('pie.informes.show', $i->id) }}"
-                               class="btn btn-sm btn-info">
+                               class="btn btn-sm btn-info" title="Ver">
                                 <i class="bi bi-eye"></i>
                             </a>
 

@@ -4,6 +4,17 @@
 
 @section('content')
 
+{{-- ============================================================
+      PERMISO: CREAR
+============================================================== --}}
+@if(!canAccess('conflictos_funcionarios','create'))
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-shield-lock-fill me-2"></i>
+        No tienes permisos para registrar conflictos entre funcionarios.
+    </div>
+@endif
+
+
 <div class="page-header">
     <h1 class="page-title">Registrar Conflicto entre Funcionarios</h1>
     <p class="text-muted">Complete la información correspondiente al conflicto reportado.</p>
@@ -68,35 +79,41 @@
 
         <div class="row g-3">
 
+            {{-- Fecha --}}
             <div class="col-md-4">
                 <label class="form-label">Fecha del conflicto <span class="text-danger">*</span></label>
                 <input type="date" name="fecha" class="form-control" required>
             </div>
 
+            {{-- Tipo --}}
             <div class="col-md-8">
                 <label class="form-label">Tipo de conflicto <span class="text-danger">*</span></label>
                 <input type="text" name="tipo_conflicto" class="form-control"
                        placeholder="Ej: Discusión, maltrato, desacuerdo laboral..." required>
             </div>
 
+            {{-- Lugar --}}
             <div class="col-12">
                 <label class="form-label">Lugar del conflicto</label>
                 <input type="text" name="lugar_conflicto" class="form-control"
                        placeholder="Ej: Oficina, sala de profesores, pasillo...">
             </div>
 
+            {{-- Descripción --}}
             <div class="col-12">
                 <label class="form-label">Descripción detallada <span class="text-danger">*</span></label>
                 <textarea name="descripcion" class="form-control" rows="4"
                           placeholder="Describa detalladamente lo ocurrido..." required></textarea>
             </div>
 
+            {{-- Acuerdos previos --}}
             <div class="col-12">
                 <label class="form-label">Acuerdos previos (si existen)</label>
                 <textarea name="acuerdos_previos" class="form-control" rows="3"
                           placeholder="Ingrese información relevante adicional..."></textarea>
             </div>
 
+            {{-- Estado --}}
             <div class="col-md-6">
                 <label class="form-label">Estado del caso</label>
                 <select name="estado_id" class="form-select">
@@ -107,6 +124,7 @@
                 </select>
             </div>
 
+            {{-- Confidencial --}}
             <div class="col-md-3">
                 <label class="form-label">Confidencial</label>
                 <select name="confidencial" class="form-select">
@@ -115,6 +133,7 @@
                 </select>
             </div>
 
+            {{-- Ley Karin --}}
             <div class="col-md-3">
                 <label class="form-label">Derivado Ley Karin</label>
                 <select name="derivado_ley_karin" class="form-select">
@@ -127,11 +146,15 @@
     </div>
 
 
-    {{-- BOTONES --}}
+    {{-- =========================================================
+         BOTONES
+    ========================================================== --}}
     <div class="d-flex gap-2 flex-wrap mt-4">
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save me-2"></i> Registrar Conflicto
-        </button>
+        @if(canAccess('conflictos_funcionarios','create'))
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save me-2"></i> Registrar Conflicto
+            </button>
+        @endif
 
         <a href="{{ route('leykarin.conflictos-funcionarios.index') }}" class="btn btn-secondary">
             <i class="bi bi-x-circle me-2"></i> Cancelar
@@ -141,7 +164,9 @@
 </form>
 
 
-{{-- ERRORES --}}
+{{-- =========================================================
+     ERRORES
+========================================================= --}}
 @if ($errors->any())
 <div class="alert alert-danger mt-3">
     <ul class="mb-0">
@@ -153,22 +178,21 @@
 @endif
 
 
-
 {{-- =========================================================
-     MODAL (UNA SOLA – REUTILIZADA PARA AMBOS)
+     MODAL BÚSQUEDA FUNCIONARIOS
 ========================================================= --}}
 @include('modulos.ley-karin.partials.modal-buscar-funcionario')
 
 
 {{-- =========================================================
-     JS PARA SELECCIÓN DE FUNCIONARIOS
+     JS SELECCIÓN FUNCIONARIOS
 ========================================================= --}}
 <script>
 
 let targetInput = null;
 let targetTexto = null;
 
-// Cuando se abre la modal, identificamos qué botón la llamó
+// Cuando se abre la modal
 document.querySelectorAll('.abrir-modal-funcionario').forEach(btn => {
     btn.addEventListener('click', () => {
         targetInput = btn.dataset.target;
@@ -176,7 +200,7 @@ document.querySelectorAll('.abrir-modal-funcionario').forEach(btn => {
     });
 });
 
-// Cuando se selecciona un funcionario
+// Selección de funcionario
 document.addEventListener('click', function(e) {
 
     if (e.target.classList.contains('seleccionar-funcionario')) {

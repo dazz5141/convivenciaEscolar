@@ -13,13 +13,17 @@ class EstudiantePIEController extends Controller
      */
     public function index()
     {
+        canAccess('pie-estudiantes', 'view');
+
         $establecimiento_id = session('establecimiento_id');
 
-        $estudiantes = EstudiantePIE::with('alumno')
-        ->where('establecimiento_id', $establecimiento_id)
-        ->whereNull('fecha_egreso') // SOLO ACTIVOS
-        ->orderBy('fecha_ingreso', 'desc')
-        ->paginate(20);
+        $estudiantes = EstudiantePIE::with([
+                'alumno.curso'
+            ])
+            ->where('establecimiento_id', $establecimiento_id)
+            ->whereNull('fecha_egreso') // SOLO ACTIVOS
+            ->orderBy('fecha_ingreso', 'desc')
+            ->paginate(20);
 
         return view('modulos.pie.estudiantes.index', compact('estudiantes'));
     }
@@ -29,6 +33,8 @@ class EstudiantePIEController extends Controller
      */
     public function create()
     {
+        canAccess('pie-estudiantes', 'create');
+
         return view('modulos.pie.estudiantes.create');
     }
 
@@ -37,6 +43,8 @@ class EstudiantePIEController extends Controller
      */
     public function store(Request $request)
     {
+        canAccess('pie-estudiantes', 'create');
+
         $request->validate([
             'alumno_id'      => 'required|exists:alumnos,id|unique:estudiantes_pie,alumno_id',
             'fecha_ingreso'  => 'required|date',
@@ -62,15 +70,14 @@ class EstudiantePIEController extends Controller
      */
     public function show(EstudiantePIE $estudiantePIE)
     {
+        canAccess('pie-estudiantes', 'view');
+
         $this->validarEstablecimiento($estudiantePIE);
 
         $estudiantePIE->load([
-            'alumno',
+            'alumno.curso',
             'intervenciones.tipo',
             'intervenciones.profesional.funcionario',
-            'planes',
-            'derivaciones',
-            'informes',
         ]);
 
         return view('modulos.pie.estudiantes.show', compact('estudiantePIE'));
@@ -81,7 +88,14 @@ class EstudiantePIEController extends Controller
      */
     public function destroy(EstudiantePIE $estudiantePIE)
     {
+        canAccess('pie-estudiantes', 'delete');
+
         $this->validarEstablecimiento($estudiantePIE);
+
+        // ⚠️ Opcional: Si no quieres permitir eliminar con intervenciones:
+        // if ($estudiantePIE->intervenciones()->exists()) {
+        //     return back()->withErrors(['error' => 'No se puede eliminar este estudiante porque tiene intervenciones registradas.']);
+        // }
 
         $estudiantePIE->delete();
 
@@ -101,10 +115,12 @@ class EstudiantePIEController extends Controller
     }
 
     /**
-     * Egresar estudiante del PIE (asigna fecha_egreso)
+     * Egresar estudiante del PIE
      */
     public function egresar(Request $request, EstudiantePIE $estudiantePIE)
     {
+        canAccess('pie-estudiantes', 'egresar');
+
         $this->validarEstablecimiento($estudiantePIE);
 
         $request->validate([
@@ -112,11 +128,17 @@ class EstudiantePIEController extends Controller
             'observaciones_egreso' => 'nullable|string',
         ]);
 
+        // Registrar egreso y agregar nota al campo "observaciones"
+        $observacionesNuevo = $estudiantePIE->observaciones;
+
+        if ($request->observaciones_egreso) {
+            $observacionesNuevo .= "\n---\nEGRESO (" . now()->format('d/m/Y H:i') . "): " 
+                . $request->observaciones_egreso;
+        }
+
         $estudiantePIE->update([
             'fecha_egreso' => $request->fecha_egreso,
-            'observaciones' => $request->observaciones_egreso 
-                ? ($estudiantePIE->observaciones . "\nEGRESO: " . $request->observaciones_egreso)
-                : $estudiantePIE->observaciones,
+            'observaciones' => $observacionesNuevo,
         ]);
 
         return redirect()

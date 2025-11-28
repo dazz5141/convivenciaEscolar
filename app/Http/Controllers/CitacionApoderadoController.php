@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CitacionApoderado;
 use App\Models\EstadoCitacion;
@@ -17,6 +16,10 @@ class CitacionApoderadoController extends Controller
      */
     public function index()
     {
+        if (!canAccess('citaciones','view')) {
+            abort(403,'No tienes permisos para ver citaciones.');
+        }
+
         $estados = EstadoCitacion::orderBy('nombre')->get();
 
         $citaciones = CitacionApoderado::with([
@@ -32,21 +35,31 @@ class CitacionApoderadoController extends Controller
         return view('modulos.inspectoria.citaciones.index', compact('citaciones', 'estados'));
     }
 
+
     /**
-     * Crear nueva citación
+     * Formulario de creación
      */
     public function create()
     {
+        if (!canAccess('citaciones','create')) {
+            abort(403,'No tienes permisos para crear citaciones.');
+        }
+
         $estados = EstadoCitacion::orderBy('nombre')->get();
 
         return view('modulos.inspectoria.citaciones.create', compact('estados'));
     }
+
 
     /**
      * Guardar citación
      */
     public function store(Request $request)
     {
+        if (!canAccess('citaciones','create')) {
+            abort(403,'No tienes permisos para crear citaciones.');
+        }
+
         $request->validate([
             'alumno_id'      => 'required|exists:alumnos,id',
             'apoderado_id'   => 'nullable|exists:apoderados,id',
@@ -58,7 +71,8 @@ class CitacionApoderadoController extends Controller
 
         $establecimientoId = session('establecimiento_id');
 
-        CitacionApoderado::create([
+        // Crear registro (antes no se guardaba en variable)
+        $citacion = CitacionApoderado::create([
             'alumno_id'          => $request->alumno_id,
             'apoderado_id'       => $request->apoderado_id,
             'fecha_citacion'     => $request->fecha_citacion,
@@ -71,32 +85,20 @@ class CitacionApoderadoController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | NOTIFICACIONES AUTOMÁTICAS – CITACIONES
-        |--------------------------------------------------------------------------
-        |
-        | Destinos habituales:
-        | - Inspectoría
-        | - Convivencia Escolar
-        | - Inspector General
+        | NOTIFICACIONES AUTOMÁTICAS
         |--------------------------------------------------------------------------
         */
 
-        // Obtener alumno (para usar nombre completo)
         $alumno = Alumno::find($request->alumno_id);
 
-        // Roles destino (ajustables según tu estructura)
-        $rolesDestino = [3, 8]; 
-        // 3 = Inspector General
-        // 8 = Convivencia Escolar
+        $rolesDestino = [3, 8]; // Inspector General, Convivencia Escolar
 
         $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
             ->where('establecimiento_id', $establecimientoId)
             ->where('activo', 1)
             ->get();
 
-        // Mensaje profesional
-        $mensaje = "Nueva citación registrada para {$alumno->nombre_completo} "
-                . "con fecha {$request->fecha_citacion}.";
+        $mensaje = "Nueva citación registrada para {$alumno->nombre_completo} con fecha {$request->fecha_citacion}.";
 
         foreach ($usuariosDestino as $u) {
             Notificacion::create([
@@ -111,24 +113,34 @@ class CitacionApoderadoController extends Controller
 
         return redirect()
             ->route('inspectoria.citaciones.index')
-            ->with('success', 'Citacion registrada.');
+            ->with('success', 'Citación registrada correctamente.');
     }
+
 
     /**
      * Mostrar citación
      */
     public function show(CitacionApoderado $citacion)
     {
+        if (!canAccess('citaciones','view')) {
+            abort(403,'No tienes permisos para ver citaciones.');
+        }
+
         $this->validarEstablecimiento($citacion);
 
         return view('modulos.inspectoria.citaciones.show', compact('citacion'));
     }
+
 
     /**
      * Editar citación
      */
     public function edit(CitacionApoderado $citacion)
     {
+        if (!canAccess('citaciones','edit')) {
+            abort(403,'No tienes permisos para editar citaciones.');
+        }
+
         $this->validarEstablecimiento($citacion);
 
         $estados = EstadoCitacion::orderBy('nombre')->get();
@@ -136,11 +148,16 @@ class CitacionApoderadoController extends Controller
         return view('modulos.inspectoria.citaciones.edit', compact('citacion', 'estados'));
     }
 
+
     /**
      * Actualizar citación
      */
     public function update(Request $request, CitacionApoderado $citacion)
     {
+        if (!canAccess('citaciones','edit')) {
+            abort(403,'No tienes permisos para editar citaciones.');
+        }
+
         $this->validarEstablecimiento($citacion);
 
         $request->validate([
@@ -150,11 +167,6 @@ class CitacionApoderadoController extends Controller
             'observaciones'  => 'nullable|string',
             'apoderado_id'   => 'nullable|exists:apoderados,id',
         ]);
-
-        // Campos NO editables:
-        // - alumno_id
-        // - funcionario_id
-        // - establecimiento_id
 
         $citacion->update([
             'fecha_citacion' => $request->fecha_citacion,
@@ -166,11 +178,13 @@ class CitacionApoderadoController extends Controller
 
         return redirect()
             ->route('inspectoria.citaciones.index')
-            ->with('success', 'Citacion actualizada.');
+            ->with('success', 'Citación actualizada correctamente.');
     }
 
+
+
     /**
-     * Validar establecimiento
+     * Seguridad multicolegio
      */
     private function validarEstablecimiento($modelo)
     {
@@ -178,16 +192,11 @@ class CitacionApoderadoController extends Controller
         $establecimientoModelo = $modelo->establecimiento_id ?? null;
 
         if (!$establecimientoModelo) {
-            if (app()->environment('local')) {
-                \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
-                return;
-            } else {
-                abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
-            }
+            abort(403,'El registro no tiene establecimiento asignado.');
         }
 
         if ($establecimientoModelo != $establecimientoSesion) {
-            abort(403, 'Acceso denegado: el registro pertenece a otro establecimiento.');
+            abort(403,'Acceso denegado: el registro pertenece a otro establecimiento.');
         }
     }
 }

@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- =========================================================
+     PERMISO: ver citaciones
+========================================================= --}}
+@if(canAccess('citaciones', 'view'))
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div>
         <h1 class="page-title">Citación #{{ $citacion->id }}</h1>
@@ -18,9 +23,11 @@
         </a>
 
         {{-- Editar --}}
+        @if(canAccess('citaciones','edit'))
         <a href="{{ route('inspectoria.citaciones.edit', $citacion) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+        @endif
     </div>
 </div>
 
@@ -167,5 +174,15 @@
 
     </div>
 </div>
+
+@else
+{{-- =========================================================
+     SIN PERMISO
+========================================================= --}}
+<div class="alert alert-warning mt-4">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    No tienes permisos para ver citaciones.
+</div>
+@endif
 
 @endsection

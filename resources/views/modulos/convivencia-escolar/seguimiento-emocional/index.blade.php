@@ -4,6 +4,8 @@
 
 @section('content')
 
+@ver('seguimientos')
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div class="mb-3 mb-md-0">
         <h1 class="page-title">Seguimiento Emocional</h1>
@@ -11,9 +13,11 @@
     </div>
 
     <div>
+        @crear('seguimientos')
         <a href="{{ route('convivencia.seguimiento.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i> Nuevo Seguimiento
         </a>
+        @endcrear
     </div>
 </div>
 
@@ -148,15 +152,21 @@
 
                         {{-- ACCIONES --}}
                         <td class="table-actions">
+
+                            @ver('seguimientos')
                             <a href="{{ route('convivencia.seguimiento.show', $s->id) }}"
                                class="btn btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
                             </a>
+                            @endver
 
+                            @editar('seguimientos')
                             <a href="{{ route('convivencia.seguimiento.edit', $s->id) }}"
                                class="btn btn-sm btn-primary">
                                 <i class="bi bi-pencil"></i>
                             </a>
+                            @endeditar
+
                         </td>
 
                     </tr>
@@ -175,6 +185,8 @@
 
     </div>
 </div>
+
+@endver
 
 @endsection
 

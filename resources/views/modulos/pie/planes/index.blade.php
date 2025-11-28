@@ -10,10 +10,28 @@
         <p class="text-muted">Listado de planes individuales asignados a estudiantes PIE</p>
     </div>
 
-    <a href="{{ route('pie.planes.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-circle me-2"></i> Nuevo Plan
-    </a>
+    {{-- ============================
+         BOTÓN NUEVO PLAN (PERMISO)
+    ============================= --}}
+    @if(canAccess('pie','create'))
+        <a href="{{ route('pie.planes.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i> Nuevo Plan
+        </a>
+    @endif
 </div>
+
+
+{{-- =========================================================
+     PERMISOS — SI NO PUEDE VER, BLOQUEAMOS TODA LA VISTA
+========================================================= --}}
+@if(!canAccess('pie','view'))
+    <div class="alert alert-warning mt-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para ver los planes individuales PIE.
+    </div>
+    @return
+@endif
+
 
 
 {{-- ============================
@@ -33,8 +51,11 @@
                     <select name="estudiante_pie_id" class="form-select">
                         <option value="">Todos</option>
                         @foreach($estudiantes as $e)
-                            <option value="{{ $e->id }}" {{ request('estudiante_pie_id') == $e->id ? 'selected' : '' }}>
-                                {{ $e->alumno->apellido_paterno }} {{ $e->alumno->apellido_materno }}, {{ $e->alumno->nombre }}
+                            <option value="{{ $e->id }}" 
+                                {{ request('estudiante_pie_id') == $e->id ? 'selected' : '' }}>
+                                {{ $e->alumno->apellido_paterno }} 
+                                {{ $e->alumno->apellido_materno }}, 
+                                {{ $e->alumno->nombre }}
                             </option>
                         @endforeach
                     </select>
@@ -42,12 +63,18 @@
 
                 <div class="col-md-4">
                     <label class="form-label">Fecha Inicio</label>
-                    <input type="date" name="fecha_inicio" class="form-control" value="{{ request('fecha_inicio') }}">
+                    <input type="date" 
+                           name="fecha_inicio" 
+                           class="form-control" 
+                           value="{{ request('fecha_inicio') }}">
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label">Fecha Término</label>
-                    <input type="date" name="fecha_termino" class="form-control" value="{{ request('fecha_termino') }}">
+                    <input type="date" 
+                           name="fecha_termino" 
+                           class="form-control" 
+                           value="{{ request('fecha_termino') }}">
                 </div>
 
             </div>
@@ -100,11 +127,13 @@
                         </td>
 
                         <td>
+                            {{-- Ver --}}
                             <a href="{{ route('pie.planes.show', $p->id) }}"
                                class="btn btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
                             </a>
 
+                            {{-- Historial --}}
                             <a href="{{ route('pie.historial.show', ['tipo' => 'plan', 'id' => $p->id]) }}"
                                 class="btn btn-sm btn-secondary"
                                 title="Ver en historial">

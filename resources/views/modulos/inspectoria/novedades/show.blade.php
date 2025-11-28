@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- =========================================================
+     PERMISO PARA VER NOVEDADES
+========================================================= --}}
+@if(canAccess('novedades', 'view'))
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div>
         <h1 class="page-title">Novedad #{{ $novedad->id }}</h1>
@@ -17,10 +22,13 @@
             <i class="bi bi-arrow-left me-2"></i> Volver
         </a>
 
-        {{-- Editar --}}
+        {{-- Editar (si tiene permiso) --}}
+        @if(canAccess('novedades', 'edit'))
         <a href="{{ route('inspectoria.novedades.edit', $novedad) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+        @endif
+
     </div>
 </div>
 
@@ -67,7 +75,7 @@
 
         </div>
 
-        {{-- INFORMACIÓN DEL ALUMNO (SI EXISTE) --}}
+        {{-- INFORMACIÓN DEL ALUMNO --}}
         <div class="form-section mt-4">
             <h5 class="form-section-title">Alumno Involucrado</h5>
 
@@ -138,5 +146,16 @@
 
     </div>
 </div>
+
+@else
+{{-- =========================================================
+     SIN PERMISOS
+========================================================= --}}
+<div class="alert alert-warning mt-4">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    No tienes permisos para ver esta novedad.
+</div>
+
+@endif
 
 @endsection

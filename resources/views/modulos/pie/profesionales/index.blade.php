@@ -10,12 +10,16 @@
         <p class="text-muted">Listado de profesionales asignados al Programa de Integración Escolar</p>
     </div>
 
+    {{-- Botón crear --}}
+    @if(canAccess('pie', 'create'))
     <a href="{{ route('pie.profesionales.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-circle me-2"></i> Nuevo Profesional PIE
     </a>
+    @endif
 </div>
 
 <div class="card card-table">
+
     <div class="card-body">
 
         <div class="table-responsive">
@@ -31,20 +35,38 @@
                 <tbody>
                     @forelse ($profesionales as $p)
                         <tr>
+
+                            {{-- Funcionario --}}
                             <td>
-                                <strong>{{ $p->funcionario->apellido_paterno }} {{ $p->funcionario->apellido_materno }}, {{ $p->funcionario->nombre }}</strong>
+                                <strong>
+                                    {{ $p->funcionario->apellido_paterno }}
+                                    {{ $p->funcionario->apellido_materno }},
+                                    {{ $p->funcionario->nombre }}
+                                </strong>
                                 <br>
-                                <span class="text-muted small">{{ $p->funcionario->cargo->nombre ?? 'Sin cargo' }}</span>
+                                <span class="text-muted small">
+                                    {{ $p->funcionario->cargo->nombre ?? 'Sin cargo' }}
+                                </span>
                             </td>
 
+                            {{-- Tipo profesional --}}
                             <td>{{ $p->tipo->nombre }}</td>
 
-                            <td>
+                            {{-- Acciones --}}
+                            <td class="table-actions">
+
+                                @if(canAccess('pie', 'view'))
                                 <a href="{{ route('pie.profesionales.show', $p->id) }}"
-                                   class="btn btn-sm btn-info">
+                                   class="btn btn-sm btn-info"
+                                   title="Ver detalle">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                @endif
+
+                                {{-- No se agrega editar porque el profesional PIE usualmente no se edita,
+                                     pero si se usa en tu sistema se agrega más adelante --}}
                             </td>
+
                         </tr>
                     @empty
                         <tr>
@@ -54,14 +76,17 @@
                         </tr>
                     @endforelse
                 </tbody>
+
             </table>
         </div>
 
     </div>
 
+    {{-- Paginación --}}
     <div class="card-footer">
         {{ $profesionales->links() }}
     </div>
+
 </div>
 
 @endsection

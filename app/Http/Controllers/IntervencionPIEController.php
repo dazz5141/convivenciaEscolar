@@ -6,6 +6,7 @@ use App\Models\IntervencionPIE;
 use App\Models\TipoIntervencionPIE;
 use App\Models\ProfesionalPIE;
 use App\Models\EstudiantePIE;
+use App\Models\Notificacion;
 use Illuminate\Http\Request;
 
 class IntervencionPIEController extends Controller
@@ -15,6 +16,11 @@ class IntervencionPIEController extends Controller
      */
     public function index(Request $request)
     {
+        // 🔐 Permiso
+        if (!canAccess('intervenciones', 'view')) {
+            abort(403, 'No tienes permisos para acceder a Intervenciones PIE.');
+        }
+
         $establecimiento_id = session('establecimiento_id');
 
         // Listado de estudiantes PIE
@@ -31,8 +37,11 @@ class IntervencionPIEController extends Controller
         $tipos = TipoIntervencionPIE::orderBy('nombre')->get();
 
         // Filtrado de intervenciones
-        $query = IntervencionPIE::with(['estudiante.alumno', 'tipo', 'profesional'])
-            ->where('establecimiento_id', $establecimiento_id);
+        $query = IntervencionPIE::with([
+            'estudiante.alumno',
+            'tipo',
+            'profesional'
+        ])->where('establecimiento_id', $establecimiento_id);
 
         if ($request->filled('estudiante_pie_id')) {
             $query->where('estudiante_pie_id', $request->estudiante_pie_id);
@@ -42,7 +51,7 @@ class IntervencionPIEController extends Controller
             $query->where('tipo_intervencion_id', $request->tipo_intervencion_id);
         }
 
-        $intervenciones = $query->paginate(20);
+        $intervenciones = $query->orderBy('fecha', 'desc')->paginate(20);
 
         return view('modulos.pie.intervenciones.index', compact(
             'estudiantes',
@@ -52,10 +61,15 @@ class IntervencionPIEController extends Controller
     }
 
     /**
-     * Crear intervención desde ficha PIE
+     * Crear intervención
      */
     public function create($estudiante_pie_id = null)
     {
+        // 🔐 Permiso
+        if (!canAccess('intervenciones', 'create')) {
+            abort(403, 'No tienes permisos para registrar intervenciones PIE.');
+        }
+
         $establecimiento_id = session('establecimiento_id');
 
         // Estudiantes PIE del establecimiento
@@ -90,6 +104,11 @@ class IntervencionPIEController extends Controller
      */
     public function store(Request $request)
     {
+        // 🔐 Permiso
+        if (!canAccess('intervenciones', 'create')) {
+            abort(403, 'No tienes permisos para registrar intervenciones PIE.');
+        }
+
         $request->validate([
             'estudiante_pie_id'      => 'required|exists:estudiantes_pie,id',
             'tipo_intervencion_id'   => 'required|exists:tipos_intervencion_pie,id',
@@ -103,7 +122,8 @@ class IntervencionPIEController extends Controller
             EstudiantePIE::findOrFail($request->estudiante_pie_id)
         );
 
-        IntervencionPIE::create([
+        // Guardar intervención
+        $intervencion = IntervencionPIE::create([
             'establecimiento_id'   => session('establecimiento_id'),
             'estudiante_pie_id'    => $request->estudiante_pie_id,
             'tipo_intervencion_id' => $request->tipo_intervencion_id,
@@ -119,11 +139,13 @@ class IntervencionPIEController extends Controller
         */
         $profesional = ProfesionalPIE::with('funcionario.usuario')->find($request->profesional_id);
 
-        if ($profesional && $profesional->funcionario && $profesional->funcionario->usuario) {
+        if ($profesional &&
+            $profesional->funcionario &&
+            $profesional->funcionario->usuario) {
 
             Notificacion::create([
                 'tipo'              => 'pie_intervencion',
-                'mensaje'           => "Nueva intervención PIE registrada para el estudiante ID {$request->estudiante_pie_id}.",
+                'mensaje'           => "Nueva intervención PIE registrada.",
                 'usuario_id'        => $profesional->funcionario->usuario->id, // DESTINATARIO
                 'origen_id'         => $intervencion->id,
                 'origen_model'      => IntervencionPIE::class,
@@ -141,6 +163,11 @@ class IntervencionPIEController extends Controller
      */
     public function show($id)
     {
+        // 🔐 Permiso
+        if (!canAccess('intervenciones', 'view')) {
+            abort(403, 'No tienes permisos para ver intervenciones PIE.');
+        }
+
         $intervencion = IntervencionPIE::with([
             'estudiante.alumno.curso',
             'tipo',
@@ -161,19 +188,15 @@ class IntervencionPIEController extends Controller
         $establecimientoSesion = session('establecimiento_id');
         $establecimientoModelo = $modelo->establecimiento_id ?? null;
 
-        // Si no hay valor en el modelo
         if (!$establecimientoModelo) {
             if (app()->environment('local')) {
-                // 💡 En desarrollo: permitir y registrar advertencia
-                \Log::warning("⚠️ [DEV] El modelo " . get_class($modelo) . " (ID: {$modelo->id}) no tiene establecimiento_id definido.");
+                \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
                 return;
             } else {
-                // Bloquear si no tiene establecimiento_id
                 abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
             }
         }
 
-        // Si no coincide con la sesión actual
         if ($establecimientoModelo != $establecimientoSesion) {
             abort(403, 'Acceso denegado: el registro pertenece a otro establecimiento.');
         }

@@ -10,9 +10,14 @@
         <p class="text-muted">Listado de alumnos integrados al Programa de Integración Escolar</p>
     </div>
 
+    {{-- =====================================================
+         PERMISO: crear estudiante PIE
+    ====================================================== --}}
+    @if(canAccess('pie-estudiantes', 'create'))
     <a href="{{ route('pie.estudiantes.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-circle me-2"></i> Nuevo Estudiante PIE
     </a>
+    @endif
 </div>
 
 
@@ -35,6 +40,7 @@
                 <tbody>
                 @forelse($estudiantes as $e)
                     <tr>
+
                         {{-- ALUMNO --}}
                         <td>
                             {{ $e->alumno->apellido_paterno }}
@@ -63,19 +69,24 @@
                         {{-- ACCIONES --}}
                         <td class="table-actions">
 
-                            {{-- Ver Ficha --}}
+                            {{-- PERMISO: ver estudiante PIE --}}
+                            @if(canAccess('pie-estudiantes', 'view'))
                             <a href="{{ route('pie.estudiantes.show', $e->id) }}"
                                class="btn btn-sm btn-info" title="Ver">
                                 <i class="bi bi-eye"></i>
                             </a>
+                            @endif
 
-                            {{-- Historial --}}
+                            {{-- PERMISO: ver historial --}}
+                            @if(canAccess('pie-historial', 'view'))
                             <a href="{{ route('pie.historial.index', $e->id) }}"
                                class="btn btn-sm btn-primary" title="Historial">
                                 <i class="bi bi-clock-history"></i>
                             </a>
+                            @endif
 
                         </td>
+
                     </tr>
                 @empty
                     <tr>

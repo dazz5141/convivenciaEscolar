@@ -9,6 +9,11 @@
 
 @include('components.alerts')
 
+{{-- =========================================================
+     SOLO SI TIENE PERMISO PARA EDITAR CURSOS
+========================================================= --}}
+@if(canAccess('cursos', 'edit'))
+
 <form action="{{ route('cursos.update', $curso->id) }}" method="POST">
     @csrf
     @method('PUT')
@@ -40,32 +45,48 @@
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
+        {{-- BOTÓN GUARDAR SOLO PARA ROLES AUTORIZADOS --}}
+        @if(canAccess('cursos', 'edit'))
         <button type="submit" class="btn btn-primary">
             <i class="bi bi-save me-2"></i>
             Guardar Cambios
         </button>
+        @endif
 
         <a href="{{ route('cursos.index') }}" class="btn btn-secondary">
             <i class="bi bi-x-circle me-2"></i> Cancelar
         </a>
 
-        @if($curso->activo)
-            <form action="{{ route('cursos.disable', $curso->id) }}" method="POST"
-                  class="ms-auto d-inline">
-                @csrf @method('PUT')
-                <button class="btn btn-danger" onclick="return confirm('¿Deshabilitar curso?')">
-                    <i class="bi bi-slash-circle me-2"></i> Deshabilitar
-                </button>
-            </form>
-        @else
-            <form action="{{ route('cursos.enable', $curso->id) }}" method="POST"
-                  class="ms-auto d-inline">
-                @csrf @method('PUT')
-                <button class="btn btn-success" onclick="return confirm('¿Habilitar curso?')">
-                    <i class="bi bi-check-circle me-2"></i> Habilitar
-                </button>
-            </form>
+        {{-- =========================================================
+             BOTÓN DESHABILITAR / HABILITAR SOLO SI TIENE PERMISO
+        ========================================================== --}}
+        @if(canAccess('cursos', 'edit'))
+            @if($curso->activo)
+                <form action="{{ route('cursos.disable', $curso->id) }}" method="POST"
+                      class="ms-auto d-inline">
+                    @csrf @method('PUT')
+                    <button class="btn btn-danger" onclick="return confirm('¿Deshabilitar curso?')">
+                        <i class="bi bi-slash-circle me-2"></i> Deshabilitar
+                    </button>
+                </form>
+            @else
+                <form action="{{ route('cursos.enable', $curso->id) }}" method="POST"
+                      class="ms-auto d-inline">
+                    @csrf @method('PUT')
+                    <button class="btn btn-success" onclick="return confirm('¿Habilitar curso?')">
+                        <i class="bi bi-check-circle me-2"></i> Habilitar
+                    </button>
+                </form>
+            @endif
         @endif
     </div>
 </form>
+
+@else
+{{-- SIN PERMISO --}}
+<div class="alert alert-danger mt-4">
+    No tienes permiso para editar cursos.
+</div>
+@endif
+
 @endsection

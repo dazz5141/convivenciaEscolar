@@ -18,7 +18,7 @@
          CONFLICTO ASOCIADO
     ========================================================== --}}
     <div class="form-section mb-4">
-        <h5 class="form-section-title">Conflicto Asociado *</h5>
+        <h5 class="form-section-title">Conflicto Asociado (opcional)</h5>
 
         <button type="button"
             class="btn btn-outline-dark abrir-modal-conflicto"
@@ -32,7 +32,7 @@
         <input type="hidden" name="conflictable_type" id="conflictable_type">
         <input type="hidden" name="conflictable_id" id="conflictable_id">
 
-        <p class="fw-bold mt-2" id="textoConflictoSeleccionado" style="min-height: 22px;">
+        <p class="fw-bold mt-2 text-primary" id="textoConflictoSeleccionado">
             No se ha seleccionado un conflicto.
         </p>
     </div>
@@ -70,9 +70,7 @@
 
         <input type="hidden" name="denunciante_id" id="denunciante_id">
 
-        <p class="fw-bold" id="textoDenunciante" style="min-height: 22px;">
-            No se ha seleccionado un denunciante.
-        </p>
+        <p class="fw-bold" id="textoDenunciante">No se ha seleccionado un denunciante.</p>
     </div>
 
 
@@ -108,11 +106,8 @@
 
         <input type="hidden" name="denunciado_id" id="denunciado_id">
 
-        <p class="fw-bold" id="textoDenunciado" style="min-height: 22px;">
-            No se ha seleccionado un denunciado.
-        </p>
+        <p class="fw-bold" id="textoDenunciado">No se ha seleccionado un denunciado.</p>
     </div>
-
 
 
     {{-- =========================================================
@@ -165,7 +160,6 @@
 </form>
 
 
-{{-- ERRORES --}}
 @if ($errors->any())
 <div class="alert alert-danger mt-3">
     <ul class="mb-0">

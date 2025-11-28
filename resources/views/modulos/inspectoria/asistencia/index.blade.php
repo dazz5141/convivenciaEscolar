@@ -9,13 +9,21 @@
         <h1 class="page-title">Asistencia y Atrasos</h1>
         <p class="text-muted">Registro general de asistencia, atrasos e inasistencias</p>
     </div>
+
+    {{-- =====================================================
+         PERMISO: crear evento (atraso / asistencia)
+    ====================================================== --}}
+    @if(canAccess('atrasos', 'create'))
     <div>
         <a href="{{ route('inspectoria.asistencia.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>
             Registrar Evento
         </a>
     </div>
+    @endif
+
 </div>
+
 
 <div class="card card-table">
 
@@ -81,6 +89,7 @@
         </form>
     </div>
 
+
     {{-- TABLA --}}
     <div class="card-body">
         @if($eventos->count() == 0)
@@ -127,7 +136,7 @@
                                 {{ $ev->funcionario->apellido_paterno }}
                             </td>
 
-                            {{-- OBSERVACIÓN TRUNCADA --}}
+                            {{-- Observación --}}
                             <td>
                                 @if($ev->observaciones)
                                     {{ Str::limit($ev->observaciones, 30) }}
@@ -138,17 +147,24 @@
 
                             {{-- Acciones --}}
                             <td class="table-actions">
+
+                                {{-- PERMISO: ver --}}
+                                @if(canAccess('atrasos', 'view'))
                                 <a href="{{ route('inspectoria.asistencia.show', $ev) }}"
                                    class="btn btn-sm btn-info"
                                    title="Ver">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                @endif
 
+                                {{-- PERMISO: editar --}}
+                                @if(canAccess('atrasos', 'edit'))
                                 <a href="{{ route('inspectoria.asistencia.edit', $ev) }}"
                                    class="btn btn-sm btn-primary"
                                    title="Editar">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                @endif
 
                             </td>
 
@@ -158,7 +174,7 @@
             </table>
         </div>
 
-        {{-- PAGINACIÓN --}}
+        {{-- Paginación --}}
         <div class="mt-3">
             {{ $eventos->links() }}
         </div>
@@ -169,6 +185,7 @@
 </div>
 
 @endsection
+
 
 <script>
 document.addEventListener('click', function(e) {

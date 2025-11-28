@@ -10,6 +10,11 @@
 
 @include('components.alerts')
 
+{{-- =========================================================
+     PERMISO: SOLO QUIEN TENGA editar EN retiros
+========================================================= --}}
+@if(canAccess('retiros', 'edit'))
+
 <form action="{{ route('inspectoria.retiros.update', ['retiro' => $retiro->id]) }}" method="POST">
     @csrf
     @method('PUT')
@@ -158,5 +163,12 @@
     </div>
 
 </form>
+
+@else
+    {{-- SIN PERMISOS --}}
+    <div class="alert alert-danger mt-3">
+        No tiene permisos para editar retiros anticipados.
+    </div>
+@endif
 
 @endsection

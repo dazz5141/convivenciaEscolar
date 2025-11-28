@@ -10,6 +10,14 @@
 
 @include('components.alerts')
 
+{{-- 🔐 Permiso: editar apoderados --}}
+@if(!canAccess('apoderados','edit'))
+    <div class="alert alert-danger">
+        No tienes permisos para editar apoderados.
+    </div>
+    @php return; @endphp
+@endif
+
 <form action="{{ route('apoderados.update', $apoderado->id) }}" method="POST">
     @csrf
     @method('PUT')
@@ -114,6 +122,6 @@
 @section('scripts')
 @include('partials.select-territorio-js', [
     'provinciaActual' => $apoderado->provincia_id,
-    'comunaActual' => $apoderado->comuna_id
+    'comunaActual'    => $apoderado->comuna_id
 ])
 @endsection

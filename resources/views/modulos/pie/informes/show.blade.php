@@ -11,6 +11,7 @@
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
+
         {{-- Volver --}}
         <a href="{{ route('pie.informes.index') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i> Volver
@@ -18,12 +19,27 @@
 
         {{-- Historial --}}
         @if($informePIE->estudiante)
-            <a href="{{ route('pie.historial.index', $informePIE->estudiante->id) }}" class="btn btn-primary">
+            <a href="{{ route('pie.historial.index', $informePIE->estudiante->id) }}"
+               class="btn btn-primary">
                 <i class="bi bi-clock-history me-1"></i> Historial
             </a>
         @endif
+
     </div>
 </div>
+
+{{-- =========================================================
+     PERMISOS
+========================================================= --}}
+@if(!canAccess('documentos','view'))
+    <div class="alert alert-warning mt-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para visualizar informes PIE.
+    </div>
+    @return
+@endif
+
+
 
 <div class="row g-4">
 
@@ -60,6 +76,8 @@
             </div>
         </div>
 
+
+
         {{-- ============================================================
              ESTUDIANTE PIE
         ============================================================ --}}
@@ -92,10 +110,14 @@
                     </div>
                 </div>
             @else
-                <p class="text-muted mb-0">No se encontró información del estudiante asociado.</p>
+                <p class="text-muted mb-0">
+                    No se encontró información del estudiante asociado.
+                </p>
             @endif
         </div>
     </div>
+
+
 
     {{-- ============================================================
          COLUMNA DERECHA (RESUMEN)
@@ -123,7 +145,7 @@
                     {{ $informePIE->tipo }}
                 </p>
 
-                <p class="mb-2">
+                <p class="mb-0">
                     <strong>Fecha:</strong><br>
                     {{ \Carbon\Carbon::parse($informePIE->fecha)->format('d/m/Y') }}
                 </p>
@@ -132,6 +154,7 @@
         </div>
 
     </div>
+
 </div>
 
 @endsection

@@ -13,9 +13,14 @@
     </div>
 
     <div class="d-flex gap-2">
+
+        {{-- SOLO PERMISOS DE EDICIÓN --}}
+        @editar('alumnos')
         <a href="{{ route('alumnos.edit', $alumno->id) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+        @endeditar
+
         <a href="{{ route('alumnos.index') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left me-2"></i> Volver
         </a>
@@ -107,11 +112,14 @@
                 </ul>
             @endif
 
+            {{-- SOLO QUIEN TIENE PERMISOS PARA MODIFICAR CURSOS --}}
+            @editar('alumnos')
             <div class="mt-3">
                 <a href="{{ route('alumnos.cambiarCurso.form', $alumno->id) }}" class="btn btn-warning">
                     <i class="bi bi-arrow-left-right me-2"></i> Cambiar de Curso
                 </a>
             </div>
+            @endeditar
         </div>
 
         {{-- Relación Apoderados --}}

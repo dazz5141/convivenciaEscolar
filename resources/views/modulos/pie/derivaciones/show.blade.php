@@ -4,6 +4,18 @@
 
 @section('content')
 
+{{-- ============================================================
+     PERMISO: VER
+============================================================ --}}
+@if(!canAccess('pie','view'))
+    <div class="alert alert-danger mt-3">
+        <i class="bi bi-x-circle me-2"></i>
+        No tienes permisos para ver los detalles de derivaciones PIE.
+    </div>
+    @return
+@endif
+
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap mb-3">
     <div>
         <h1 class="page-title">Derivación PIE #{{ $derivacionPIE->id }}</h1>
@@ -11,17 +23,22 @@
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
-        {{-- Volver --}}
-        <a href="{{ route('pie.derivaciones.index') }}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left me-2"></i> Volver
-        </a>
 
-        {{-- Historial --}}
+        {{-- PERMISO: VER --}}
+        @if(canAccess('pie','view'))
+            <a href="{{ route('pie.derivaciones.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i> Volver
+            </a>
+        @endif
+
+        {{-- Historial (visible siempre porque NO es una acción administrativa) --}}
         @if($derivacionPIE->estudiante)
-            <a href="{{ route('pie.historial.index', $derivacionPIE->estudiante->id) }}" class="btn btn-primary">
+            <a href="{{ route('pie.historial.index', $derivacionPIE->estudiante->id) }}"
+               class="btn btn-primary">
                 <i class="bi bi-clock-history me-1"></i> Historial
             </a>
         @endif
+
     </div>
 </div>
 
@@ -92,8 +109,8 @@
                 <div class="detail-label">Diagnóstico PIE:</div>
                 <div class="detail-value">
                     {!! $derivacionPIE->estudiante?->diagnostico
-                        ? nl2br(e($derivacionPIE->estudiante?->diagnostico))
-                            : '<span class="text-muted">Sin diagnóstico registrado.</span>' !!}
+                        ? nl2br(e($derivacionPIE->estudiante->diagnostico))
+                        : '<span class="text-muted">Sin diagnóstico registrado.</span>' !!}
                 </div>
             </div>
 
@@ -104,7 +121,7 @@
 
 
     {{-- ============================
-         COLUMNA DERECHA
+         COLUMNA DERECHA (RESUMEN)
     ============================= --}}
     <div class="col-lg-4">
 

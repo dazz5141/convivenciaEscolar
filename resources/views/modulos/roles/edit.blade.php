@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- PERMISO: EDITAR ROLES --}}
+@if(!canAccess('roles', 'update'))
+    @php(abort(403, 'No tienes permisos para editar roles.'))
+@endif
+
 <div class="page-header">
     <h1 class="page-title">Editar Rol</h1>
 </div>

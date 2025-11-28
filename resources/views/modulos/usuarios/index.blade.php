@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- 🔒 PERMISO --}}
+@if(!canAccess('usuarios', 'view'))
+    @php(abort(403, 'No tienes permisos para ver usuarios.'))
+@endif
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div class="mb-3 mb-md-0">
         <h1 class="page-title">Usuarios del Sistema</h1>
@@ -18,69 +23,68 @@
 <div class="card card-table mt-3">
 
     {{-- FILTROS --}}
-    {{-- FILTROS --}}
-<div class="card-header">
-    <form method="GET" action="{{ route('usuarios.index') }}">
+    <div class="card-header">
+        <form method="GET" action="{{ route('usuarios.index') }}">
 
-        <div class="row g-3 align-items-end">
+            <div class="row g-3 align-items-end">
 
-            {{-- Buscar --}}
-            <div class="col-md-4">
-                <input type="text"
-                    name="buscar"
-                    class="form-control"
-                    placeholder="Buscar por nombre o email..."
-                    value="{{ request('buscar') }}">
+                {{-- Buscar --}}
+                <div class="col-md-4">
+                    <input type="text"
+                        name="buscar"
+                        class="form-control"
+                        placeholder="Buscar por nombre o email..."
+                        value="{{ request('buscar') }}">
+                </div>
+
+                {{-- Rol --}}
+                <div class="col-md-2">
+                    <select name="rol_id" class="form-select">
+                        <option value="">— Rol —</option>
+
+                        @foreach($roles as $r)
+                            <option value="{{ $r->id }}"
+                                {{ request('rol_id') == $r->id ? 'selected' : '' }}>
+                                {{ $r->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Establecimiento --}}
+                <div class="col-md-3">
+                    <select name="establecimiento_id" class="form-select">
+                        <option value="">— Establecimiento —</option>
+
+                        @foreach($establecimientos as $e)
+                            <option value="{{ $e->id }}"
+                                {{ request('establecimiento_id') == $e->id ? 'selected' : '' }}>
+                                {{ $e->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Estado --}}
+                <div class="col-md-2">
+                    <select name="estado" class="form-select">
+                        <option value="">— Estado —</option>
+                        <option value="1" {{ request('estado') == '1' ? 'selected' : '' }}>Activo</option>
+                        <option value="0" {{ request('estado') == '0' ? 'selected' : '' }}>Inactivo</option>
+                    </select>
+                </div>
+
+                {{-- Botón Filtrar --}}
+                <div class="col-md-1 text-end">
+                    <button class="btn btn-secondary" style="min-width: 110px;">
+                        <i class="bi bi-funnel me-1"></i> Filtrar
+                    </button>
+                </div>
+
             </div>
 
-            {{-- Rol --}}
-            <div class="col-md-2">
-                <select name="rol_id" class="form-select">
-                    <option value="">— Rol —</option>
-
-                    @foreach($roles as $r)
-                        <option value="{{ $r->id }}"
-                            {{ request('rol_id') == $r->id ? 'selected' : '' }}>
-                            {{ $r->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- Establecimiento --}}
-            <div class="col-md-3">
-                <select name="establecimiento_id" class="form-select">
-                    <option value="">— Establecimiento —</option>
-
-                    @foreach($establecimientos as $e)
-                        <option value="{{ $e->id }}"
-                            {{ request('establecimiento_id') == $e->id ? 'selected' : '' }}>
-                            {{ $e->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- Estado --}}
-            <div class="col-md-2">
-                <select name="estado" class="form-select">
-                    <option value="">— Estado —</option>
-                    <option value="1" {{ request('estado') == '1' ? 'selected' : '' }}>Activo</option>
-                    <option value="0" {{ request('estado') == '0' ? 'selected' : '' }}>Inactivo</option>
-                </select>
-            </div>
-
-            {{-- Botón Filtrar --}}
-            <div class="col-md-1 text-end">
-                <button class="btn btn-secondary" style="min-width: 110px;">
-                    <i class="bi bi-funnel me-1"></i> Filtrar
-                </button>
-            </div>
-
-        </div>
-
-    </form>
-</div>
+        </form>
+    </div>
 
     {{-- TABLA --}}
     <div class="card-body">
@@ -149,8 +153,6 @@
                     </tr>
                     @endforeach
                 </tbody>
-
-
             </table>
         </div>
 

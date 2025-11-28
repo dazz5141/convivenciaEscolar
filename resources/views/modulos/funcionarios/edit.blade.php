@@ -1,5 +1,10 @@
 @extends('layouts.app')
 
+{{-- PERMISO --}}
+@if(!canAccess('funcionarios_edit', 'full'))
+    @php(abort(403, 'No tienes permisos para editar funcionarios.'))
+@endif
+
 @section('title', 'Editar Funcionario')
 
 @section('content')

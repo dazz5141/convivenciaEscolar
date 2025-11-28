@@ -9,12 +9,16 @@
         <h1 class="page-title">Libro de Novedades</h1>
         <p class="text-muted">Registro general de novedades de Inspectoría</p>
     </div>
+
+    {{-- PERMISO: crear --}}
+    @if(canAccess('novedades', 'create'))
     <div>
         <a href="{{ route('inspectoria.novedades.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>
             Registrar Novedad
         </a>
     </div>
+    @endif
 </div>
 
 <div class="card card-table">
@@ -46,10 +50,9 @@
                     <input type="hidden" name="alumno_id" id="alumno_id" value="{{ request('alumno_id') }}">
                 </div>
 
-                {{-- Modal de alumno --}}
                 @include('modulos.inspectoria.partials.modal-buscar-alumno')
 
-                {{-- Tipo de novedad --}}
+                {{-- Tipo --}}
                 <div class="col-12 col-md-3">
                     <select name="tipo" class="form-select">
                         <option value="">Tipo de novedad</option>
@@ -99,53 +102,68 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @foreach($novedades as $nov)
-                        <tr>
-                            <td>{{ date('d/m/Y H:i', strtotime($nov->fecha)) }}</td>
+                    <tr>
 
-                            <td>
-                                @if($nov->alumno)
-                                    {{ $nov->alumno->nombre_completo }}<br>
-                                    <small class="text-muted">{{ $nov->alumno->curso->nombre ?? '' }}</small>
-                                @elseif($nov->curso)
-                                    Curso: {{ $nov->curso->nombre }}
-                                @else
-                                    <span class="text-muted">—</span>
-                                @endif
-                            </td>
+                        {{-- Fecha --}}
+                        <td>{{ date('d/m/Y H:i', strtotime($nov->fecha)) }}</td>
 
-                            <td>{{ $nov->tipo->nombre }}</td>
+                        {{-- Alumno --}}
+                        <td>
+                            @if($nov->alumno)
+                                {{ $nov->alumno->nombre_completo }}<br>
+                                <small class="text-muted">{{ $nov->alumno->curso->nombre ?? '' }}</small>
+                            @elseif($nov->curso)
+                                Curso: {{ $nov->curso->nombre }}
+                            @else
+                                <span class="text-muted">—</span>
+                            @endif
+                        </td>
 
-                            <td>
-                                {{ $nov->funcionario->nombre }} 
-                                {{ $nov->funcionario->apellido_paterno }}
-                            </td>
+                        {{-- Tipo --}}
+                        <td>{{ $nov->tipo->nombre }}</td>
 
-                            <td class="table-actions">
-                                <a href="{{ route('inspectoria.novedades.show', $nov) }}" 
-                                   class="btn btn-sm btn-info" 
-                                   title="Ver">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                        {{-- Funcionario --}}
+                        <td>
+                            {{ $nov->funcionario->nombre }} 
+                            {{ $nov->funcionario->apellido_paterno }}
+                        </td>
 
-                                <a href="{{ route('inspectoria.novedades.edit', $nov) }}" 
-                                   class="btn btn-sm btn-primary" 
-                                   title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        {{-- Acciones --}}
+                        <td class="table-actions">
+
+                            {{-- Ver --}}
+                            @if(canAccess('novedades', 'view'))
+                            <a href="{{ route('inspectoria.novedades.show', $nov) }}" 
+                               class="btn btn-sm btn-info" 
+                               title="Ver">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            @endif
+
+                            {{-- Editar --}}
+                            @if(canAccess('novedades', 'edit'))
+                            <a href="{{ route('inspectoria.novedades.edit', $nov) }}" 
+                               class="btn btn-sm btn-primary" 
+                               title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            @endif
+
+                        </td>
+
+                    </tr>
                     @endforeach
                 </tbody>
+
             </table>
         </div>
 
-        {{-- PAGINACIÓN --}}
         <div class="mt-3">
             {{ $novedades->links() }}
         </div>
-
         @endif
     </div>
 
@@ -153,8 +171,6 @@
 
 @endsection
 
-
-{{-- JS PARA SELECCIÓN DE ALUMNO --}}
 <script>
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('seleccionar-alumno')) {

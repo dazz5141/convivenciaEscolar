@@ -17,6 +17,17 @@
     </div>
 </div>
 
+{{-- =========================================================
+     PERMISOS
+========================================================= --}}
+@if(!canAccess('pie','view'))
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para ver esta información.
+    </div>
+    @return
+@endif
+
 <div class="row g-4">
     {{-- =============================
         COLUMNA IZQUIERDA
@@ -30,9 +41,7 @@
             <div class="detail-item">
                 <div class="detail-label">Nombre Completo:</div>
                 <div class="detail-value">
-                    {{ $profesional->funcionario->apellido_paterno }}
-                    {{ $profesional->funcionario->apellido_materno }},
-                    {{ $profesional->funcionario->nombre }}
+                    {{ $profesional->funcionario->nombre_completo ?? 'No disponible' }}
                 </div>
             </div>
 
@@ -74,24 +83,26 @@
             </div>
 
             <div class="card-body">
+                {{-- Funcionario --}}
                 <p class="mb-2">
                     <strong>Funcionario:</strong><br>
-                    {{ $profesional->funcionario->apellido_paterno }}
-                    {{ $profesional->funcionario->apellido_materno }},
-                    {{ $profesional->funcionario->nombre }}
+                    {{ $profesional->funcionario->nombre_completo ?? 'No disponible' }}
                 </p>
 
+                {{-- Cargo --}}
                 <p class="mb-2">
                     <strong>Cargo:</strong><br>
                     {{ $profesional->funcionario->cargo->nombre ?? 'Sin cargo' }}
                 </p>
 
+                {{-- Tipo PIE --}}
                 <p class="mb-2">
                     <strong>Tipo PIE:</strong><br>
                     {{ $profesional->tipo->nombre ?? '—' }}
                 </p>
 
-                <p class="mb-2">
+                {{-- Fecha --}}
+                <p class="mb-0">
                     <strong>Registrado el:</strong><br>
                     {{ \Carbon\Carbon::parse($profesional->created_at)->format('d/m/Y H:i') }}
                 </p>

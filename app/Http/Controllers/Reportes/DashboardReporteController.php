@@ -37,6 +37,14 @@ class DashboardReporteController extends Controller
             ? null
             : $user->establecimiento_id;
 
+            
+        // ======================================================
+        //   PERMISO: VER REPORTE ESTADÍSTICO DASHBOARD
+        // ======================================================
+        if (!canAccess('dashboard_estadistico', 'view')) {
+            abort(403, 'No tienes permisos para ver el reporte por alumno.');
+        }
+
         // ===========================
         //    KPIs GENERALES
         // ===========================

@@ -18,15 +18,16 @@
         </a>
 
         {{-- Editar --}}
+        @if(canAccess('denuncias','edit'))
         <a href="{{ route('leykarin.denuncias.edit', $denuncia) }}" class="btn btn-primary">
             <i class="bi bi-pencil me-2"></i> Editar
         </a>
+        @endif
 
         {{-- Adjuntar documentos --}}
         <a href="{{ route('leykarin.documentos.index', $denuncia) }}" class="btn btn-info">
             <i class="bi bi-paperclip me-2"></i> Documentos Adjuntos
         </a>
-
     </div>
 </div>
 
@@ -40,52 +41,47 @@
 
         <div class="form-section">
 
+            {{-- ====================== DENUNCIANTE ====================== --}}
             <h5 class="form-section-title">Datos del Denunciante</h5>
 
             <div class="detail-item">
                 <div class="detail-label">Nombre completo:</div>
-                <div class="detail-value">
-                    {{ $denuncia->denunciante_nombre ?? '—' }}
-                </div>
+                <div class="detail-value">{{ $denuncia->denunciante_nombre ?? '—' }}</div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">RUN:</div>
-                <div class="detail-value">
-                    {{ $denuncia->denunciante_rut ?? '—' }}
-                </div>
+                <div class="detail-value">{{ $denuncia->denunciante_rut ?? '—' }}</div>
             </div>
 
-            <div class="detail-item">
+            <div class="detail-item mb-4">
                 <div class="detail-label">Cargo / Rol:</div>
-                <div class="detail-value">
-                    {{ $denuncia->denunciante_cargo ?? '—' }}
-                </div>
+                <div class="detail-value">{{ $denuncia->denunciante_cargo ?? '—' }}</div>
             </div>
 
+
+
+            {{-- ====================== DENUNCIADO ====================== --}}
             <h5 class="form-section-title mt-4">Datos del Denunciado</h5>
 
             <div class="detail-item">
                 <div class="detail-label">Nombre completo:</div>
-                <div class="detail-value">
-                    {{ $denuncia->denunciado_nombre ?? '—' }}
-                </div>
+                <div class="detail-value">{{ $denuncia->denunciado_nombre ?? '—' }}</div>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">RUN:</div>
-                <div class="detail-value">
-                    {{ $denuncia->denunciado_rut ?? '—' }}
-                </div>
+                <div class="detail-value">{{ $denuncia->denunciado_rut ?? '—' }}</div>
             </div>
 
-            <div class="detail-item">
+            <div class="detail-item mb-4">
                 <div class="detail-label">Cargo / Rol:</div>
-                <div class="detail-value">
-                    {{ $denuncia->denunciado_cargo ?? '—' }}
-                </div>
+                <div class="detail-value">{{ $denuncia->denunciado_cargo ?? '—' }}</div>
             </div>
 
+
+
+            {{-- ====================== INFORMACIÓN DE LA DENUNCIA ====================== --}}
             <h5 class="form-section-title mt-4">Información de la Denuncia</h5>
 
             <div class="detail-item">
@@ -95,13 +91,12 @@
                 </div>
             </div>
 
-            <div class="detail-item">
+            <div class="detail-item mb-4">
                 <div class="detail-label">Tipo de denuncia:</div>
-                <div class="detail-value">
-                    {{ $denuncia->tipo?->nombre ?? '—' }}
-                </div>
+                <div class="detail-value">{{ $denuncia->tipo?->nombre ?? '—' }}</div>
             </div>
 
+            {{-- Descripción --}}
             <div class="detail-item mb-4">
                 <div class="detail-label">Descripción detallada:</div>
                 <div class="detail-value">
@@ -112,6 +107,8 @@
             </div>
 
 
+
+            {{-- ====================== INFORMACIÓN LEGAL ====================== --}}
             <h5 class="form-section-title mt-4">Información Legal</h5>
 
             <div class="detail-item">
@@ -137,6 +134,8 @@
             </div>
 
 
+
+            {{-- ====================== DOCUMENTOS ====================== --}}
             <h5 class="form-section-title mt-4">Documentos Adjuntos</h5>
 
             @if($denuncia->documentos->count() == 0)
@@ -149,7 +148,9 @@
                                 <i class="bi bi-file-earmark-text me-2"></i>
                                 {{ $doc->nombre_archivo }}
                             </span>
-                            <a href="{{ asset($doc->ruta_archivo) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+
+                            <a href="{{ asset($doc->ruta_archivo) }}" target="_blank"
+                                class="btn btn-sm btn-outline-primary">
                                 Ver / Descargar
                             </a>
                         </li>
@@ -160,6 +161,7 @@
         </div>
 
     </div>
+
 
 
     {{-- ============================================================
@@ -174,6 +176,7 @@
 
             <div class="card-body">
 
+                {{-- Estado --}}
                 <p class="mb-2">
                     <strong>Estado:</strong><br>
                     <span class="badge bg-primary">
@@ -181,6 +184,7 @@
                     </span>
                 </p>
 
+                {{-- Registrado por --}}
                 <p class="mb-2">
                     <strong>Registrado por:</strong><br>
                     {{ $denuncia->registradoPor->nombre_completo ?? '—' }}<br>
@@ -189,15 +193,21 @@
                     </span>
                 </p>
 
-                <p class="mb-2">
+                {{-- Fecha de registro --}}
+                <p class="mb-3">
                     <strong>Fecha de registro:</strong><br>
                     {{ $denuncia->created_at->format('d/m/Y H:i') }}
                 </p>
 
+                {{-- Origen --}}
                 @if($denuncia->conflictable)
-                    <p class="mb-2">
+                    <p class="mb-0">
                         <strong>Origen:</strong><br>
-                        <a href="{{ $denuncia->conflictable instanceof \App\Models\ConflictoFuncionario
+                        @php
+                            $isFuncionario = $denuncia->conflictable instanceof \App\Models\ConflictoFuncionario;
+                        @endphp
+
+                        <a href="{{ $isFuncionario
                                     ? route('leykarin.conflictos-funcionarios.show', $denuncia->conflictable_id)
                                     : route('leykarin.conflictos-apoderados.show', $denuncia->conflictable_id) }}"
                            class="text-primary">

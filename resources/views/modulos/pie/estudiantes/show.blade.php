@@ -4,10 +4,14 @@
 
 @section('content')
 
+{{-- =========================================================
+     ENCABEZADO
+========================================================= --}}
 <div class="page-header d-flex justify-content-between flex-wrap align-items-center">
     <div class="mb-2">
         <h1 class="page-title">
-            Estudiante PIE: {{ $estudiantePIE->alumno->apellido_paterno }}
+            Estudiante PIE:
+            {{ $estudiantePIE->alumno->apellido_paterno }}
             {{ $estudiantePIE->alumno->apellido_materno }},
             {{ $estudiantePIE->alumno->nombre }}
         </h1>
@@ -17,6 +21,9 @@
         </p>
     </div>
 
+    {{-- =========================================================
+         BOTONES SUPERIORES (BLINDADOS)
+    ========================================================== --}}
     <div class="d-flex gap-2 flex-wrap">
 
         {{-- Volver --}}
@@ -29,8 +36,8 @@
             <i class="bi bi-clock-history me-1"></i> Historial
         </a>
 
-        {{-- Egreso --}}
-        @if(!$estudiantePIE->fecha_egreso)
+        {{-- Egreso (solo si tiene permisos) --}}
+        @if(canAccess('pie','edit') && !$estudiantePIE->fecha_egreso)
             <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalEgreso">
                 <i class="bi bi-box-arrow-right me-2"></i> Egresar del PIE
             </button>
@@ -41,11 +48,24 @@
 
 
 
+{{-- =========================================================
+     VALIDACIÓN DE PERMISOS
+========================================================= --}}
+@if(!canAccess('pie','view'))
+    <div class="alert alert-warning mt-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No tienes permisos para ver esta información.
+    </div>
+    @return
+@endif
+
+
+
 <div class="row g-4">
 
-    {{-- ===========================
+    {{-- =========================================================
          COLUMNA PRINCIPAL
-    ============================ --}}
+    ========================================================== --}}
     <div class="col-lg-8">
 
         {{-- ===========================
@@ -117,14 +137,11 @@
 
 
 
-    {{-- ===========================
-         COLUMNA DERECHA
-    ============================ --}}
+    {{-- =========================================================
+         COLUMNA DERECHA — INTERVENCIONES
+    ========================================================== --}}
     <div class="col-lg-4">
 
-        {{-- ===========================
-             INTERVENCIONES
-        ============================ --}}
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0">Intervenciones del Estudiante</h5>
@@ -134,13 +151,17 @@
 
                 @forelse($estudiantePIE->intervenciones as $i)
                     <div class="p-2 mb-2 border rounded bg-light">
+
                         <strong>{{ $i->tipo->nombre }}</strong><br>
 
                         <span class="text-muted small">
                             {{ \Carbon\Carbon::parse($i->fecha)->format('d/m/Y') }}
                         </span>
 
-                        <div class="mt-1">{{ $i->detalle }}</div>
+                        <div class="mt-1">
+                            {{ $i->detalle }}
+                        </div>
+
                     </div>
                 @empty
                     <p class="text-muted">No existen intervenciones registradas.</p>
@@ -150,14 +171,14 @@
         </div>
 
     </div>
-
 </div>
 
 
 
-{{-- ================================
-      MODAL DE EGRESO DEL PIE
-================================ --}}
+{{-- =========================================================
+     MODAL DE EGRESO (BLINDADO)
+========================================================= --}}
+@if(canAccess('pie','edit') && !$estudiantePIE->fecha_egreso)
 <div class="modal fade" id="modalEgreso" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -173,12 +194,12 @@
         <div class="modal-body">
 
           <p class="text-muted">
-            Confirme la fecha de egreso del estudiante
+            Confirme la fecha de egreso del estudiante:
             <strong>
                 {{ $estudiantePIE->alumno->apellido_paterno }}
                 {{ $estudiantePIE->alumno->apellido_materno }},
                 {{ $estudiantePIE->alumno->nombre }}
-            </strong>.
+            </strong>
           </p>
 
           <label class="form-label">Fecha de Egreso *</label>
@@ -202,5 +223,6 @@
     </div>
   </div>
 </div>
+@endif
 
 @endsection

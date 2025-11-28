@@ -10,6 +10,11 @@
 
 @include('components.alerts')
 
+{{-- ============================================
+     SOLO ROLES CON PERMISO EDIT EN ALUMNOS
+=============================================== --}}
+@editar('alumnos')
+
 <form action="{{ route('alumnos.update', $alumno->id) }}" method="POST">
     @csrf
     @method('PUT')
@@ -191,6 +196,9 @@
     </div>
 
 </form>
+
+@endeditar {{-- FIN PERMISOS DE EDICIÓN --}}
+
 <!-- MODAL BUSCAR APODERADO -->
 <div class="modal fade" id="modalBuscarApoderado" tabindex="-1">
   <div class="modal-dialog modal-lg">

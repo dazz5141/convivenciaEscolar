@@ -13,6 +13,11 @@
 
 @include('components.alerts')
 
+{{-- =========================================================
+     PERMISO: SOLO QUIEN TIENE create EN ATRASOS
+========================================================= --}}
+@if(canAccess('atrasos', 'create'))
+
 <form action="{{ route('inspectoria.asistencia.store') }}" method="POST">
     @csrf
 
@@ -70,7 +75,7 @@
                        required>
             </div>
 
-            {{-- HORA (solo para atrasos o retiros) --}}
+            {{-- HORA --}}
             <div class="col-md-4">
                 <label class="form-label">Hora</label>
                 <input type="time"
@@ -108,6 +113,8 @@
     </div>
 
 </form>
+
+@endif {{-- FIN PERMISO --}}
 
 
 {{-- =========================================================

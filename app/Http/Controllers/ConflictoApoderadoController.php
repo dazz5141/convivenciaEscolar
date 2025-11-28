@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\ConflictoApoderado;
 use App\Models\EstadoConflictoApoderado;
-use App\Models\Funcionario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ConflictoApoderadoController extends Controller
 {
-    // LISTADO
+    /* =========================================================
+       LISTADO
+    ========================================================= */
     public function index(Request $request)
     {
+        if (!canAccess('conflictos_apoderados', 'view')) {
+            abort(403, 'No tienes permiso para ver los conflictos con apoderados.');
+        }
+
         $conflictos = ConflictoApoderado::with(['funcionario', 'registradoPor', 'estado'])
             ->delColegio(session('establecimiento_id'))
             ->orderBy('fecha', 'desc')
@@ -21,17 +26,31 @@ class ConflictoApoderadoController extends Controller
         return view('modulos.ley-karin.conflictos-apoderados.index', compact('conflictos'));
     }
 
-    // FORMULARIO CREAR
+
+    /* =========================================================
+       FORMULARIO CREAR
+    ========================================================= */
     public function create()
     {
+        if (!canAccess('conflictos_apoderados', 'create')) {
+            abort(403, 'No tienes permiso para registrar conflictos.');
+        }
+
         $estados = EstadoConflictoApoderado::all();
 
         return view('modulos.ley-karin.conflictos-apoderados.create', compact('estados'));
     }
 
-    // REGISTRAR
+
+    /* =========================================================
+       REGISTRAR
+    ========================================================= */
     public function store(Request $request)
     {
+        if (!canAccess('conflictos_apoderados', 'create')) {
+            abort(403, 'No tienes permiso para registrar conflictos.');
+        }
+
         $request->validate([
             'fecha' => 'required|date',
             'funcionario_id' => 'required|exists:funcionarios,id',
@@ -46,48 +65,76 @@ class ConflictoApoderadoController extends Controller
         ]);
 
         ConflictoApoderado::create([
-            'fecha' => $request->fecha,
-            'funcionario_id' => $request->funcionario_id,
-            'registrado_por_id' => Auth::user()->funcionario_id,
-            'apoderado_id' => $request->apoderado_id,
-            'apoderado_nombre' => $request->apoderado_nombre,
-            'apoderado_rut' => $request->apoderado_rut,
-            'tipo_conflicto' => $request->tipo_conflicto,
-            'lugar_conflicto' => $request->lugar_conflicto,
-            'descripcion' => $request->descripcion,
-            'accion_tomada' => $request->accion_tomada,
-            'estado_id' => $request->estado_id,
-            'confidencial' => $request->confidencial ?? 0,
-            'derivado_ley_karin' => $request->derivado_ley_karin ?? 0,
-            'establecimiento_id' => session('establecimiento_id'),
+            'fecha'               => $request->fecha,
+            'funcionario_id'      => $request->funcionario_id,
+            'registrado_por_id'   => Auth::user()->funcionario_id,
+            'apoderado_id'        => $request->apoderado_id,
+            'apoderado_nombre'    => $request->apoderado_nombre,
+            'apoderado_rut'       => $request->apoderado_rut,
+            'tipo_conflicto'      => $request->tipo_conflicto,
+            'lugar_conflicto'     => $request->lugar_conflicto,
+            'descripcion'         => $request->descripcion,
+            'accion_tomada'       => $request->accion_tomada,
+            'estado_id'           => $request->estado_id,
+            'confidencial'        => $request->confidencial ?? 0,
+            'derivado_ley_karin'  => $request->derivado_ley_karin ?? 0,
+            'establecimiento_id'  => session('establecimiento_id'),
         ]);
 
-        return redirect()->route('leykarin.conflictos-apoderados.index')
+        return redirect()
+            ->route('leykarin.conflictos-apoderados.index')
             ->with('success', 'Conflicto registrado correctamente.');
     }
 
-    // MOSTRAR
+
+    /* =========================================================
+       MOSTRAR
+    ========================================================= */
     public function show(ConflictoApoderado $conflictoApoderado)
     {
+        if (!canAccess('conflictos_apoderados', 'view')) {
+            abort(403, 'No tienes permiso para ver este conflicto.');
+        }
+
+        $this->validarEstablecimiento($conflictoApoderado);
+
         return view('modulos.ley-karin.conflictos-apoderados.show', [
             'conflicto' => $conflictoApoderado
         ]);
     }
 
-    // EDITAR
+
+    /* =========================================================
+       EDITAR
+    ========================================================= */
     public function edit(ConflictoApoderado $conflictoApoderado)
     {
+        if (!canAccess('conflictos_apoderados', 'edit')) {
+            abort(403, 'No tienes permiso para editar conflictos.');
+        }
+
+        $this->validarEstablecimiento($conflictoApoderado);
+
         $estados = EstadoConflictoApoderado::all();
 
         return view('modulos.ley-karin.conflictos-apoderados.edit', [
             'conflicto' => $conflictoApoderado,
-            'estados' => $estados
+            'estados'   => $estados
         ]);
     }
 
-    // ACTUALIZAR
+
+    /* =========================================================
+       ACTUALIZAR
+    ========================================================= */
     public function update(Request $request, ConflictoApoderado $conflictoApoderado)
     {
+        if (!canAccess('conflictos_apoderados', 'edit')) {
+            abort(403, 'No tienes permiso para editar conflictos.');
+        }
+
+        $this->validarEstablecimiento($conflictoApoderado);
+
         $request->validate([
             'tipo_conflicto' => 'nullable|string|max:100',
             'lugar_conflicto' => 'nullable|string|max:150',
@@ -97,22 +144,24 @@ class ConflictoApoderadoController extends Controller
         ]);
 
         $conflictoApoderado->update([
-            'tipo_conflicto' => $request->tipo_conflicto,
-            'lugar_conflicto' => $request->lugar_conflicto,
-            'descripcion' => $request->descripcion,
-            'accion_tomada' => $request->accion_tomada,
-            'estado_id' => $request->estado_id,
-            'confidencial' => $request->confidencial ?? 0,
+            'tipo_conflicto'     => $request->tipo_conflicto,
+            'lugar_conflicto'    => $request->lugar_conflicto,
+            'descripcion'        => $request->descripcion,
+            'accion_tomada'      => $request->accion_tomada,
+            'estado_id'          => $request->estado_id,
+            'confidencial'       => $request->confidencial ?? 0,
             'derivado_ley_karin' => $request->derivado_ley_karin ?? 0,
         ]);
 
-        return redirect()->route('leykarin.conflictos-apoderados.index')
+        return redirect()
+            ->route('leykarin.conflictos-apoderados.index')
             ->with('success', 'Conflicto actualizado correctamente.');
     }
 
-    /**
-     * Seguridad multicolegio
-     */
+
+    /* =========================================================
+       Seguridad multicolegio
+    ========================================================= */
     private function validarEstablecimiento($modelo)
     {
         $establecimientoSesion = session('establecimiento_id');

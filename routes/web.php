@@ -6,6 +6,7 @@ use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\EstablecimientoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardAdminController;
 use App\Http\Controllers\FuncionarioController;
 use App\Http\Controllers\ApoderadoController;
 use App\Http\Controllers\AlumnoController;
@@ -95,14 +96,8 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('dashboard')->group(function () {
-        Route::view('/admin', 'dashboard.roles.admin')->name('dashboard.admin');
-        Route::view('/establecimiento', 'dashboard.roles.establecimiento')->name('dashboard.establecimiento');
-        Route::view('/inspector-general', 'dashboard.roles.inspector-general')->name('dashboard.inspector.general');
-        Route::view('/inspector', 'dashboard.roles.inspector')->name('dashboard.inspector');
-        Route::view('/docente', 'dashboard.roles.docente')->name('dashboard.docente');
-        Route::view('/psicologo', 'dashboard.roles.psicologo')->name('dashboard.psicologo');
-        Route::view('/asistente', 'dashboard.roles.asistente')->name('dashboard.asistente');
-        Route::view('/convivencia', 'dashboard.roles.convivencia')->name('dashboard.convivencia');
+        Route::get('/admin', [DashboardAdminController::class, 'index'])->name('dashboard.admin')->middleware('auth');
+        Route::view('/establecimiento', 'dashboard.roles.establecimiento')->name('dashboard.establecimiento')->middleware('auth');
     });
 
     /*--------------------------------------------------------------------------

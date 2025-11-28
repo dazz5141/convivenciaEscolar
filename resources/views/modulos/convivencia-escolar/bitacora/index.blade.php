@@ -4,6 +4,8 @@
 
 @section('content')
 
+@ver('bitacora')
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div class="mb-3 mb-md-0">
         <h1 class="page-title">Bitácora de Incidentes</h1>
@@ -11,9 +13,11 @@
     </div>
 
     <div>
+        @crear('bitacora')
         <a href="{{ route('convivencia.bitacora.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i> Nuevo Incidente
         </a>
+        @endcrear
     </div>
 </div>
 
@@ -157,17 +161,25 @@
 
                         {{-- ACCIONES --}}
                         <td class="table-actions">
+
+                            {{-- Ver --}}
+                            @ver('bitacora')
                             <a href="{{ route('convivencia.bitacora.show', $i->id) }}"
                                class="btn btn-sm btn-info"
                                title="Ver">
                                 <i class="bi bi-eye"></i>
                             </a>
+                            @endver
 
+                            {{-- Editar --}}
+                            @editar('bitacora')
                             <a href="{{ route('convivencia.bitacora.edit', $i->id) }}"
                                class="btn btn-sm btn-primary"
                                title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </a>
+                            @endeditar
+
                         </td>
 
                     </tr>
@@ -186,6 +198,8 @@
 
     </div>
 </div>
+
+@endver
 
 @endsection
 

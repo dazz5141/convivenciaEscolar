@@ -9,9 +9,11 @@
         <p class="text-muted">Gestión de cursos del establecimiento</p>
     </div>
     <div>
+        @if(canAccess('cursos', 'create'))
         <a href="{{ route('cursos.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i> Nuevo Curso
         </a>
+        @endif
     </div>
 </div>
 
@@ -86,13 +88,21 @@
                         </td>
 
                         <td class="table-actions">
+
+                            {{-- Ver --}}
+                            @if(canAccess('cursos', 'view'))
                             <a href="{{ route('cursos.show', $c->id) }}" class="btn btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
                             </a>
+                            @endif
 
+                            {{-- Editar --}}
+                            @if(canAccess('cursos', 'edit'))
                             <a href="{{ route('cursos.edit', $c->id) }}" class="btn btn-sm btn-primary">
                                 <i class="bi bi-pencil"></i>
                             </a>
+                            @endif
+
                         </td>
                     </tr>
                     @empty

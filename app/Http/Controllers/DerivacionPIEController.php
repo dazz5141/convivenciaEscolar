@@ -14,6 +14,13 @@ class DerivacionPIEController extends Controller
      */
     public function index(Request $request)
     {
+        // =============================
+        // PERMISO: VER
+        // =============================
+        if (!canAccess('pie','view')) {
+            abort(403, 'No tienes permisos para ver derivaciones PIE.');
+        }
+
         $establecimiento_id = session('establecimiento_id');
 
         // Estudiantes PIE del establecimiento
@@ -24,7 +31,7 @@ class DerivacionPIEController extends Controller
             ->orderBy(\DB::raw("CONCAT(alumnos.apellido_paterno, ' ', alumnos.apellido_materno, ' ', alumnos.nombre)"))
             ->get();
 
-        // Filtro por estudiante
+        // Listado de derivaciones con filtro por estudiante
         $query = DerivacionPIE::with(['estudiante.alumno'])
             ->where('establecimiento_id', $establecimiento_id);
 
@@ -38,19 +45,35 @@ class DerivacionPIEController extends Controller
         return view('modulos.pie.derivaciones.index', compact('estudiantes', 'derivaciones'));
     }
 
+
     /**
-     * Crear derivación desde ficha del estudiante PIE
+     * Formulario de creación
      */
     public function create($estudiante_pie_id = null)
     {
+        // =============================
+        // PERMISO: CREAR
+        // =============================
+        if (!canAccess('pie','create')) {
+            abort(403, 'No tienes permisos para crear derivaciones PIE.');
+        }
+
         return view('modulos.pie.derivaciones.create', compact('estudiante_pie_id'));
     }
+
 
     /**
      * Guardar derivación
      */
     public function store(Request $request)
     {
+        // =============================
+        // PERMISO: CREAR
+        // =============================
+        if (!canAccess('pie','create')) {
+            abort(403, 'No tienes permisos para registrar derivaciones PIE.');
+        }
+
         $request->validate([
             'estudiante_pie_id' => 'required|exists:estudiantes_pie,id',
             'fecha'             => 'required|date',
@@ -59,10 +82,13 @@ class DerivacionPIEController extends Controller
             'estado'            => 'nullable|string|max:60',
         ]);
 
-        // Validar que el estudiante PIE pertenece al establecimiento
-        $this->validarEstablecimiento(EstudiantePIE::findOrFail($request->estudiante_pie_id));
+        // Validar multicolegio del estudiante
+        $this->validarEstablecimiento(
+            EstudiantePIE::findOrFail($request->estudiante_pie_id)
+        );
 
-        DerivacionPIE::create([
+        // Crear derivación
+        $derivacion = DerivacionPIE::create([
             'establecimiento_id' => session('establecimiento_id'),
             'estudiante_pie_id'  => $request->estudiante_pie_id,
             'fecha'              => $request->fecha,
@@ -73,56 +99,42 @@ class DerivacionPIEController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | NOTIFICACIONES – EQUIPO PIE
+        | NOTIFICACIONES – (DESACTIVADAS)
         |--------------------------------------------------------------------------
+        | Si más adelante se define un profesional asignado al estudiante PIE,
+        | puedes activar este bloque nuevamente.
         */
-        $establecimientoId = session('establecimiento_id');
-
-        // Obtener profesionales PIE con usuario válido
-        $profesionales = ProfesionalPIE::where('establecimiento_id', $establecimientoId)
-            ->with('funcionario.usuario')
-            ->get();
-
-        foreach ($profesionales as $pro) {
-            if ($pro->funcionario && $pro->funcionario->usuario) {
-
-                Notificacion::create([
-                    'tipo'              => 'pie_derivacion',
-                    'mensaje'           => "Nueva derivación PIE registrada para estudiante ID {$request->estudiante_pie_id}.",
-                    'usuario_id'        => $pro->funcionario->usuario->id, // receptor
-                    'origen_id'         => $derivacion->id,
-                    'origen_model'      => DerivacionPIE::class,
-                    'establecimiento_id'=> $establecimientoId,
-                ]);
-
-            }
-        }
 
         return redirect()
             ->route('pie.derivaciones.index')
             ->with('success', 'Derivación registrada correctamente.');
     }
 
+
     /**
      * Mostrar derivación individual
      */
     public function show(DerivacionPIE $derivacionPIE)
     {
+        // =============================
+        // PERMISO: VER
+        // =============================
+        if (!canAccess('pie','view')) {
+            abort(403, 'No tienes permisos para ver derivaciones PIE.');
+        }
+
+        // Validar establecimiento
         $this->validarEstablecimiento($derivacionPIE);
 
-        // Cargar relaciones necesarias (anidado: estudiante -> alumno)
-        $derivacionPIE->load([
-            'estudiante.alumno'
-        ]);
-
-        // Alias corto para mantener compatibilidad con la vista
-        $derivacion = $derivacionPIE;
+        // Cargar relaciones necesarias
+        $derivacionPIE->load(['estudiante.alumno.curso']);
 
         return view('modulos.pie.derivaciones.show', compact('derivacionPIE'));
     }
 
+
     /**
-     * Validación de establecimiento
+     * Validación multicolegio
      */
     private function validarEstablecimiento($modelo)
     {
@@ -132,11 +144,10 @@ class DerivacionPIEController extends Controller
         // Si no tiene establecimiento definido
         if (!$establecimientoModelo) {
             if (app()->environment('local')) {
-                \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
+                \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID {$modelo->id}) no tiene establecimiento_id.");
                 return;
-            } else {
-                abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
             }
+            abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
         }
 
         // Si pertenece a otro establecimiento

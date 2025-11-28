@@ -4,36 +4,52 @@
 
 @section('content')
 
+{{-- ============================================================
+      PERMISO: VER
+============================================================= --}}
+@if(!canAccess('denuncias','view'))
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-shield-lock-fill me-2"></i>
+        No tienes permisos para ver las denuncias ingresadas bajo Ley Karin.
+    </div>
+@endif
+
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div class="mb-3 mb-md-0">
         <h1 class="page-title">Denuncias Ley Karin</h1>
         <p class="text-muted">Registro oficial de denuncias ingresadas bajo la Ley Karin</p>
     </div>
-    <div>
+
+    {{-- BOTÓN CREAR --}}
+    @if(canAccess('denuncias','create'))
         <a href="{{ route('leykarin.denuncias.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>
             Registrar Denuncia
         </a>
-    </div>
+    @endif
 </div>
+
 
 <div class="card card-table">
 
-    <!-- FILTROS -->
+    {{-- ============================================================
+            FILTROS
+    ============================================================ --}}
     <div class="card-header">
 
         <form method="GET" action="{{ route('leykarin.denuncias.index') }}">
             <div class="row g-3">
 
-                <!-- Buscar denunciante -->
+                {{-- DENUNCIANTE --}}
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="input-group">
                         <input type="text"
-                            id="inputDenuncianteSeleccionado"
-                            class="form-control"
-                            value="{{ $denuncianteSeleccionado->nombre_completo ?? '' }}"
-                            placeholder="Buscar denunciante..."
-                            readonly>
+                               id="inputDenuncianteSeleccionado"
+                               class="form-control"
+                               value="{{ $denuncianteSeleccionado->nombre_completo ?? '' }}"
+                               placeholder="Buscar denunciante..."
+                               readonly>
 
                         <button type="button"
                                 class="btn btn-primary"
@@ -45,19 +61,18 @@
                         </button>
                     </div>
 
-                    <input type="hidden" name="denunciante_id" id="denunciante_id"
-                        value="{{ request('denunciante_id') }}">
+                    <input type="hidden" name="denunciante_id" id="denunciante_id" value="{{ request('denunciante_id') }}">
                 </div>
 
-                <!-- Buscar denunciado -->
+                {{-- DENUNCIADO --}}
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="input-group">
                         <input type="text"
-                            id="inputDenunciadoSeleccionado"
-                            class="form-control"
-                            value="{{ $denunciadoSeleccionado->nombre_completo ?? '' }}"
-                            placeholder="Buscar denunciado..."
-                            readonly>
+                               id="inputDenunciadoSeleccionado"
+                               class="form-control"
+                               value="{{ $denunciadoSeleccionado->nombre_completo ?? '' }}"
+                               placeholder="Buscar denunciado..."
+                               readonly>
 
                         <button type="button"
                                 class="btn btn-danger"
@@ -69,28 +84,27 @@
                         </button>
                     </div>
 
-                    <input type="hidden" name="denunciado_id" id="denunciado_id"
-                        value="{{ request('denunciado_id') }}">
+                    <input type="hidden" name="denunciado_id" id="denunciado_id" value="{{ request('denunciado_id') }}">
                 </div>
 
-                <!-- Tipo de acoso -->
+                {{-- TIPO --}}
                 <div class="col-12 col-md-4 col-lg-2">
                     <input type="text"
-                        name="tipo_acoso"
-                        class="form-control"
-                        placeholder="Tipo de acoso"
-                        value="{{ request('tipo_acoso') }}">
+                           name="tipo_acoso"
+                           class="form-control"
+                           placeholder="Tipo de acoso"
+                           value="{{ request('tipo_acoso') }}">
                 </div>
 
-                <!-- Fecha -->
+                {{-- FECHA --}}
                 <div class="col-12 col-md-4 col-lg-2">
                     <input type="date"
-                        name="fecha"
-                        class="form-control"
-                        value="{{ request('fecha') }}">
+                           name="fecha"
+                           class="form-control"
+                           value="{{ request('fecha') }}">
                 </div>
 
-                <!-- Botón Filtrar -->
+                {{-- BOTÓN --}}
                 <div class="col-12 col-md-4 col-lg-2">
                     <button class="btn btn-secondary w-100 h-100">
                         <i class="bi bi-funnel me-2"></i>
@@ -103,7 +117,10 @@
 
     </div>
 
-    <!-- TABLA -->
+
+    {{-- ============================================================
+            TABLA
+    ============================================================ --}}
     <div class="card-body">
 
         @if($denuncias->count() == 0)
@@ -120,7 +137,7 @@
                 <thead>
                     <tr>
                         <th>Fecha</th>
-                        <th>Victima</th>
+                        <th>Víctima</th>
                         <th>Denunciado</th>
                         <th>Tipo</th>
                         <th>Confidencial</th>
@@ -132,30 +149,19 @@
                 @foreach($denuncias as $d)
                     <tr>
 
-                        <!-- FECHA -->
+                        {{-- FECHA --}}
                         <td>{{ $d->created_at->format('d/m/Y') }}</td>
 
-                        <!-- VÍCTIMA -->
-                        <td>{{ $d->victima_nombre ?? '—' }}</td>
+                        {{-- VÍCTIMA --}}
+                        <td>{{ $d->denunciante_nombre ?? '—' }}</td>
 
-                        <!-- DENUNCIADO -->
+                        {{-- DENUNCIADO --}}
                         <td>{{ $d->denunciado_nombre ?? '—' }}</td>
 
-                        <!-- TIPO -->
-                        <td>
-                            @php
-                                $tipos = [
-                                    $d->tipo_acoso,
-                                    $d->tipo_laboral,
-                                    $d->tipo_violencia,
-                                ];
-                                $tipos = array_filter($tipos);
-                            @endphp
+                        {{-- TIPO --}}
+                        <td>{{ $d->tipo?->nombre ?? '—' }}</td>
 
-                            {{ count($tipos) ? implode(', ', $tipos) : '—' }}
-                        </td>
-
-                        <!-- CONFIDENCIAL -->
+                        {{-- CONFIDENCIAL --}}
                         <td>
                             @if($d->confidencial)
                                 <i class="bi bi-lock-fill text-danger" title="Confidencial"></i>
@@ -164,20 +170,24 @@
                             @endif
                         </td>
 
-                        <!-- ACCIONES -->
+                        {{-- ACCIONES --}}
                         <td class="table-actions">
 
-                            <a href="{{ route('leykarin.denuncias.show', $d->id) }}"
-                               class="btn btn-sm btn-info"
-                               title="Ver">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                            {{-- Ver --}}
+                            @if(canAccess('denuncias','view'))
+                                <a href="{{ route('leykarin.denuncias.show', $d) }}"
+                                   class="btn btn-sm btn-info">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            @endif
 
-                            <a href="{{ route('leykarin.denuncias.edit', $d->id) }}"
-                               class="btn btn-sm btn-primary"
-                               title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
+                            {{-- Editar --}}
+                            @if(canAccess('denuncias','edit'))
+                                <a href="{{ route('leykarin.denuncias.edit', $d) }}"
+                                   class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            @endif
 
                         </td>
 
@@ -201,9 +211,9 @@
 @endsection
 
 
-{{-- =========================================================
-     JS PARA SELECCIÓN EN EL MODAL
-========================================================= --}}
+{{-- ============================================================
+      JS: Selección de funcionario
+============================================================= --}}
 <script>
 let targetInput = null;
 let targetTexto = null;

@@ -7,6 +7,7 @@ use App\Models\AccidenteEscolar;
 use App\Models\TipoAccidente;
 use App\Models\Alumno;
 use App\Models\Usuario;
+use App\Models\Notificacion;
 use Illuminate\Support\Facades\Auth;
 
 class AccidenteEscolarController extends Controller
@@ -16,23 +17,32 @@ class AccidenteEscolarController extends Controller
      */
     public function index(Request $request)
     {
+        // ---------------------------------------------------
+        // LISTADO DE ACCIDENTES POR ESTABLECIMIENTO ACTUAL
+        // ---------------------------------------------------
         $query = AccidenteEscolar::with(['alumno.curso', 'tipo', 'funcionario', 'usuario'])
             ->delColegio(session('establecimiento_id'));
 
+        // ---------------------------------------------------
         // FILTRO: Alumno seleccionado desde modal
+        // ---------------------------------------------------
         if ($request->filled('alumno_id')) {
             $query->where('alumno_id', $request->alumno_id);
-            $alumnoSeleccionado = \App\Models\Alumno::find($request->alumno_id);
+            $alumnoSeleccionado = Alumno::find($request->alumno_id);
         } else {
             $alumnoSeleccionado = null;
         }
 
+        // ---------------------------------------------------
         // FILTRO: Tipo accidente
+        // ---------------------------------------------------
         if ($request->filled('tipo')) {
             $query->where('tipo_accidente_id', $request->tipo);
         }
 
+        // ---------------------------------------------------
         // FILTRO: Fecha
+        // ---------------------------------------------------
         if ($request->filled('fecha')) {
             $query->whereDate('fecha', $request->fecha);
         }
@@ -47,22 +57,31 @@ class AccidenteEscolarController extends Controller
         ));
     }
 
+
+
     /**
      * FORMULARIO DE CREACIÓN
      */
     public function create()
     {
+        // ---------------------------------------------------
+        // LISTADO DE ALUMNOS DEL ESTABLECIMIENTO
+        // ---------------------------------------------------
         $alumnos = Alumno::with('curso')
             ->whereHas('curso', function ($q) {
                 $q->where('establecimiento_id', session('establecimiento_id'));
             })
             ->get()
-            ->sortBy('nombre_completo'); // ← ORDEN CORRECTO
+            ->sortBy('nombre_completo');
 
+        // ---------------------------------------------------
+        // TIPOS DE ACCIDENTE
+        // ---------------------------------------------------
         $tipos = TipoAccidente::orderBy('nombre')->get();
 
         return view('modulos.inspectoria.accidentes.create', compact('alumnos', 'tipos'));
     }
+
 
 
     /**
@@ -79,20 +98,25 @@ class AccidenteEscolarController extends Controller
             'atencion_inmediata'=> 'nullable|string',
             'derivacion_salud'  => 'nullable|string',
         ]);
-        
-        $establecimientoId = session('establecimiento_id');
 
-        AccidenteEscolar::create([
+        $establecimientoId = session('establecimiento_id');
+        $alumno            = Alumno::find($request->alumno_id);
+
+        // ---------------------------------------------------
+        // CREAR ACCIDENTE
+        // ---------------------------------------------------
+        $accidente = AccidenteEscolar::create([
             'fecha'              => $request->fecha,
             'alumno_id'          => $request->alumno_id,
             'tipo_accidente_id'  => $request->tipo_accidente_id,
             'lugar'              => $request->lugar,
             'descripcion'        => $request->descripcion,
             'atencion_inmediata' => $request->atencion_inmediata,
-            'derivacion_salud'   => $request->derivacion_salud, // texto real
-            'registrado_por' => Auth::user()->id,
-            'establecimiento_id' => session('establecimiento_id'),
+            'derivacion_salud'   => $request->derivacion_salud,
+            'registrado_por'     => Auth::user()->id,
+            'establecimiento_id' => $establecimientoId,
         ]);
+
 
         /*
         |--------------------------------------------------------------------------
@@ -100,8 +124,8 @@ class AccidenteEscolarController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        // Roles destino (ajustables)
-        $rolesDestino = [3, 8]; 
+        // Roles destino
+        $rolesDestino = [3, 8];
         // 3 = Inspector General
         // 8 = Encargado de Convivencia Escolar
 
@@ -127,6 +151,7 @@ class AccidenteEscolarController extends Controller
     }
 
 
+
     /**
      * MOSTRAR DETALLE
      */
@@ -136,6 +161,7 @@ class AccidenteEscolarController extends Controller
 
         return view('modulos.inspectoria.accidentes.show', compact('accidente'));
     }
+
 
 
     /**
@@ -149,6 +175,7 @@ class AccidenteEscolarController extends Controller
 
         return view('modulos.inspectoria.accidentes.edit', compact('accidente', 'tipos'));
     }
+
 
 
     /**
@@ -180,6 +207,7 @@ class AccidenteEscolarController extends Controller
     }
 
 
+
     /**
      * VALIDAR MULTICOLEGIO
      */
@@ -191,7 +219,7 @@ class AccidenteEscolarController extends Controller
         // 1. Si el modelo NO tiene establecimiento_id
         if (!$establecimientoModelo) {
 
-            // En desarrollo: mostrar mensaje útil en log y permitir continuar
+            // En desarrollo permitimos continuar pero dejamos log
             if (app()->environment('local')) {
                 \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
                 return;
@@ -201,9 +229,9 @@ class AccidenteEscolarController extends Controller
             abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
         }
 
-        // 2. Si el registro pertenece a otro establecimiento
+        // 2. Si pertenece a otro establecimiento → bloqueo
         if ($establecimientoModelo != $establecimientoSesion) {
-            abort(403, 'Acceso denegado: el registro pertenece a otro establecimiento.');
+            abort(403, 'Acceso denegado: este registro pertenece a otro establecimiento.');
         }
     }
 }

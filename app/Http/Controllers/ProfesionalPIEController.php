@@ -14,6 +14,10 @@ class ProfesionalPIEController extends Controller
      */
     public function index()
     {
+        if (!canAccess('pie', 'view')) {
+            abort(403, 'No tienes permisos para ver profesionales PIE.');
+        }
+
         $establecimiento_id = session('establecimiento_id');
 
         $profesionales = ProfesionalPIE::with(['funcionario', 'tipo'])
@@ -29,6 +33,10 @@ class ProfesionalPIEController extends Controller
      */
     public function create()
     {
+        if (!canAccess('pie', 'create')) {
+            abort(403, 'No tienes permisos para agregar profesionales PIE.');
+        }
+
         $establecimiento_id = session('establecimiento_id');
 
         $tipos = TipoProfesionalPIE::orderBy('nombre')->get();
@@ -47,6 +55,10 @@ class ProfesionalPIEController extends Controller
      */
     public function show($id)
     {
+        if (!canAccess('pie', 'view')) {
+            abort(403, 'No tienes permisos para ver profesionales PIE.');
+        }
+
         $profesional = ProfesionalPIE::with(['funcionario.cargo', 'tipo'])
             ->findOrFail($id);
 
@@ -63,12 +75,16 @@ class ProfesionalPIEController extends Controller
      */
     public function store(Request $request)
     {
+        if (!canAccess('pie', 'create')) {
+            abort(403, 'No tienes permisos para agregar profesionales PIE.');
+        }
+
         $request->validate([
             'funcionario_id' => 'required|exists:funcionarios,id',
             'tipo_id'        => 'required|exists:tipos_profesional_pie,id',
         ]);
 
-        // Evitar que el mismo funcionario se registre 2 veces
+        // Evitar duplicados
         $yaExiste = ProfesionalPIE::where('funcionario_id', $request->funcionario_id)
             ->where('establecimiento_id', session('establecimiento_id'))
             ->exists();
@@ -95,12 +111,16 @@ class ProfesionalPIEController extends Controller
      */
     public function destroy(ProfesionalPIE $profesionalPIE)
     {
+        if (!canAccess('pie', 'delete')) {
+            abort(403, 'No tienes permisos para eliminar profesionales PIE.');
+        }
+
         // Validación multicolegio
         if ($profesionalPIE->establecimiento_id !== session('establecimiento_id')) {
             abort(403, 'Acceso denegado.');
         }
 
-        // ⚠️ Opcional: evitar eliminar si tiene intervenciones asociadas
+        // Opcional: evitar eliminar si tiene intervenciones PIE
         // if ($profesionalPIE->intervenciones()->count() > 0) {
         //     return back()->withErrors([
         //         'error' => 'No se puede eliminar este profesional porque tiene intervenciones registradas.'

@@ -27,6 +27,14 @@ class CursoReporteController extends Controller
         $rol = $user->rol_id;
         $establecimientoId = $user->establecimiento_id;
 
+        
+        // ======================================================
+        //   PERMISO: VER REPORTE CURSO
+        // ======================================================
+        if (!canAccess('reporte_curso', 'view')) {
+            abort(403, 'No tienes permisos para ver el reporte por alumno.');
+        }
+
         // ===========================
         //   LISTA DE CURSOS SEGÚN ROL
         // ===========================

@@ -26,6 +26,13 @@ class AlumnoReporteController extends Controller
         $establecimientoId = $user->establecimiento_id;
 
         // ======================================================
+        //   PERMISO: VER REPORTE POR ALUMNO
+        // ======================================================
+        if (!canAccess('reporte_alumno', 'view')) {
+            abort(403, 'No tienes permisos para ver el reporte por alumno.');
+        }
+
+        // ======================================================
         //   LISTA DE ALUMNOS DEL ESTABLECIMIENTO
         // ======================================================
         $alumnos = Alumno::whereHas('curso', function ($q) use ($establecimientoId) {

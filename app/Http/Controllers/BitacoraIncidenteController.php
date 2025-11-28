@@ -24,6 +24,9 @@ class BitacoraIncidenteController extends Controller
      */
     public function index(Request $request)
     {
+        // -------- PERMISO --------
+        if (!canAccess('bitacora', 'view')) abort(403);
+
         $establecimientoId = session('establecimiento_id');
 
         $query = BitacoraIncidente::with(['involucrados.alumno.curso', 'estado'])
@@ -70,6 +73,9 @@ class BitacoraIncidenteController extends Controller
      */
     public function create()
     {
+        // -------- PERMISO --------
+        if (!canAccess('bitacora', 'create')) abort(403);
+
         $establecimientoId = session('establecimiento_id');
 
         return view('modulos.convivencia-escolar.bitacora.create', [
@@ -92,6 +98,9 @@ class BitacoraIncidenteController extends Controller
      */
     public function store(Request $request)
     {
+        // -------- PERMISO --------
+        if (!canAccess('bitacora', 'create')) abort(403);
+
         $request->validate([
             'fecha'          => 'required|date',
             'tipo_incidente' => 'required|string|max:120',
@@ -163,15 +172,12 @@ class BitacoraIncidenteController extends Controller
             }
 
             /*
-            |--------------------------------------------------------------------------
+            |------------------------------------------------------------------
             | NOTIFICACIONES AUTOMÁTICAS – BITÁCORA INCIDENTE
-            |--------------------------------------------------------------------------
+            |------------------------------------------------------------------
             */
 
-            // DESTINATARIOS por rol
             $rolesDestino = [3, 8]; 
-            // 3 = Inspector General
-            // 8 = Encargado de Convivencia Escolar
 
             $usuariosDestino = Usuario::whereIn('rol_id', $rolesDestino)
                 ->where('establecimiento_id', $establecimientoId)
@@ -210,6 +216,9 @@ class BitacoraIncidenteController extends Controller
      */
     public function show($id)
     {
+        // -------- PERMISO --------
+        if (!canAccess('bitacora', 'view')) abort(403);
+
         $incidente = BitacoraIncidente::with([
             'estado',
             'reportadoPor',
@@ -229,6 +238,9 @@ class BitacoraIncidenteController extends Controller
      */
     public function edit($id)
     {
+        // -------- PERMISO --------
+        if (!canAccess('bitacora', 'edit')) abort(403);
+
         $establecimientoId = session('establecimiento_id');
 
         $incidente = BitacoraIncidente::with([
@@ -247,6 +259,9 @@ class BitacoraIncidenteController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // -------- PERMISO --------
+        if (!canAccess('bitacora', 'edit')) abort(403);
+
         $request->validate([
             'fecha'          => 'required|date',
             'tipo_incidente' => 'required|string|max:120',
@@ -275,17 +290,16 @@ class BitacoraIncidenteController extends Controller
 
             $incidente = BitacoraIncidente::findOrFail($id);
 
-            // Primer alumno determina curso
             $primerAlumno = Alumno::findOrFail($request->alumnos[0]);
 
             // Actualizar datos base
             $incidente->update([
-                'fecha'              => $request->fecha,
-                'tipo_incidente'     => $request->tipo_incidente,
-                'descripcion'        => $request->descripcion,
-                'curso_id'           => $primerAlumno->curso_id,
-                'reportado_por'      => $request->reportado_por,
-                'estado_id'          => $request->estado_id,
+                'fecha'          => $request->fecha,
+                'tipo_incidente' => $request->tipo_incidente,
+                'descripcion'    => $request->descripcion,
+                'curso_id'       => $primerAlumno->curso_id,
+                'reportado_por'  => $request->reportado_por,
+                'estado_id'      => $request->estado_id,
             ]);
 
             // Eliminar involucrados anteriores
@@ -294,26 +308,19 @@ class BitacoraIncidenteController extends Controller
             // Registrar nuevos involucrados
             foreach ($request->alumnos as $index => $alumnoId) {
 
-            // Si viene vacío o null → ignorar
-            if (!$alumnoId) {
-                continue;
+                if (!$alumnoId) continue;
+
+                $alumno = Alumno::find($alumnoId);
+
+                if (!$alumno) continue;
+
+                BitacoraIncidenteAlumno::create([
+                    'incidente_id' => $incidente->id,
+                    'alumno_id'    => $alumnoId,
+                    'rol'          => $request->rol[$index],
+                    'curso_id'     => $alumno->curso_id,
+                ]);
             }
-
-            $alumno = Alumno::find($alumnoId);
-
-            // Si no existe el alumno → ignorar
-            if (!$alumno) {
-                continue;
-            }
-
-            BitacoraIncidenteAlumno::create([
-                'incidente_id' => $incidente->id,
-                'alumno_id'    => $alumnoId,
-                'rol'          => $request->rol[$index],
-                'curso_id'     => $alumno->curso_id,
-            ]);
-}
-
 
             // Adjuntar nuevos documentos
             if ($request->hasFile('archivos')) {

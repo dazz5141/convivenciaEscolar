@@ -15,6 +15,11 @@ class AlumnoController extends Controller
      */
     public function index(Request $request)
     {
+        // 🔐 Permiso: ver alumnos
+        if (!canAccess('alumnos', 'view')) {
+            abort(403);
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         $query = Alumno::whereHas('curso', function ($q) use ($establecimientoId) {
@@ -55,6 +60,11 @@ class AlumnoController extends Controller
      */
     public function create()
     {
+        // 🔐 Permiso: crear alumnos
+        if (!canAccess('alumnos', 'create')) {
+            abort(403);
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         $regiones = Region::orderBy('nombre')->get();
@@ -72,6 +82,11 @@ class AlumnoController extends Controller
      */
     public function store(Request $request)
     {
+        // 🔐 Permiso: crear alumnos
+        if (!canAccess('alumnos', 'create')) {
+            abort(403);
+        }
+
         $request->validate([
             'run' => 'required|unique:alumnos,run|max:20',
             'nombre' => 'required',
@@ -115,6 +130,11 @@ class AlumnoController extends Controller
      */
     public function show($id)
     {
+        // 🔐 Permiso: ver
+        if (!canAccess('alumnos', 'view')) {
+            abort(403);
+        }
+
         $alumno = Alumno::with(['curso', 'region', 'provincia', 'comuna', 'apoderados', 'historialCursos.curso'])
             ->findOrFail($id);
 
@@ -126,6 +146,11 @@ class AlumnoController extends Controller
      */
     public function edit($id)
     {
+        // 🔐 Permiso: editar alumnos
+        if (!canAccess('alumnos', 'edit')) {
+            abort(403);
+        }
+
         $establecimientoId = session('establecimiento_id');
 
         $alumno = Alumno::findOrFail($id);
@@ -145,6 +170,11 @@ class AlumnoController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // 🔐 Permiso: editar alumnos
+        if (!canAccess('alumnos', 'edit')) {
+            abort(403);
+        }
+
         $alumno = Alumno::findOrFail($id);
 
         // Guardar curso anterior
@@ -192,6 +222,11 @@ class AlumnoController extends Controller
      */
     public function disable($id)
     {
+        // 🔐 Permiso: desactivar alumnos
+        if (!canAccess('alumnos', 'disable')) {
+            abort(403);
+        }
+
         Alumno::findOrFail($id)->update(['activo' => 0]);
 
         return redirect()->route('alumnos.index')
@@ -203,6 +238,11 @@ class AlumnoController extends Controller
      */
     public function enable($id)
     {
+        // 🔐 Permiso: desactivar (o habilitar, usa mismo tipo)
+        if (!canAccess('alumnos', 'disable')) {
+            abort(403);
+        }
+
         Alumno::findOrFail($id)->update(['activo' => 1]);
 
         return redirect()->route('alumnos.index')
@@ -212,9 +252,13 @@ class AlumnoController extends Controller
     /**
      * FORM CAMBIAR CURSO
      */
-
     public function cambiarCursoForm($id)
     {
+        // 🔐 Permiso: editar alumnos
+        if (!canAccess('alumnos', 'edit')) {
+            abort(403);
+        }
+
         $alumno = Alumno::findOrFail($id);
 
         // solo cursos del mismo establecimiento
@@ -229,6 +273,11 @@ class AlumnoController extends Controller
 
     public function cambiarCurso(Request $request, $id)
     {
+        // 🔐 Permiso: editar alumnos
+        if (!canAccess('alumnos', 'edit')) {
+            abort(403);
+        }
+
         $alumno = Alumno::findOrFail($id);
 
         $request->validate([

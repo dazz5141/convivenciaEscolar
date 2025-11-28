@@ -9,12 +9,18 @@
         <h1 class="page-title">Retiros Anticipados</h1>
         <p class="text-muted">Registro general de retiros de alumnos autorizados</p>
     </div>
+
+    {{-- =====================================
+         PERMISO: CREAR RETIRO
+    ===================================== --}}
+    @if(canAccess('retiros', 'create'))
     <div>
         <a href="{{ route('inspectoria.retiros.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i>
             Registrar Retiro
         </a>
     </div>
+    @endif
 </div>
 
 <div class="card card-table">
@@ -88,7 +94,7 @@
                         <th>Fecha</th>
                         <th>Alumno / Curso</th>
                         <th>Retirado Por</th>
-                        <th>Motivo</th> {{-- NUEVO --}}
+                        <th>Motivo</th>
                         <th>Funcionario</th>
                         <th>Acciones</th>
                     </tr>
@@ -99,8 +105,11 @@
                         <tr>
 
                             {{-- Fecha / Hora --}}
-                            <td>{{ date('d/m/Y', strtotime($ret->fecha)) }}<br>
-                                <small class="text-muted">{{ date('H:i', strtotime($ret->hora)) }}</small>
+                            <td>
+                                {{ date('d/m/Y', strtotime($ret->fecha)) }}<br>
+                                <small class="text-muted">
+                                    {{ date('H:i', strtotime($ret->hora)) }}
+                                </small>
                             </td>
 
                             {{-- Alumno --}}
@@ -109,7 +118,7 @@
                                 <small class="text-muted">{{ $ret->alumno->curso->nombre ?? '' }}</small>
                             </td>
 
-                            {{-- QUIÉN RETIRA --}}
+                            {{-- Quién retira --}}
                             <td>
                                 @if($ret->apoderado)
                                     {{ $ret->apoderado->nombre_completo }}
@@ -121,7 +130,7 @@
                                 @endif
                             </td>
 
-                            {{-- MOTIVO (NUEVO) --}}
+                            {{-- Motivo --}}
                             <td>{{ $ret->motivo ?? '—' }}</td>
 
                             {{-- Funcionario --}}
@@ -133,17 +142,23 @@
                             {{-- Acciones --}}
                             <td class="table-actions">
 
+                                {{-- PERMISO: VER --}}
+                                @if(canAccess('retiros', 'view'))
                                 <a href="{{ route('inspectoria.retiros.show', $ret) }}"
                                 class="btn btn-sm btn-info"
                                 title="Ver">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                @endif
 
+                                {{-- PERMISO: EDITAR --}}
+                                @if(canAccess('retiros', 'edit'))
                                 <a href="{{ route('inspectoria.retiros.edit', $ret) }}"
                                 class="btn btn-sm btn-primary"
                                 title="Editar">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                @endif
 
                             </td>
 

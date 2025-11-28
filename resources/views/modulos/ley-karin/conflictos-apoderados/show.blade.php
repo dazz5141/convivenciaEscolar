@@ -4,6 +4,17 @@
 
 @section('content')
 
+{{-- =========================================================
+      PERMISO: VER
+=========================================================== --}}
+@if(!canAccess('conflictos_apoderados','view'))
+    <div class="alert alert-danger mb-4">
+        <i class="bi bi-shield-lock-fill me-2"></i>
+        No tienes permisos para ver el detalle de los conflictos entre apoderados.
+    </div>
+@endif
+
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div>
         <h1 class="page-title">Conflicto #{{ $conflicto->id }}</h1>
@@ -18,9 +29,11 @@
         </a>
 
         {{-- Editar --}}
-        <a href="{{ route('leykarin.conflictos-apoderados.edit', $conflicto) }}" class="btn btn-primary">
-            <i class="bi bi-pencil me-2"></i> Editar
-        </a>
+        @if(canAccess('conflictos_apoderados','edit'))
+            <a href="{{ route('leykarin.conflictos-apoderados.edit', $conflicto) }}" class="btn btn-primary">
+                <i class="bi bi-pencil me-2"></i> Editar
+            </a>
+        @endif
 
     </div>
 </div>
@@ -28,7 +41,7 @@
 <div class="row g-4">
 
     {{-- ============================================================
-         COLUMNA IZQUIERDA (Información principal)
+         COLUMNA IZQUIERDA — Información principal
     ============================================================ --}}
     <div class="col-lg-8">
 
@@ -43,9 +56,9 @@
                 </div>
             </div>
 
-            {{-- FUNCIONARIO QUE RECIBE EL CASO --}}
+            {{-- FUNCIONARIO --}}
             <div class="detail-item">
-                <div class="detail-label">Funcionario que recibe el caso:</div>
+                <div class="detail-label">Funcionario:</div>
                 <div class="detail-value">
                     {{ $conflicto->funcionario->nombre_completo ?? '—' }}
                 </div>
@@ -95,7 +108,7 @@
                 </div>
             </div>
 
-            {{-- ACCIÓN TOMADA --}}
+            {{-- ACCIÓN --}}
             <div class="detail-item">
                 <div class="detail-label">Acción tomada:</div>
                 <div class="detail-value">
@@ -149,15 +162,15 @@
             <div class="detail-item">
                 <div class="detail-label">Registrado por:</div>
                 <div class="detail-value">
-                    @if($conflicto->registradoPor?->usuario)
-                        {{ $conflicto->registradoPor->usuario->nombre_completo }}
+
+                    @if($conflicto->registradoPor)
+                        {{ $conflicto->registradoPor->nombre_completo }}
                         <br>
-                        <small class="text-muted">
-                            {{ $conflicto->registradoPor->usuario->rol->nombre }}
-                        </small>
+                        <small class="text-muted">{{ $conflicto->registradoPor->cargo->nombre ?? '' }}</small>
                     @else
                         <span class="text-muted">No disponible</span>
                     @endif
+
                 </div>
             </div>
 
@@ -166,7 +179,7 @@
     </div>
 
     {{-- ============================================================
-         COLUMNA DERECHA (Resumen)
+         COLUMNA DERECHA — Resumen
     ============================================================ --}}
     <div class="col-lg-4">
 
@@ -208,23 +221,19 @@
                 <p class="mb-2">
                     <strong>Confidencial:</strong><br>
                     @if($conflicto->confidencial)
-                        <span class="text-danger"><i class="bi bi-lock-fill me-1"></i> Sí</span>
+                        <span class="text-danger">
+                            <i class="bi bi-lock-fill me-1"></i> Sí
+                        </span>
                     @else
-                        <span class="text-muted"><i class="bi bi-unlock me-1"></i> No</span>
+                        <span class="text-muted">
+                            <i class="bi bi-unlock me-1"></i> No
+                        </span>
                     @endif
                 </p>
 
                 <p class="mb-2">
                     <strong>Registrado por:</strong><br>
-                    @if($conflicto->registradoPor?->usuario)
-                        {{ $conflicto->registradoPor->usuario->nombre_completo }}
-                        <br>
-                        <small class="text-muted">
-                            {{ $conflicto->registradoPor->usuario->rol->nombre }}
-                        </small>
-                    @else
-                        <span class="text-muted">No disponible</span>
-                    @endif
+                    {{ $conflicto->registradoPor->nombre_completo ?? 'No disponible' }}
                 </p>
 
             </div>

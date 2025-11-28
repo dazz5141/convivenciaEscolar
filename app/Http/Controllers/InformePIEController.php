@@ -25,14 +25,14 @@ class InformePIEController extends Controller
             ->with('alumno')
             ->get();
 
-        // Tipos de informe distintos (para el filtro)
+        // Tipos de informe (para filtros)
         $tipos = InformePIE::select('tipo')
             ->distinct()
             ->whereNotNull('tipo')
             ->orderBy('tipo')
             ->pluck('tipo');
 
-        // Filtrado
+        // Filtros
         $query = InformePIE::with(['estudiante.alumno'])
             ->where('establecimiento_id', $establecimiento_id);
 
@@ -50,11 +50,10 @@ class InformePIEController extends Controller
     }
 
     /**
-     * Crear informe desde la ficha del estudiante PIE
+     * Formulario para crear informe
      */
     public function create($estudiante_pie_id = null)
     {
-        // 🔹 Obtener tipos de informe distintos ya usados
         $tipos = InformePIE::select('tipo')
             ->distinct()
             ->whereNotNull('tipo')
@@ -76,11 +75,12 @@ class InformePIEController extends Controller
             'contenido'         => 'nullable|string',
         ]);
 
-        // Validar establecimiento del estudiante PIE
+        // Validar establecimiento
         $this->validarEstablecimiento(
             EstudiantePIE::findOrFail($request->estudiante_pie_id)
         );
 
+        // Crear informe
         InformePIE::create([
             'establecimiento_id' => session('establecimiento_id'),
             'estudiante_pie_id'  => $request->estudiante_pie_id,
@@ -89,32 +89,7 @@ class InformePIEController extends Controller
             'contenido'          => $request->contenido,
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | NOTIFICACIÓN PROFESIONAL - INFORME PIE
-        |--------------------------------------------------------------------------
-        */
-
-        // obtener estudiante + profesional asignado
-        $estudiante = EstudiantePIE::with('profesional.funcionario.usuario')
-                        ->find($request->estudiante_pie_id);
-
-        if ($estudiante &&
-            $estudiante->profesional &&
-            $estudiante->profesional->funcionario &&
-            $estudiante->profesional->funcionario->usuario) {
-
-            $usuarioDestino = $estudiante->profesional->funcionario->usuario->id;
-
-            Notificacion::create([
-                'tipo'              => 'pie_informe',
-                'mensaje'           => "Nuevo informe PIE creado para el estudiante ID {$estudiante->id}.",
-                'usuario_id'        => $usuarioDestino,
-                'origen_id'         => $informe->id,
-                'origen_model'      => InformePIE::class,
-                'establecimiento_id'=> session('establecimiento_id'),
-            ]);
-        }
+        // Ya no hay notificación porque no hay profesional asignado
 
         return redirect()
             ->route('pie.informes.index')
@@ -146,9 +121,8 @@ class InformePIEController extends Controller
             if (app()->environment('local')) {
                 \Log::warning("⚠️ [DEV] El modelo ".get_class($modelo)." (ID: {$modelo->id}) no tiene establecimiento_id definido.");
                 return;
-            } else {
-                abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
             }
+            abort(403, 'Acceso denegado: el registro no tiene establecimiento asignado.');
         }
 
         if ($establecimientoModelo != $establecimientoSesion) {

@@ -4,6 +4,11 @@
 
 @section('content')
 
+{{-- =========================================================
+     PERMISO: crear citación
+========================================================= --}}
+@if(canAccess('citaciones', 'create'))
+
 <div class="page-header">
     <h1 class="page-title">Registrar Citación a Apoderado</h1>
     <p class="text-muted">Ingrese la información correspondiente a la citación.</p>
@@ -36,7 +41,7 @@
 
 
     {{-- =========================================================
-         SECCIÓN 2: APODERADO (OPCIONAL CON MODAL)
+         SECCIÓN 2: APODERADO (OPCIONAL)
     ========================================================== --}}
     <div class="form-section mt-4">
         <h5 class="form-section-title">Apoderado citado (opcional)</h5>
@@ -75,7 +80,7 @@
 
 
     {{-- =========================================================
-         SECCIÓN 4: ESTADO DE LA CITACIÓN
+         SECCIÓN 4: ESTADO
     ========================================================== --}}
     <div class="form-section mt-4">
         <h5 class="form-section-title">Estado de la citación *</h5>
@@ -148,18 +153,14 @@
 
 
 {{-- =========================================================
-     MODALS
+     MODALES
 ========================================================= --}}
-
-{{-- Modal Buscar Alumno --}}
 @include('modulos.inspectoria.partials.modal-buscar-alumno')
-
-{{-- Modal Buscar Apoderado --}}
 @include('modulos.inspectoria.partials.modal-buscar-apoderado')
 
 
 {{-- =========================================================
-     JS SELECCIÓN DE ALUMNO Y APODERADO
+     JS
 ========================================================= --}}
 <script>
 document.addEventListener('click', function(e) {
@@ -196,5 +197,15 @@ document.addEventListener('click', function(e) {
     }
 });
 </script>
+
+@else
+{{-- =========================================================
+     SIN PERMISO
+========================================================= --}}
+<div class="alert alert-warning mt-4">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    No tienes permisos para registrar citaciones.
+</div>
+@endif
 
 @endsection

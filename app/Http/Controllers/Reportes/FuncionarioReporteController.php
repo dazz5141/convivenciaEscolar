@@ -29,6 +29,14 @@ class FuncionarioReporteController extends Controller
         // ============================================
         $establecimientoId = $user->establecimiento_id ?? null;
 
+        
+        // ======================================================
+        //   PERMISO: VER REPORTE POR FUNCIONARIO
+        // ======================================================
+        if (!canAccess('reporte_funcionario', 'view')) {
+            abort(403, 'No tienes permisos para ver el reporte por alumno.');
+        }
+
         // ============================================
         // LISTA DE FUNCIONARIOS
         // ============================================
