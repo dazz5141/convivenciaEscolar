@@ -20,6 +20,8 @@ return [
             'alumnos'                => ['full'],
             'apoderados'             => ['full'],
             'auditoria'              => ['full'],
+            'auditoria_index'        => ['full'],   
+            'auditoria_show'         => ['full'], 
             'documentos'             => ['full'],
 
             // MÓDULO CONVIVENCIA

@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Establecimiento;
+use App\Models\Dependencia;
+use App\Models\Region;
+use App\Models\Provincia;
+use App\Models\Comuna;
 use App\Models\Auditoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +18,10 @@ class EstablecimientoController extends Controller
      */
     public function index()
     {
+        if (!canAccess('establecimientos', 'view')) {
+            abort(403, 'No tienes permiso para ver establecimientos.');
+        }
+
         if (Auth::user()->rol_id == 1) {
 
             // Admin General ve todos (activos/inactivos)
@@ -35,9 +43,16 @@ class EstablecimientoController extends Controller
      */
     public function create()
     {
-        $this->authorizeGeneral();
+        if (!canAccess('establecimientos', 'create')) {
+            abort(403, 'No tienes permiso para crear establecimientos.');
+        }
 
-        return view('modulos.establecimientos.create');
+        return view('modulos.establecimientos.create', [
+            'dependencias' => Dependencia::orderBy('nombre')->get(),
+            'regiones'     => Region::orderBy('nombre')->get(),
+            'provincias'   => Provincia::orderBy('nombre')->get(),
+            'comunas'      => Comuna::orderBy('nombre')->get(),
+        ]);
     }
 
     /**
@@ -45,7 +60,9 @@ class EstablecimientoController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorizeGeneral();
+        if (!canAccess('establecimientos', 'create')) {
+            abort(403, 'No tienes permiso para crear establecimientos.');
+        }
 
         $data = $request->validate([
             'RBD'          => 'required|string|max:20|unique:establecimientos,RBD',
@@ -53,7 +70,7 @@ class EstablecimientoController extends Controller
             'direccion'    => 'required|string|max:255',
             'dependencia_id' => 'required|exists:dependencias,id',
             'region_id'      => 'required|exists:regiones,id',
-            'provincia_id'   => 'required:exists:provincias,id',
+            'provincia_id'   => 'required|exists:provincias,id',
             'comuna_id'      => 'required|exists:comunas,id',
         ]);
 
@@ -75,6 +92,10 @@ class EstablecimientoController extends Controller
      */
     public function show($id)
     {
+        if (!canAccess('establecimientos', 'view')) {
+            abort(403, 'No tienes permiso para ver establecimientos.');
+        }
+
         $establecimiento = $this->findForUser($id);
 
         return view('modulos.establecimientos.show', compact('establecimiento'));
@@ -85,11 +106,19 @@ class EstablecimientoController extends Controller
      */
     public function edit($id)
     {
-        $this->authorizeGeneral();
+        if (!canAccess('establecimientos', 'edit')) {
+            abort(403, 'No tienes permiso para editar establecimientos.');
+        }
 
         $establecimiento = Establecimiento::findOrFail($id);
 
-        return view('modulos.establecimientos.edit', compact('establecimiento'));
+        return view('modulos.establecimientos.edit', [
+            'establecimiento' => $establecimiento,
+            'dependencias' => Dependencia::orderBy('nombre')->get(),
+            'regiones'     => Region::orderBy('nombre')->get(),
+            'provincias'   => Provincia::orderBy('nombre')->get(),
+            'comunas'      => Comuna::orderBy('nombre')->get(),
+        ]);
     }
 
     /**
@@ -97,7 +126,9 @@ class EstablecimientoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->authorizeGeneral();
+        if (!canAccess('establecimientos', 'edit')) {
+            abort(403, 'No tienes permiso para editar establecimientos.');
+        }
 
         $establecimiento = Establecimiento::findOrFail($id);
 
@@ -129,7 +160,9 @@ class EstablecimientoController extends Controller
      */
     public function disable($id)
     {
-        $this->authorizeGeneral();
+        if (!canAccess('establecimientos', 'edit')) {
+            abort(403, 'No tienes permiso para deshabilitar establecimientos.');
+        }
 
         $establecimiento = Establecimiento::findOrFail($id);
 
@@ -151,7 +184,9 @@ class EstablecimientoController extends Controller
      */
     public function enable($id)
     {
-        $this->authorizeGeneral();
+        if (!canAccess('establecimientos', 'edit')) {
+            abort(403, 'No tienes permiso para habilitar establecimientos.');
+        }
 
         $establecimiento = Establecimiento::findOrFail($id);
 
@@ -171,13 +206,6 @@ class EstablecimientoController extends Controller
     /* ============================================================
        MÉTODOS AUXILIARES PRIVADOS
        ============================================================ */
-
-    private function authorizeGeneral()
-    {
-        if (Auth::user()->rol_id !== 1) {
-            abort(403, 'Solo el Administrador General puede realizar esta acción.');
-        }
-    }
 
     private function findForUser($id)
     {

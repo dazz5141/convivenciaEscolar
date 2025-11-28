@@ -3,77 +3,154 @@
 @section('title', 'Auditoría del Sistema')
 
 @section('content')
+
+{{-- 🔒 PERMISO --}}
+@if(!canAccess('auditoria', 'view'))
+    @php(abort(403, 'No tienes permiso para ver la auditoría.'))
+@endif
+
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
     <div class="mb-3 mb-md-0">
         <h1 class="page-title">Auditoría del Sistema</h1>
-        <p class="text-muted">Gestión de Auditoría del Sistema_LOWER</p>
-    </div>
-    <div>
-        <a href="/modulos/auditoria/create" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>
-            Nuevo Registro
-        </a>
+        <p class="text-muted">Registros de acciones realizadas dentro del sistema</p>
     </div>
 </div>
 
-<div class="card card-table">
+<div class="card card-table mt-3">
+
+    {{-- ========== FILTROS ========== --}}
     <div class="card-header">
-        <div class="row g-3">
-            <div class="col-12 col-md-6">
-                <input type="text" class="form-control" placeholder="Buscar...">
+        <form method="GET" action="{{ route('auditoria.index') }}">
+            <div class="row g-3 align-items-end">
+
+                {{-- Buscar texto --}}
+                <div class="col-md-4">
+                    <input type="text"
+                           name="buscar"
+                           class="form-control"
+                           placeholder="Buscar por detalle..."
+                           value="{{ request('buscar') }}">
+                </div>
+
+                {{-- Módulo --}}
+                <div class="col-md-2">
+                    <select name="modulo" class="form-select">
+                        <option value="">— Módulo —</option>
+                        @foreach($auditorias->pluck('modulo')->unique() as $mod)
+                            <option value="{{ $mod }}" {{ request('modulo') == $mod ? 'selected' : '' }}>
+                                {{ $mod }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Acción --}}
+                <div class="col-md-2">
+                    <select name="accion" class="form-select">
+                        <option value="">— Acción —</option>
+                        <option value="create" {{ request('accion') == 'create' ? 'selected' : '' }}>Creación</option>
+                        <option value="update" {{ request('accion') == 'update' ? 'selected' : '' }}>Actualización</option>
+                        <option value="delete" {{ request('accion') == 'delete' ? 'selected' : '' }}>Eliminación</option>
+                        <option value="login" {{ request('accion') == 'login' ? 'selected' : '' }}>Login</option>
+                    </select>
+                </div>
+
+                {{-- Usuario --}}
+                <div class="col-md-3">
+                    <select name="usuario_id" class="form-select">
+                        <option value="">— Usuario —</option>
+                        @foreach($usuarios as $u)
+                            <option value="{{ $u->id }}" {{ request('usuario_id') == $u->id ? 'selected' : '' }}>
+                                {{ $u->nombre_completo ?? $u->email }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Fecha desde --}}
+                <div class="col-md-2">
+                    <label class="form-label small text-muted">Desde</label>
+                    <input type="date" name="desde" class="form-control" value="{{ request('desde') }}">
+                </div>
+
+                {{-- Fecha hasta --}}
+                <div class="col-md-2">
+                    <label class="form-label small text-muted">Hasta</label>
+                    <input type="date" name="hasta" class="form-control" value="{{ request('hasta') }}">
+                </div>
+
+                {{-- Botón Filtrar --}}
+                <div class="col-md-2 text-end">
+                    <button class="btn btn-secondary w-100">
+                        <i class="bi bi-funnel me-1"></i> Filtrar
+                    </button>
+                </div>
+
             </div>
-            <div class="col-12 col-md-4">
-                <input type="date" class="form-control">
-            </div>
-            <div class="col-12 col-md-2">
-                <button class="btn btn-secondary w-100">
-                    <i class="bi bi-funnel me-2"></i>Filtrar
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
+
+    {{-- ========== TABLA ========== --}}
     <div class="card-body">
+
+        @if($auditorias->count() == 0)
+            <div class="alert alert-info">No se encontraron registros.</div>
+        @else
+
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
                     <tr>
-                        <th>ID</th>
                         <th>Fecha</th>
-                        <th>Descripción</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
+                        <th>Usuario</th>
+                        <th>Establecimiento</th>
+                        <th>Módulo</th>
+                        <th>Acción</th>
+                        <th>Detalle</th>
+                        <th class="text-end">Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
+                    @foreach($auditorias as $a)
                     <tr>
-                        <td>#001</td>
-                        <td>08/11/2025</td>
-                        <td>Registro de ejemplo</td>
-                        <td><span class="badge bg-success">Activo</span></td>
-                        <td class="table-actions">
-                            <a href="/modulos/auditoria/1" class="btn btn-sm btn-info" title="Ver">
+                        <td>{{ $a->created_at->format('d/m/Y H:i') }}</td>
+                        <td>{{ $a->usuario->nombre_completo ?? $a->usuario->email }}</td>
+                        <td>{{ $a->establecimiento?->nombre ?? '— Global —' }}</td>
+                        <td>{{ $a->modulo }}</td>
+
+                        <td>
+                            @if($a->accion == 'create')
+                                <span class="badge bg-success">Crear</span>
+                            @elseif($a->accion == 'update')
+                                <span class="badge bg-warning text-dark">Actualizar</span>
+                            @elseif($a->accion == 'delete')
+                                <span class="badge bg-danger">Eliminar</span>
+                            @elseif($a->accion == 'login')
+                                <span class="badge bg-info text-dark">Login</span>
+                            @endif
+                        </td>
+
+                        <td>{{ Str::limit($a->detalle, 60) }}</td>
+
+                        <td class="text-end">
+                            <a href="{{ route('auditoria.show', $a->id) }}"
+                               class="btn btn-sm btn-info"
+                               title="Ver">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="/modulos/auditoria/1/edit" class="btn btn-sm btn-primary" title="Editar">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-confirm-delete title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </button>
                         </td>
                     </tr>
+                    @endforeach
                 </tbody>
+
             </table>
         </div>
-    </div>
-    <div class="card-footer">
-        <nav>
-            <ul class="pagination mb-0 justify-content-center">
-                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
-            </ul>
-        </nav>
+
+        {{ $auditorias->links() }}
+
+        @endif
     </div>
 </div>
+
 @endsection

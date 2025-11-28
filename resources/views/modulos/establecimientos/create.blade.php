@@ -1,73 +1,125 @@
 @extends('layouts.app')
 
-@section('title', 'Crear Establecimiento')
+@section('title', 'Nuevo Establecimiento')
 
 @section('content')
 
-<div class="page-header">
-    <h1 class="page-title">Crear Nuevo Establecimiento</h1>
-</div>
+{{-- PERMISO --}}
+@if(!canAccess('establecimientos', 'create'))
+    @php(abort(403, 'No tienes permisos para crear establecimientos.'))
+@endif
 
-@include('components.alerts')
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+    <div>
+        <h1 class="page-title">Nuevo Establecimiento</h1>
+        <p class="text-muted">Registrar un nuevo establecimiento educacional</p>
+    </div>
+</div>
 
 <form action="{{ route('establecimientos.store') }}" method="POST">
     @csrf
 
-    <div class="form-section">
-        <h5 class="form-section-title">Información General</h5>
+    {{-- =========================================================
+         INFORMACIÓN GENERAL
+    ========================================================== --}}
+    <div class="card mb-4">
+        <div class="card-body">
 
-        <div class="row g-3">
+            <h5 class="mb-3">Información General</h5>
 
-            <div class="col-md-4">
-                <label class="form-label">RBD <span class="text-danger">*</span></label>
-                <input type="text" name="RBD" class="form-control" required>
-            </div>
+            <div class="row g-3">
 
-            <div class="col-md-8">
-                <label class="form-label">Nombre del Establecimiento <span class="text-danger">*</span></label>
-                <input type="text" name="nombre" class="form-control" required>
-            </div>
+                {{-- RBD --}}
+                <div class="col-md-4">
+                    <label class="form-label">RBD *</label>
+                    <input type="text" name="RBD" class="form-control" required value="{{ old('RBD') }}">
+                </div>
 
-            <div class="col-12">
-                <label class="form-label">Dirección <span class="text-danger">*</span></label>
-                <input type="text" name="direccion" class="form-control" required>
-            </div>
+                {{-- Nombre --}}
+                <div class="col-md-8">
+                    <label class="form-label">Nombre del Establecimiento *</label>
+                    <input type="text" name="nombre" class="form-control" required value="{{ old('nombre') }}">
+                </div>
 
-            <h5 class="form-section-title mt-4">Ubicación y Dependencia</h5>
-
-            <div class="col-md-3">
-                <label class="form-label">Dependencia <span class="text-danger">*</span></label>
-                <select name="dependencia_id" class="form-select" required>
-                    <option value="">Seleccione...</option>
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Región <span class="text-danger">*</span></label>
-                <select name="region_id" class="form-select" required>
-                    <option value="">Seleccione...</option>
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Provincia <span class="text-danger">*</span></label>
-                <select name="provincia_id" class="form-select" required>
-                    <option value="">Seleccione...</option>
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Comuna <span class="text-danger">*</span></label>
-                <select name="comuna_id" class="form-select" required>
-                    <option value="">Seleccione...</option>
-                </select>
             </div>
 
         </div>
     </div>
 
-    <div class="d-flex gap-2 flex-wrap">
-        <button type="submit" class="btn btn-primary">
+    {{-- =========================================================
+         UBICACIÓN
+    ========================================================== --}}
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <h5 class="mb-3">Ubicación</h5>
+
+            <div class="row g-3">
+
+                {{-- Región --}}
+                <div class="col-md-4">
+                    <label class="form-label">Región *</label>
+                    <select name="region_id" id="region_id" class="form-select" required>
+                        <option value="">— Seleccione región —</option>
+                        @foreach($regiones as $r)
+                            <option value="{{ $r->id }}">{{ $r->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Provincia --}}
+                <div class="col-md-4">
+                    <label class="form-label">Provincia *</label>
+                    <select name="provincia_id" id="provincia_id" class="form-select" required disabled>
+                        <option value="">— Seleccione provincia —</option>
+                    </select>
+                </div>
+
+                {{-- Comuna --}}
+                <div class="col-md-4">
+                    <label class="form-label">Comuna *</label>
+                    <select name="comuna_id" id="comuna_id" class="form-select" required disabled>
+                        <option value="">— Seleccione comuna —</option>
+                    </select>
+                </div>
+
+                {{-- Dirección --}}
+                <div class="col-md-12">
+                    <label class="form-label">Dirección *</label>
+                    <input type="text" name="direccion" class="form-control" value="{{ old('direccion') }}" required>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    {{-- =========================================================
+         DEPENDENCIA
+    ========================================================== --}}
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <h5 class="mb-3">Dependencia</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Dependencia *</label>
+                    <select name="dependencia_id" class="form-select" required>
+                        <option value="">— Seleccione —</option>
+                        @foreach($dependencias as $d)
+                            <option value="{{ $d->id }}">{{ $d->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {{-- BOTONES --}}
+    <div class="d-flex gap-3">
+        <button class="btn btn-primary">
             <i class="bi bi-save me-2"></i> Guardar
         </button>
 
@@ -77,4 +129,10 @@
     </div>
 
 </form>
+
+@endsection
+
+{{-- JS de selects dinámicos --}}
+@section('scripts')
+@include('partials.select-territorio-js')
 @endsection

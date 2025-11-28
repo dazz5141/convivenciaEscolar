@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\EstablecimientoController;
@@ -551,20 +552,12 @@ Route::middleware(['auth', 'establecimiento'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | DUMMY ROUTES 
+    | MÓDULO AUDITORÍA
     |--------------------------------------------------------------------------
     */
+    Route::prefix('modulos/auditoria')->name('auditoria.')->middleware(['auth', 'establecimiento'])->group(function () {
 
-    if (!function_exists('crudDummy')) {
-        function crudDummy($base, $folder) {
-            Route::view("/modulos/$base", "modulos.$folder.index")->name("$base.index");
-            Route::view("/modulos/$base/crear", "modulos.$folder.create")->name("$base.create");
-            Route::view("/modulos/$base/editar", "modulos.$folder.edit")->name("$base.edit");
-            Route::view("/modulos/$base/ver", "modulos.$folder.show")->name("$base.show");
-        }
-    }
-
-    // ADMIN
-    crudDummy('auditoria', 'auditoria');
-
+        Route::get('/', [AuditoriaController::class, 'index'])->name('index');
+        Route::get('/{id}', [AuditoriaController::class, 'show'])->name('show');
+    });
 });
