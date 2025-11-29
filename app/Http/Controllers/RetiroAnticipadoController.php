@@ -143,6 +143,16 @@ class RetiroAnticipadoController extends Controller
             ]);
         }
 
+        /* ===========================================
+        AUDITORÍA - CREAR RETIRO ANTICIPADO
+        =========================================== */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'retiros',
+            detalle: 'Se registró un retiro anticipado ID ' . $retiro->id,
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return redirect()
             ->route('inspectoria.retiros.index')
             ->with('success', 'Retiro registrado correctamente.');
@@ -232,6 +242,16 @@ class RetiroAnticipadoController extends Controller
             'telefono_retira',
             'observaciones',
         ]));
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZAR RETIRO
+        =========================================== */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'retiros',
+            detalle: 'Se actualizó el retiro anticipado ID ' . $retiro->id,
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()
             ->route('inspectoria.retiros.index')

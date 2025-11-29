@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Auditoria;
 use App\Models\Usuario;
+use App\Models\Establecimiento;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,6 +28,11 @@ class AuditoriaController extends Controller
         // Multicolegio: solo el Admin General ve todos
         if ($usuario->rol_id !== 1) {
             $query->where('establecimiento_id', $usuario->establecimiento_id);
+        } else {
+            // Filtrar por establecimiento (admin general)
+            if ($request->filled('establecimiento_id')) {
+                $query->where('establecimiento_id', $request->establecimiento_id);
+            }
         }
 
         /* =============================
@@ -66,7 +72,10 @@ class AuditoriaController extends Controller
         // Para el filtro por usuario
         $usuarios = Usuario::orderBy('nombre')->get();
 
-        return view('modulos.auditoria.index', compact('auditorias', 'usuarios'));
+        // Listado de establecimientos (para el filtro)
+        $establecimientos = Establecimiento::orderBy('nombre')->get();
+
+        return view('modulos.auditoria.index', compact('auditorias', 'usuarios', 'establecimientos'));
     }
 
     /**

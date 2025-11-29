@@ -1,7 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
+use App\Models\Auditoria;
 
+// ==========================
+// HELPER DE PERMISOS
+// ==========================
 function canAccess(string $modulo, string $accion = null): bool
 {
     $user = Auth::user();
@@ -38,3 +42,24 @@ function canAccess(string $modulo, string $accion = null): bool
     // Verifica la acción
     return in_array($accion, $accesos[$modulo]);
 }
+
+// ==========================
+// HELPER DE AUDITORÍA
+// ==========================
+if (!function_exists('logAuditoria')) {
+    function logAuditoria(
+        string $accion,
+        string $modulo,
+        string $detalle,
+        ?int $establecimiento_id = null
+    ) {
+        Auditoria::create([
+            'usuario_id'          => Auth::id(),
+            'establecimiento_id'  => $establecimiento_id ?? Auth::user()->establecimiento_id,
+            'accion'              => $accion,
+            'modulo'              => $modulo,
+            'detalle'             => $detalle,
+        ]);
+    }
+}
+

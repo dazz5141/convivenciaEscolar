@@ -157,6 +157,16 @@ class SeguimientoEmocionalController extends Controller
             ]);
         }
 
+        /* ===========================================
+        AUDITORÍA - CREACIÓN DE SEGUIMIENTO
+        =========================================== */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'seguimientos',
+            detalle: 'Se creó un seguimiento emocional ID ' . $seguimiento->id,
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return redirect()
             ->route('convivencia.seguimiento.index')
             ->with('success', 'Seguimiento emocional registrado correctamente.');
@@ -248,6 +258,16 @@ class SeguimientoEmocionalController extends Controller
             'comentario'         => $request->comentario,
             'evaluado_por'       => $request->evaluado_por,
         ]);
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZACIÓN DE SEGUIMIENTO
+        =========================================== */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'seguimientos',
+            detalle: 'Se actualizó el seguimiento emocional ID ' . $seguimiento->id,
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()
             ->route('convivencia.seguimiento.index')

@@ -30,6 +30,14 @@ class SeguimientoEmocionalObservacionController extends Controller
             'fecha_observacion'=> Carbon::now(),
         ]);
 
+        // Auditoría
+        logAuditoria(
+            accion: 'create',
+            modulo: 'seguimiento_emocional_observacion',
+            detalle: 'Creó una observación para el seguimiento emocional ID ' . $seguimiento->id,
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return back()->with('success', 'Observación agregada correctamente.');
     }
 }

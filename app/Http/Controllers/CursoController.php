@@ -95,13 +95,21 @@ class CursoController extends Controller
             'letra' => 'required|string|max:5',
         ]);
 
-        Curso::create([
+        $curso = Curso::create([
             'anio' => $request->anio,
             'nivel' => $request->nivel,
             'letra' => $request->letra,
             'establecimiento_id' => $establecimientoId,
             'activo' => 1,
         ]);
+
+        // Auditoría
+        logAuditoria(
+            'create',
+            'Cursos',
+            'Creó el curso: ' . $curso->nivel . ' ' . $curso->letra . ' (' . $curso->anio . ')',
+            $curso->establecimiento_id
+        );
 
         return redirect()->route('cursos.index')
             ->with('success', 'Curso creado correctamente.');
@@ -167,6 +175,14 @@ class CursoController extends Controller
             'letra' => $request->letra,
         ]);
 
+        // Auditoría
+        logAuditoria(
+            'update',
+            'Cursos',
+            'Actualizó el curso: ' . $curso->nivel . ' ' . $curso->letra . ' (' . $curso->anio . ')',
+            $curso->establecimiento_id
+        );
+
         return redirect()->route('cursos.index')
             ->with('success', 'Curso actualizado correctamente.');
     }
@@ -183,7 +199,16 @@ class CursoController extends Controller
             abort(403, 'No tienes permiso para deshabilitar cursos.');
         }
 
-        Curso::findOrFail($id)->update(['activo' => 0]);
+        $curso = Curso::findOrFail($id);
+        $curso->update(['activo' => 0]);
+
+        // Auditoría
+        logAuditoria(
+            'disable',
+            'Cursos',
+            'Deshabilitó el curso: ' . $curso->nivel . ' ' . $curso->letra . ' (' . $curso->anio . ')',
+            $curso->establecimiento_id
+        );
 
         return redirect()->route('cursos.index')
             ->with('success', 'Curso deshabilitado.');
@@ -201,7 +226,16 @@ class CursoController extends Controller
             abort(403, 'No tienes permiso para habilitar cursos.');
         }
 
-        Curso::findOrFail($id)->update(['activo' => 1]);
+        $curso = Curso::findOrFail($id);
+        $curso->update(['activo' => 1]);
+
+        // Auditoría
+        logAuditoria(
+            'enable',
+            'Cursos',
+            'Habilitó el curso: ' . $curso->nivel . ' ' . $curso->letra . ' (' . $curso->anio . ')',
+            $curso->establecimiento_id
+        );
 
         return redirect()->route('cursos.index')
             ->with('success', 'Curso habilitado.');

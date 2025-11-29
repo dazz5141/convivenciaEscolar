@@ -167,6 +167,13 @@ class DashboardReporteController extends Controller
                 ->get();
         }
 
+        // AUDITORÍA
+        logAuditoria(
+            'view',
+            'dashboard_estadistico',
+            'Visualizó dashboard estadístico general'
+        );
+
         return view('reportes.dashboard', compact(
             'totalIncidentesMes',
             'totalSeguimientosMes',

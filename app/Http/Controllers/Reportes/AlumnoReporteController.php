@@ -95,6 +95,14 @@ class AlumnoReporteController extends Controller
             ->orderBy('total', 'desc')
             ->get();
 
+
+        // AUDITORÍA
+        logAuditoria(
+            'view',
+            'reporte_alumno',
+            "Visualizó reporte de alumno ID {$alumnoId}"
+        );
+
         return view('reportes.alumno', compact(
             'alumnos',
             'alumnoSeleccionado',

@@ -25,6 +25,14 @@ class BitacoraDocumentoController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // AUDITORÍA
+        logAuditoria(
+            'view',
+            'bitacora_documentos',
+            "Visualizó documentos del incidente ID {$incidente->id}",
+            $incidente->establecimiento_id
+        );
+
         return view('modulos.convivencia-escolar.documentos.index',
             compact('incidente', 'documentos'));
     }
@@ -57,6 +65,14 @@ class BitacoraDocumentoController extends Controller
             'activo'             => 1,
         ]);
 
+        // AUDITORÍA
+        logAuditoria(
+            'create',
+            'bitacora_documentos',
+            "Adjuntó documento al incidente ID {$incidente->id}",
+            $incidente->establecimiento_id
+        );
+
         return redirect()
             ->route('convivencia.bitacora.documentos.index', $incidente->id)
             ->with('success', 'Documento subido correctamente.');
@@ -79,6 +95,14 @@ class BitacoraDocumentoController extends Controller
             'invalidado_en'  => now(),
         ]);
 
+        // AUDITORÍA
+        logAuditoria(
+            'disable',
+            'bitacora_documentos',
+            "Invalidó documento ID {$documento->id}",
+            $documento->establecimiento_id
+        );
+
         return back()->with('success', 'Documento invalidado correctamente.');
     }
 
@@ -98,6 +122,14 @@ class BitacoraDocumentoController extends Controller
             'invalidado_por' => null,
             'invalidado_en'  => null,
         ]);
+        
+        // AUDITORÍA
+        logAuditoria(
+            'enable',
+            'bitacora_documentos',
+            "Habilitó documento ID {$documento->id}",
+            $documento->establecimiento_id
+        );
 
         return back()->with('success', 'Documento habilitado nuevamente.');
     }

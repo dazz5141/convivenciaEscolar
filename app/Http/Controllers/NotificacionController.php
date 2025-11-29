@@ -24,6 +24,14 @@ class NotificacionController extends Controller
             $notificacion->update(['leida' => 1]);
         }
 
+        // Auditoría
+        logAuditoria(
+            accion: 'update',
+            modulo: 'notificaciones',
+            detalle: 'Marcó como leída la notificación ID ' . $notificacion->id,
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return back();
     }
 
@@ -33,6 +41,14 @@ class NotificacionController extends Controller
         Notificacion::where('usuario_id', auth()->id())
             ->update(['leida' => 1]);
 
+            // Auditoría global
+            logAuditoria(
+                accion: 'update',
+                modulo: 'notificaciones',
+                detalle: 'Marcó todas las notificaciones como leídas.',
+                establecimiento_id: session('establecimiento_id')
+            );
+            
         return back();
     }
 }

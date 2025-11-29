@@ -7,7 +7,6 @@ use App\Models\Dependencia;
 use App\Models\Region;
 use App\Models\Provincia;
 use App\Models\Comuna;
-use App\Models\Auditoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -76,13 +75,13 @@ class EstablecimientoController extends Controller
 
         $establecimiento = Establecimiento::create($data);
 
-        Auditoria::create([
-            'usuario_id'          => Auth::id(),
-            'establecimiento_id'  => Auth::user()->establecimiento_id,
-            'accion'              => 'create',
-            'modulo'              => 'Establecimientos',
-            'detalle'             => 'Creó el establecimiento: '.$establecimiento->nombre,
-        ]);
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'create',
+            modulo: 'Establecimientos',
+            detalle: 'Creó el establecimiento: ' . $establecimiento->nombre,
+            establecimiento_id: $establecimiento->id
+        );
 
         return redirect()->route('establecimientos.index')->with('success', 'Establecimiento creado correctamente.');
     }
@@ -144,13 +143,13 @@ class EstablecimientoController extends Controller
 
         $establecimiento->update($data);
 
-        Auditoria::create([
-            'usuario_id'          => Auth::id(),
-            'establecimiento_id'  => Auth::user()->establecimiento_id,
-            'accion'              => 'update',
-            'modulo'              => 'Establecimientos',
-            'detalle'             => 'Actualizó el establecimiento: '.$establecimiento->nombre,
-        ]);
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'update',
+            modulo: 'Establecimientos',
+            detalle: 'Actualizó el establecimiento: ' . $establecimiento->nombre,
+            establecimiento_id: $establecimiento->id
+        );
 
         return redirect()->route('establecimientos.index')->with('success', 'Establecimiento actualizado correctamente.');
     }
@@ -168,13 +167,13 @@ class EstablecimientoController extends Controller
 
         $establecimiento->update(['activo' => 0]);
 
-        Auditoria::create([
-            'usuario_id'          => Auth::id(),
-            'establecimiento_id'  => Auth::user()->establecimiento_id,
-            'accion'              => 'disable',
-            'modulo'              => 'Establecimientos',
-            'detalle'             => 'Deshabilitó el establecimiento: '.$establecimiento->nombre,
-        ]);
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'disable',
+            modulo: 'Establecimientos',
+            detalle: 'Deshabilitó el establecimiento: ' . $establecimiento->nombre,
+            establecimiento_id: $establecimiento->id
+        );
 
         return redirect()->route('establecimientos.index')->with('success', 'Establecimiento deshabilitado.');
     }
@@ -192,13 +191,13 @@ class EstablecimientoController extends Controller
 
         $establecimiento->update(['activo' => 1]);
 
-        Auditoria::create([
-            'usuario_id'          => Auth::id(),
-            'establecimiento_id'  => Auth::user()->establecimiento_id,
-            'accion'              => 'enable',
-            'modulo'              => 'Establecimientos',
-            'detalle'             => 'Habilitó el establecimiento: '.$establecimiento->nombre,
-        ]);
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'enable',
+            modulo: 'Establecimientos',
+            detalle: 'Habilitó el establecimiento: ' . $establecimiento->nombre,
+            establecimiento_id: $establecimiento->id
+        );
 
         return redirect()->route('establecimientos.index')->with('success', 'Establecimiento habilitado.');
     }

@@ -176,6 +176,16 @@ class DerivacionController extends Controller
             ]);
         }
 
+        /* ===========================================
+        AUDITORÍA - CREACIÓN DE DERIVACIÓN
+        =========================================== */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'derivaciones',
+            detalle: 'Se creó la derivación ID ' . $derivacion->id,
+            establecimiento_id: $derivacion->establecimiento_id
+        );
+
         return redirect()
             ->route('convivencia.derivaciones.index')
             ->with('success', 'Derivación registrada correctamente.');
@@ -233,6 +243,16 @@ class DerivacionController extends Controller
         ]);
 
         $derivacion->update($request->all());
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZACIÓN DE DERIVACIÓN
+        =========================================== */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'derivaciones',
+            detalle: 'Se actualizó la derivación ID ' . $derivacion->id,
+            establecimiento_id: $derivacion->establecimiento_id
+        );
 
         return redirect()
             ->route('convivencia.derivaciones.show', $derivacion->id)

@@ -67,11 +67,19 @@ class FuncionarioController extends Controller
 
         $establecimientoId = session('establecimiento_id');
 
-        Funcionario::create([
+        $funcionario = Funcionario::create([
             ...$request->validated(),
             'establecimiento_id' => $establecimientoId,
             'activo' => 1,
         ]);
+
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'create',
+            modulo: 'Funcionarios',
+            detalle: 'Registró al funcionario: ' . $funcionario->nombre . ' ' . $funcionario->apellido_paterno,
+            establecimiento_id: $funcionario->establecimiento_id
+        );
 
         return redirect()
             ->route('funcionarios.index')
@@ -112,6 +120,14 @@ class FuncionarioController extends Controller
 
         $funcionario->update($request->validated());
 
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'update',
+            modulo: 'Funcionarios',
+            detalle: 'Actualizó al funcionario: ' . $funcionario->nombre . ' ' . $funcionario->apellido_paterno,
+            establecimiento_id: $funcionario->establecimiento_id
+        );
+
         return redirect()->route('funcionarios.index')->with('success', 'Funcionario actualizado correctamente.');
     }
 
@@ -144,6 +160,14 @@ class FuncionarioController extends Controller
             $funcionario->usuario->update(['activo' => 0]);
         }
 
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'disable',
+            modulo: 'Funcionarios',
+            detalle: 'Deshabilitó al funcionario: ' . $funcionario->nombre . ' ' . $funcionario->apellido_paterno,
+            establecimiento_id: $funcionario->establecimiento_id
+        );
+
         return redirect()->route('funcionarios.index')->with('success', 'Funcionario deshabilitado correctamente.');
     }
 
@@ -161,6 +185,14 @@ class FuncionarioController extends Controller
         if ($funcionario->usuario) {
             $funcionario->usuario->update(['activo' => 1]);
         }
+
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'enable',
+            modulo: 'Funcionarios',
+            detalle: 'Habilitó al funcionario: ' . $funcionario->nombre . ' ' . $funcionario->apellido_paterno,
+            establecimiento_id: $funcionario->establecimiento_id
+        );
 
         return redirect()->route('funcionarios.index')->with('success', 'Funcionario habilitado correctamente.');
     }

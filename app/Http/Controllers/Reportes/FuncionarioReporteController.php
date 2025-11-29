@@ -148,6 +148,13 @@ class FuncionarioReporteController extends Controller
             ->groupBy('tipos_novedad.nombre')
             ->get();
 
+        // AUDITORÍA
+        logAuditoria(
+            'view',
+            'reporte_funcionario',
+            "Visualizó reporte del funcionario ID {$funcionarioId}"
+        );
+
         return view('reportes.funcionario', compact(
             'funcionarios',
             'funcionarioSeleccionado',

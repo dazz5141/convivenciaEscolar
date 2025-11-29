@@ -39,6 +39,16 @@ class HistorialPieController extends Controller
             'derivaciones',
         ]);
 
+        /* ============================================================
+        AUDITORÍA: VISUALIZACIÓN DEL HISTORIAL PIE
+        ============================================================ */
+        logAuditoria(
+            accion: 'view',
+            modulo: 'historial_pie',
+            detalle: 'Se accedió al historial completo del estudiante PIE ID ' . $estudiantePIE->id,
+            establecimiento_id: $estudiantePIE->establecimiento_id
+        );
+
         return view('modulos.pie.historial.index', [
             'estudiantePie' => $estudiantePIE
         ]);
@@ -105,6 +115,18 @@ class HistorialPieController extends Controller
         // ============================
         $this->validarEstablecimiento($modelo);
 
+        /* ============================================================
+        AUDITORÍA: VISUALIZACIÓN DE ITEM DEL HISTORIAL PIE
+        ============================================================ */
+        logAuditoria(
+            accion: 'view',
+            modulo: 'historial_pie',
+            detalle: 'Se visualizó detalle ' . strtoupper($tipo) .
+                    ' (ID: ' . $modelo->id . ') del estudiante PIE ID ' .
+                    $modelo->estudiante_pie_id,
+            establecimiento_id: $modelo->establecimiento_id
+        );
+        
         return view('modulos.pie.historial.show', [
             'data'   => $modelo,
             'tipo'   => $tipo,

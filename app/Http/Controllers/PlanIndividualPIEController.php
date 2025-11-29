@@ -99,6 +99,17 @@ class PlanIndividualPIEController extends Controller
         }
         */
 
+        /* ============================================================
+        AUDITORÍA: CREACIÓN DE PLAN INDIVIDUAL PIE
+        ============================================================ */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'planes_individuales_pie',
+            detalle: 'Se creó el Plan Individual PIE ID ' . $plan->id .
+                    ' para el estudiante PIE ID ' . $request->estudiante_pie_id,
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return redirect()
             ->route('pie.planes.index')
             ->with('success', 'Plan individual registrado correctamente.');

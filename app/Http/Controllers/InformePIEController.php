@@ -89,7 +89,18 @@ class InformePIEController extends Controller
             'contenido'          => $request->contenido,
         ]);
 
-        // Ya no hay notificación porque no hay profesional asignado
+        /* ============================================================
+        AUDITORÍA: CREACIÓN DE INFORME PIE
+        ============================================================ */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'informes_pie',
+            detalle: 'Se registró el informe PIE para el estudiante PIE ID ' 
+                . $request->estudiante_pie_id
+                . ' con fecha ' . $request->fecha
+                . ' (tipo: ' . $request->tipo . ').',
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()
             ->route('pie.informes.index')

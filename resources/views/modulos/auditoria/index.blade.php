@@ -21,19 +21,21 @@
     {{-- ========== FILTROS ========== --}}
     <div class="card-header">
         <form method="GET" action="{{ route('auditoria.index') }}">
+
+            {{-- ===================== FILA 1 ===================== --}}
             <div class="row g-3 align-items-end">
 
                 {{-- Buscar texto --}}
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <input type="text"
-                           name="buscar"
-                           class="form-control"
-                           placeholder="Buscar por detalle..."
-                           value="{{ request('buscar') }}">
+                        name="buscar"
+                        class="form-control"
+                        placeholder="Buscar por detalle..."
+                        value="{{ request('buscar') }}">
                 </div>
 
                 {{-- Módulo --}}
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <select name="modulo" class="form-select">
                         <option value="">— Módulo —</option>
                         @foreach($auditorias->pluck('modulo')->unique() as $mod)
@@ -45,13 +47,19 @@
                 </div>
 
                 {{-- Acción --}}
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <select name="accion" class="form-select">
                         <option value="">— Acción —</option>
+
                         <option value="create" {{ request('accion') == 'create' ? 'selected' : '' }}>Creación</option>
                         <option value="update" {{ request('accion') == 'update' ? 'selected' : '' }}>Actualización</option>
                         <option value="delete" {{ request('accion') == 'delete' ? 'selected' : '' }}>Eliminación</option>
+
                         <option value="login" {{ request('accion') == 'login' ? 'selected' : '' }}>Login</option>
+                        <option value="logout" {{ request('accion') == 'logout' ? 'selected' : '' }}>Logout</option>
+
+                        <option value="disable" {{ request('accion') == 'disable' ? 'selected' : '' }}>Deshabilitación</option>
+                        <option value="enable" {{ request('accion') == 'enable' ? 'selected' : '' }}>Habilitación</option>
                     </select>
                 </div>
 
@@ -67,26 +75,46 @@
                     </select>
                 </div>
 
+            </div>
+
+            {{-- ===================== FILA 2 ===================== --}}
+            <div class="row g-3 align-items-end mt-2">
+
+                {{-- Establecimiento (solo admin general) --}}
+                @if(Auth::user()->rol_id == 1)
+                <div class="col-md-3">
+                    <select name="establecimiento_id" class="form-select">
+                        <option value="">— Establecimiento —</option>
+                        @foreach($establecimientos as $e)
+                            <option value="{{ $e->id }}" {{ request('establecimiento_id') == $e->id ? 'selected' : '' }}>
+                                {{ $e->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+
                 {{-- Fecha desde --}}
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label class="form-label small text-muted">Desde</label>
                     <input type="date" name="desde" class="form-control" value="{{ request('desde') }}">
                 </div>
 
                 {{-- Fecha hasta --}}
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label class="form-label small text-muted">Hasta</label>
                     <input type="date" name="hasta" class="form-control" value="{{ request('hasta') }}">
                 </div>
 
                 {{-- Botón Filtrar --}}
-                <div class="col-md-2 text-end">
+                <div class="col-md-3 text-end">
                     <button class="btn btn-secondary w-100">
                         <i class="bi bi-funnel me-1"></i> Filtrar
                     </button>
                 </div>
 
             </div>
+
         </form>
     </div>
 
@@ -122,12 +150,24 @@
                         <td>
                             @if($a->accion == 'create')
                                 <span class="badge bg-success">Crear</span>
+
                             @elseif($a->accion == 'update')
                                 <span class="badge bg-warning text-dark">Actualizar</span>
+
                             @elseif($a->accion == 'delete')
                                 <span class="badge bg-danger">Eliminar</span>
+
                             @elseif($a->accion == 'login')
                                 <span class="badge bg-info text-dark">Login</span>
+
+                            @elseif($a->accion == 'logout')
+                                <span class="badge bg-dark">Logout</span>
+
+                            @elseif($a->accion == 'disable')
+                                <span class="badge bg-secondary">Deshabilitar</span>
+
+                            @elseif($a->accion == 'enable')
+                                <span class="badge bg-primary">Habilitar</span>
                             @endif
                         </td>
 

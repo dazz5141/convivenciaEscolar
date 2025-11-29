@@ -95,11 +95,21 @@ class ProfesionalPIEController extends Controller
             ])->withInput();
         }
 
-        ProfesionalPIE::create([
+        $profesional = ProfesionalPIE::create([
             'establecimiento_id' => session('establecimiento_id'),
             'funcionario_id'     => $request->funcionario_id,
             'tipo_id'            => $request->tipo_id,
         ]);
+
+        /* ============================================================
+        AUDITORÍA: CREAR PROFESIONAL PIE
+        ============================================================ */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'pie_profesionales',
+            detalle: 'Se agregó al profesional PIE ID ' . $profesional->id,
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()
             ->route('pie.profesionales.index')
@@ -128,6 +138,16 @@ class ProfesionalPIEController extends Controller
         // }
 
         $profesionalPIE->delete();
+
+        /* ============================================================
+        AUDITORÍA: ELIMINAR PROFESIONAL PIE
+        ============================================================ */
+        logAuditoria(
+            accion: 'delete',
+            modulo: 'pie_profesionales',
+            detalle: 'Se eliminó al profesional PIE ID ' . $profesionalPIE->id,
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return back()->with('success', 'Profesional PIE eliminado.');
     }

@@ -21,12 +21,29 @@ class TipoMedidaRestaurativaController extends Controller
             'nombre' => $request->nombre
         ]);
 
+        // Auditoría
+        logAuditoria(
+            accion: 'create',
+            modulo: 'tipo_medida_restaurativa',
+            detalle: 'Creó un tipo de medida restaurativa: ' . $request->nombre,
+            establecimiento_id: session('establecimiento_id')
+        );
+        
         return back()->with('success', 'Tipo de medida creado');
     }
 
     public function destroy($id)
     {
         TipoMedidaRestaurativa::findOrFail($id)->delete();
+
+        // Auditoría
+        logAuditoria(
+            accion: 'delete',
+            modulo: 'tipo_medida_restaurativa',
+            detalle: 'Eliminó el tipo de medida restaurativa ID ' . $id,
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return back()->with('success', 'Tipo de medida eliminado');
     }
 }

@@ -124,6 +124,16 @@ class NovedadInspectoriaController extends Controller
             }
         }
 
+        /* ===========================================
+        AUDITORÍA - CREACIÓN DE NOVEDAD
+        =========================================== */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'novedades',
+            detalle: 'Se registró la novedad ID ' . $n->id,
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return redirect()
             ->route('inspectoria.novedades.index')
             ->with('success', 'Novedad registrada correctamente.');
@@ -186,6 +196,16 @@ class NovedadInspectoriaController extends Controller
             'tipo_novedad_id'    => $request->tipo_novedad_id,
             'descripcion'        => $request->descripcion,
         ]);
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZACIÓN DE NOVEDAD
+        =========================================== */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'novedades',
+            detalle: 'Se actualizó la novedad ID ' . $novedad->id,
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()
             ->route('inspectoria.novedades.index')

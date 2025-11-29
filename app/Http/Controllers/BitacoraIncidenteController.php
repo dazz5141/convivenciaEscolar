@@ -11,6 +11,7 @@ use App\Models\BitacoraIncidenteAlumno;
 use App\Models\EstadoIncidente;
 use App\Models\SeguimientoEmocional;
 use App\Models\DocumentoAdjunto;
+use App\Models\Notificacion;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -197,6 +198,16 @@ class BitacoraIncidenteController extends Controller
 
             DB::commit();
 
+            /* ===========================================
+            AUDITORÍA → CREACIÓN DE INCIDENTE
+            =========================================== */
+            logAuditoria(
+                accion: 'create',
+                modulo: 'bitacora',
+                detalle: 'Se creó el incidente ID ' . $incidente->id,
+                establecimiento_id: $incidente->establecimiento_id
+            );
+
             return redirect()
                 ->route('convivencia.bitacora.index')
                 ->with('success', 'Incidente registrado correctamente.');
@@ -339,6 +350,16 @@ class BitacoraIncidenteController extends Controller
             }
 
             DB::commit();
+
+            /* ===========================================
+            AUDITORÍA → ACTUALIZACIÓN DE INCIDENTE
+            =========================================== */
+            logAuditoria(
+                accion: 'update',
+                modulo: 'bitacora',
+                detalle: 'Se actualizó el incidente ID ' . $incidente->id,
+                establecimiento_id: $incidente->establecimiento_id
+            );
 
             return redirect()
                 ->route('convivencia.bitacora.index')

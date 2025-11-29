@@ -39,9 +39,19 @@ class RolController extends Controller
             'nombre' => 'required|string|max:80|unique:roles,nombre',
         ]);
 
-        Rol::create([
+        $rol = Rol::create([
             'nombre' => $request->nombre,
         ]);
+
+        /* ===========================
+           AUDITORÍA: CREACIÓN DE ROL
+        ============================ */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'roles',
+            detalle: 'Se creó el rol: ' . $rol->nombre,
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()->route('roles.index')
             ->with('success', 'Rol creado correctamente.');
@@ -71,6 +81,16 @@ class RolController extends Controller
         $rol->update([
             'nombre' => $request->nombre,
         ]);
+
+        /* ===========================
+           AUDITORÍA: ACTUALIZACIÓN
+        ============================ */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'roles',
+            detalle: 'Se actualizó el rol ID ' . $rol->id . ' (Nuevo nombre: ' . $rol->nombre . ')',
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()->route('roles.index')
             ->with('success', 'Rol actualizado correctamente.');

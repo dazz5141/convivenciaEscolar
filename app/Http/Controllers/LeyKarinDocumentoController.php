@@ -62,7 +62,7 @@ class LeyKarinDocumentoController extends Controller
         $ruta = $file->store("documentos/leykarin/{$denuncia->id}", 'public');
 
         /* --- Registro en BD --- */
-        DocumentoAdjunto::create([
+        $documento = DocumentoAdjunto::create([
             'entidad_type'       => DenunciaLeyKarin::class,
             'entidad_id'         => $denuncia->id,
             'nombre_archivo'     => $file->getClientOriginalName(),
@@ -71,6 +71,16 @@ class LeyKarinDocumentoController extends Controller
             'establecimiento_id' => session('establecimiento_id'),
             'activo'             => 1,
         ]);
+
+        /* ---------------------------------------------------------
+           AUDITORÍA: CREACIÓN DE DOCUMENTO
+        --------------------------------------------------------- */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'leykarin_documentos',
+            detalle: "Subió documento ID {$documento->id} a la denuncia ID {$denuncia->id}",
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()
             ->route('leykarin.documentos.index', $denuncia)
@@ -102,6 +112,16 @@ class LeyKarinDocumentoController extends Controller
             'invalidado_en'  => now(),
         ]);
 
+        /* ---------------------------------------------------------
+           AUDITORÍA: INVALIDAR DOCUMENTO
+        --------------------------------------------------------- */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'leykarin_documentos',
+            detalle: "Invalidó documento ID {$documento->id}",
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return back()->with('success', 'Documento invalidado correctamente.');
     }
 
@@ -130,6 +150,16 @@ class LeyKarinDocumentoController extends Controller
             'invalidado_en'  => null,
         ]);
 
+        /* ---------------------------------------------------------
+           AUDITORÍA: HABILITAR DOCUMENTO
+        --------------------------------------------------------- */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'leykarin_documentos',
+            detalle: "Habilitó nuevamente documento ID {$documento->id}",
+            establecimiento_id: session('establecimiento_id')
+        );
+        
         return back()->with('success', 'Documento habilitado nuevamente.');
     }
 }

@@ -186,6 +186,16 @@ class MedidaRestaurativaController extends Controller
             ]);
         }
 
+        /* ===========================================
+        AUDITORÍA - CREACIÓN DE MEDIDA RESTAURATIVA
+        =========================================== */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'medidas_restaurativas',
+            detalle: 'Se creó la medida restaurativa ID ' . $medida->id,
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return redirect()
             ->route('convivencia.medidas.index')
             ->with('success', 'Medida restaurativa registrada correctamente.');
@@ -260,6 +270,16 @@ class MedidaRestaurativaController extends Controller
             'fecha_fin'              => $validated['fecha_fin'],
             'observaciones'          => $validated['observaciones'],
         ]);
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZACIÓN DE MEDIDA
+        =========================================== */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'medidas_restaurativas',
+            detalle: 'Se actualizó la medida restaurativa ID ' . $medida->id,
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()
             ->route('convivencia.medidas.index') 

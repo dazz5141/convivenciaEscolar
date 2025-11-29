@@ -181,6 +181,16 @@ class DenunciaLeyKarinController extends Controller
 
         $denuncia = DenunciaLeyKarin::create($data);
 
+        /* ============================================================
+        AUDITORÍA: CREAR DENUNCIA LEY KARIN
+        ============================================================ */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'denuncias',
+            detalle: 'Se registró una nueva denuncia Ley Karin ID ' . $denuncia->id,
+            establecimiento_id: $denuncia->establecimiento_id
+        );
+
         return redirect()
             ->route('leykarin.denuncias.show', $denuncia)
             ->with('success', 'La denuncia fue registrada correctamente.');
@@ -244,6 +254,16 @@ class DenunciaLeyKarinController extends Controller
         $denuncia->update([
             'descripcion' => $request->descripcion,
         ]);
+
+        /* ============================================================
+        AUDITORÍA: ACTUALIZAR DENUNCIA LEY KARIN
+        ============================================================ */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'denuncias',
+            detalle: 'Se actualizó la denuncia Ley Karin ID ' . $denuncia->id,
+            establecimiento_id: $denuncia->establecimiento_id
+        );
 
         return redirect()
             ->route('leykarin.denuncias.show', $denuncia)

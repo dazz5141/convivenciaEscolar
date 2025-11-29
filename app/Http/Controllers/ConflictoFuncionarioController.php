@@ -96,7 +96,7 @@ class ConflictoFuncionarioController extends Controller
         $this->validarFuncionarioColegio($request->funcionario_1_id);
         $this->validarFuncionarioColegio($request->funcionario_2_id);
 
-        ConflictoFuncionario::create([
+        $conflicto = ConflictoFuncionario::create([
             'fecha'              => $request->fecha,
             'funcionario_1_id'   => $request->funcionario_1_id,
             'funcionario_2_id'   => $request->funcionario_2_id,
@@ -110,6 +110,16 @@ class ConflictoFuncionarioController extends Controller
             'derivado_ley_karin' => 0,
             'establecimiento_id' => session('establecimiento_id'),
         ]);
+
+        /* ===========================================
+        AUDITORÍA - CREAR CONFLICTO FUNCIONARIO
+        =========================================== */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'conflictos_funcionarios',
+            detalle: 'Se registró conflicto entre funcionarios ID ' . $conflicto->id,
+            establecimiento_id: $conflicto->establecimiento_id
+        );
 
         return redirect()
             ->route('leykarin.conflictos-funcionarios.index')
@@ -190,6 +200,16 @@ class ConflictoFuncionarioController extends Controller
             'confidencial'      => $request->confidencial ?? 0,
             'derivado_ley_karin'=> $request->derivado_ley_karin ?? 0,
         ]);
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZAR CONFLICTO FUNCIONARIO
+        =========================================== */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'conflictos_funcionarios',
+            detalle: 'Se actualizó el conflicto entre funcionarios ID ' . $conflictoFuncionario->id,
+            establecimiento_id: $conflictoFuncionario->establecimiento_id
+        );
 
         return redirect()
             ->route('leykarin.conflictos-funcionarios.index')

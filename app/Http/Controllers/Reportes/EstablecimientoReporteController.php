@@ -157,6 +157,13 @@ class EstablecimientoReporteController extends Controller
             ->limit(5)
             ->get();
 
+        // AUDITORÍA
+        logAuditoria(
+            'view',
+            'reporte_establecimiento',
+            'Visualizó reporte general del establecimiento'
+        );
+
         return view('reportes.establecimiento', compact(
             'establecimiento',
             'establecimientoId',
@@ -220,6 +227,13 @@ class EstablecimientoReporteController extends Controller
             ->orderBy('total', 'desc')
             ->limit(10)
             ->get();
+
+        // AUDITORÍA
+        logAuditoria(
+            'export',
+            'reporte_establecimiento_pdf',
+            "Generó PDF del establecimiento ID {$establecimientoId}"
+        );
 
         $pdf = \PDF::loadView('reportes.pdf.establecimiento-profesional', compact(
             'establecimiento',

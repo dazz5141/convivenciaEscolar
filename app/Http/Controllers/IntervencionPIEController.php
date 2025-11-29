@@ -16,7 +16,7 @@ class IntervencionPIEController extends Controller
      */
     public function index(Request $request)
     {
-        // 🔐 Permiso
+        // Permiso
         if (!canAccess('intervenciones', 'view')) {
             abort(403, 'No tienes permisos para acceder a Intervenciones PIE.');
         }
@@ -65,7 +65,7 @@ class IntervencionPIEController extends Controller
      */
     public function create($estudiante_pie_id = null)
     {
-        // 🔐 Permiso
+        // Permiso
         if (!canAccess('intervenciones', 'create')) {
             abort(403, 'No tienes permisos para registrar intervenciones PIE.');
         }
@@ -104,7 +104,7 @@ class IntervencionPIEController extends Controller
      */
     public function store(Request $request)
     {
-        // 🔐 Permiso
+        // Permiso
         if (!canAccess('intervenciones', 'create')) {
             abort(403, 'No tienes permisos para registrar intervenciones PIE.');
         }
@@ -131,6 +131,18 @@ class IntervencionPIEController extends Controller
             'fecha'                => $request->fecha,
             'detalle'              => $request->detalle,
         ]);
+
+        /* ============================================================
+        AUDITORÍA: CREACIÓN DE INTERVENCIÓN PIE
+        ============================================================ */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'intervenciones_pie',
+            detalle: 'Se registró la intervención PIE ID ' . $intervencion->id .
+                    ' para el estudiante PIE ID ' . $request->estudiante_pie_id .
+                    ' (tipo intervención: ' . $request->tipo_intervencion_id . ')',
+            establecimiento_id: session('establecimiento_id')
+        );
 
         /*
         |--------------------------------------------------------------------------
@@ -163,7 +175,7 @@ class IntervencionPIEController extends Controller
      */
     public function show($id)
     {
-        // 🔐 Permiso
+        // Permiso
         if (!canAccess('intervenciones', 'view')) {
             abort(403, 'No tienes permisos para ver intervenciones PIE.');
         }

@@ -14,7 +14,7 @@ class UsuarioController extends Controller
     // LISTADO PRINCIPAL
     public function index(Request $request)
     {
-        // 🔒 PERMISO
+        // PERMISO
         if (!canAccess('usuarios', 'view')) {
             abort(403, 'No tienes permisos para ver usuarios.');
         }
@@ -56,7 +56,7 @@ class UsuarioController extends Controller
     // FORMULARIO CREAR
     public function create()
     {
-        // 🔒 PERMISO
+        // PERMISO
         if (!canAccess('usuarios', 'create')) {
             abort(403, 'No tienes permisos para crear usuarios.');
         }
@@ -70,7 +70,7 @@ class UsuarioController extends Controller
     // GUARDAR USUARIO
     public function store(Request $request)
     {
-        // 🔒 PERMISO
+        // PERMISO
         if (!canAccess('usuarios', 'create')) {
             abort(403, 'No tienes permisos para crear usuarios.');
         }
@@ -131,7 +131,15 @@ class UsuarioController extends Controller
             ];
         }
 
-        Usuario::create($data);
+        $usuario = Usuario::create($data);
+
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'create',
+            modulo: 'usuarios',
+            detalle: 'Creó el usuario: ' . ($usuario->email ?? 'Sin email'),
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario creado correctamente.');
@@ -140,7 +148,7 @@ class UsuarioController extends Controller
     // FORMULARIO EDITAR
     public function edit(Usuario $usuario)
     {
-        // 🔒 PERMISO
+        // PERMISO
         if (!canAccess('usuarios', 'update')) {
             abort(403, 'No tienes permisos para editar usuarios.');
         }
@@ -155,7 +163,7 @@ class UsuarioController extends Controller
     // ACTUALIZAR
     public function update(Request $request, Usuario $usuario)
     {
-        // 🔒 PERMISO
+        // PERMISO
         if (!canAccess('usuarios', 'update')) {
             abort(403, 'No tienes permisos para actualizar usuarios.');
         }
@@ -184,18 +192,34 @@ class UsuarioController extends Controller
             $usuario->save();
         }
 
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'update',
+            modulo: 'usuarios',
+            detalle: 'Actualizó el usuario: ' . ($usuario->email ?? 'Sin email'),
+            establecimiento_id: session('establecimiento_id')
+        );
+
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario actualizado correctamente.');
     }
 
     public function disable(Usuario $usuario)
     {
-        // 🔒 PERMISO
+        // PERMISO
         if (!canAccess('usuarios', 'delete')) {
             abort(403, 'No tienes permisos para deshabilitar usuarios.');
         }
 
         $usuario->update(['activo' => 0]);
+
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'disable',
+            modulo: 'usuarios',
+            detalle: 'Deshabilitó el usuario: ' . ($usuario->email ?? 'Sin email'),
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario deshabilitado correctamente.');
@@ -203,12 +227,20 @@ class UsuarioController extends Controller
 
     public function enable(Usuario $usuario)
     {
-        // 🔒 PERMISO
+        // PERMISO
         if (!canAccess('usuarios', 'delete')) {
             abort(403, 'No tienes permisos para habilitar usuarios.');
         }
 
         $usuario->update(['activo' => 1]);
+
+        // AUDITORÍA
+        logAuditoria(
+            accion: 'enable',
+            modulo: 'usuarios',
+            detalle: 'Habilitó el usuario: ' . ($usuario->email ?? 'Sin email'),
+            establecimiento_id: session('establecimiento_id')
+        );
 
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario habilitado correctamente.');

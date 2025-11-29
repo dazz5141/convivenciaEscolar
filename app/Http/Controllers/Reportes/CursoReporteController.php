@@ -116,6 +116,13 @@ class CursoReporteController extends Controller
             ->orderBy('apellido_materno')
             ->get();
 
+        // AUDITORÍA
+        logAuditoria(
+            'view',
+            'reporte_curso',
+            "Visualizó reporte del curso ID {$cursoId}"
+        );
+
         return view('reportes.curso', compact(
             'cursos',
             'cursoSeleccionado',

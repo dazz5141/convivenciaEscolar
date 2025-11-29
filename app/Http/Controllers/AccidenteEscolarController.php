@@ -145,6 +145,16 @@ class AccidenteEscolarController extends Controller
             ]);
         }
 
+        /* ===========================================
+        AUDITORÍA - CREACIÓN DE ACCIDENTE ESCOLAR
+        =========================================== */
+        logAuditoria(
+            'create',
+            'accidentes',
+            'Se registró un accidente escolar ID ' . $accidente->id,
+            $accidente->establecimiento_id
+        );
+
         return redirect()
             ->route('inspectoria.accidentes.index')
             ->with('success', 'Accidente registrado correctamente.');
@@ -200,6 +210,16 @@ class AccidenteEscolarController extends Controller
             'atencion_inmediata' => $request->atencion_inmediata,
             'derivacion_salud'   => $request->derivacion_salud,
         ]);
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZACIÓN DE ACCIDENTE
+        =========================================== */
+        logAuditoria(
+            'update',
+            'accidentes',
+            'Se actualizó el accidente escolar ID ' . $accidente->id,
+            $accidente->establecimiento_id
+        );
 
         return redirect()
             ->route('inspectoria.accidentes.index')

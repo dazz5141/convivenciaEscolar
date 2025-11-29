@@ -156,6 +156,16 @@ class AsistenciaEventoController extends Controller
             ]);
         }
 
+        /* ===========================================
+        AUDITORÍA - CREACIÓN DE ASISTENCIA / ATRASO
+        =========================================== */
+        logAuditoria(
+            'create',
+            'atrasos',
+            'Se registró asistencia/atraso ID ' . $asistencia->id,
+            $asistencia->establecimiento_id
+        );
+
         return redirect()
             ->route('inspectoria.asistencia.index')
             ->with('success', 'Registro de asistencia ingresado correctamente.');
@@ -243,6 +253,16 @@ class AsistenciaEventoController extends Controller
             'hora'          => $hora,
             'observaciones' => $request->observaciones,
         ]);
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZACIÓN DE ASISTENCIA
+        =========================================== */
+        logAuditoria(
+            'update',
+            'atrasos',
+            'Se actualizó el registro de asistencia ID ' . $evento->id,
+            $evento->establecimiento_id
+        );
 
         return redirect()
             ->route('inspectoria.asistencia.index')

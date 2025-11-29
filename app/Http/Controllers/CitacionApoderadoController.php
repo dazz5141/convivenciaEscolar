@@ -111,6 +111,16 @@ class CitacionApoderadoController extends Controller
             ]);
         }
 
+        /* ===========================================
+        AUDITORÍA - CREAR CITACIÓN
+        =========================================== */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'citaciones',
+            detalle: 'Se registró una citación ID ' . $citacion->id,
+            establecimiento_id: $citacion->establecimiento_id
+        );
+
         return redirect()
             ->route('inspectoria.citaciones.index')
             ->with('success', 'Citación registrada correctamente.');
@@ -175,6 +185,16 @@ class CitacionApoderadoController extends Controller
             'observaciones'  => $request->observaciones,
             'apoderado_id'   => $request->apoderado_id,
         ]);
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZAR CITACIÓN
+        =========================================== */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'citaciones',
+            detalle: 'Se actualizó la citación ID ' . $citacion->id,
+            establecimiento_id: $citacion->establecimiento_id
+        );
 
         return redirect()
             ->route('inspectoria.citaciones.index')

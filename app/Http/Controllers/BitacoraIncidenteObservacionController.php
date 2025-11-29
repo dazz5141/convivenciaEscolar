@@ -23,6 +23,16 @@ class BitacoraIncidenteObservacionController extends Controller
                              ?? auth()->user()->id, // fallback si se maneja distinto
             'fecha_observacion' => now(),
         ]);
+        
+        // AUDITORÍA
+        $incidente = BitacoraIncidente::findOrFail($id);
+
+        logAuditoria(
+            accion: 'create',
+            modulo: 'bitacora_observaciones',
+            detalle: "Agregó observación al incidente ID {$id}",
+            establecimiento_id: $incidente->establecimiento_id
+        );
 
         return redirect()
             ->route('convivencia.bitacora.show', $id)

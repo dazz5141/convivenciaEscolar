@@ -57,6 +57,12 @@
                 <span class="badge bg-danger">Eliminación</span>
             @elseif($registro->accion == 'login')
                 <span class="badge bg-info text-dark">Login</span>
+            @elseif($registro->accion == 'logout')
+                <span class="badge bg-dark">Logout</span>
+            @elseif($registro->accion == 'disable')
+                <span class="badge bg-secondary">Deshabilitación</span>
+            @elseif($registro->accion == 'enable')
+                <span class="badge bg-primary">Habilitación</span>
             @endif
         </div>
     </div>

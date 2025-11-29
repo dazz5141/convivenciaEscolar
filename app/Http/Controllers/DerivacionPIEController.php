@@ -105,6 +105,16 @@ class DerivacionPIEController extends Controller
         | puedes activar este bloque nuevamente.
         */
 
+        /* ---------------------------------------------------------
+           AUDITORÍA: CREACIÓN
+        --------------------------------------------------------- */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'pie_derivaciones',
+            detalle: 'Registró una derivación PIE ID ' . $derivacion->id,
+            establecimiento_id: $derivacion->establecimiento_id
+        );
+        
         return redirect()
             ->route('pie.derivaciones.index')
             ->with('success', 'Derivación registrada correctamente.');

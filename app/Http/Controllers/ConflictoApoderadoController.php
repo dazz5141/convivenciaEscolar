@@ -64,7 +64,7 @@ class ConflictoApoderadoController extends Controller
             'estado_id' => 'nullable|exists:estados_conflicto_apoderado,id',
         ]);
 
-        ConflictoApoderado::create([
+        $conflicto = ConflictoApoderado::create([
             'fecha'               => $request->fecha,
             'funcionario_id'      => $request->funcionario_id,
             'registrado_por_id'   => Auth::user()->funcionario_id,
@@ -80,6 +80,16 @@ class ConflictoApoderadoController extends Controller
             'derivado_ley_karin'  => $request->derivado_ley_karin ?? 0,
             'establecimiento_id'  => session('establecimiento_id'),
         ]);
+
+        /* ===========================================
+        AUDITORÍA - CREAR CONFLICTO CON APODERADO
+        =========================================== */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'conflictos_apoderados',
+            detalle: 'Se registró un conflicto con apoderado ID ' . $conflicto->id,
+            establecimiento_id: $conflicto->establecimiento_id
+        );
 
         return redirect()
             ->route('leykarin.conflictos-apoderados.index')
@@ -152,6 +162,16 @@ class ConflictoApoderadoController extends Controller
             'confidencial'       => $request->confidencial ?? 0,
             'derivado_ley_karin' => $request->derivado_ley_karin ?? 0,
         ]);
+
+        /* ===========================================
+        AUDITORÍA - ACTUALIZAR CONFLICTO APODERADO
+        =========================================== */
+        logAuditoria(
+            accion: 'update',
+            modulo: 'conflictos_apoderados',
+            detalle: 'Se actualizó el conflicto con apoderado ID ' . $conflictoApoderado->id,
+            establecimiento_id: $conflictoApoderado->establecimiento_id
+        );
 
         return redirect()
             ->route('leykarin.conflictos-apoderados.index')

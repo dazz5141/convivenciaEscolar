@@ -102,7 +102,7 @@ class ApoderadoController extends Controller
         // -------------------------------------------
         // Crear apoderado
         // -------------------------------------------
-        Apoderado::create([
+        $apoderado = Apoderado::create([
             'run' => $request->run,
             'nombre' => $request->nombre,
             'apellido_paterno' => $request->apellido_paterno,
@@ -116,6 +116,14 @@ class ApoderadoController extends Controller
             'establecimiento_id' => $establecimientoId,
             'activo' => 1,
         ]);
+
+        // AUDITORÍA
+        logAuditoria(
+            'create',
+            'apoderados',
+            'Registró al apoderado: ' . $apoderado->nombre . ' ' . $apoderado->apellido_paterno,
+            $apoderado->establecimiento_id
+        );
 
         return redirect()->route('apoderados.index')
             ->with('success', 'Apoderado registrado correctamente.');
@@ -198,6 +206,14 @@ class ApoderadoController extends Controller
             'comuna_id' => $request->comuna_id,
         ]);
 
+        // AUDITORÍA
+        logAuditoria(
+            'update',
+            'apoderados',
+            'Actualizó al apoderado: ' . $apoderado->nombre . ' ' . $apoderado->apellido_paterno,
+            $apoderado->establecimiento_id
+        );
+
         return redirect()->route('apoderados.index')
             ->with('success', 'Apoderado actualizado correctamente.');
     }
@@ -215,6 +231,14 @@ class ApoderadoController extends Controller
         $apoderado = Apoderado::findOrFail($id);
         $apoderado->update(['activo' => 0]);
 
+        // AUDITORÍA
+        logAuditoria(
+            'disable',
+            'apoderados',
+            'Deshabilitó al apoderado: ' . $apoderado->nombre . ' ' . $apoderado->apellido_paterno,
+            $apoderado->establecimiento_id
+        );
+
         return redirect()->route('apoderados.index')
             ->with('success', 'Apoderado deshabilitado correctamente.');
     }
@@ -231,6 +255,14 @@ class ApoderadoController extends Controller
 
         $apoderado = Apoderado::findOrFail($id);
         $apoderado->update(['activo' => 1]);
+
+        // AUDITORÍA
+        logAuditoria(
+            'enable',
+            'apoderados',
+            'Habilitó al apoderado: ' . $apoderado->nombre . ' ' . $apoderado->apellido_paterno,
+            $apoderado->establecimiento_id
+        );
 
         return redirect()->route('apoderados.index')
             ->with('success', 'Apoderado habilitado correctamente.');

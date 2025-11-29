@@ -52,13 +52,23 @@ class EstudiantePIEController extends Controller
             'observaciones'  => 'nullable|string',
         ]);
 
-        EstudiantePIE::create([
+        $estudiante = EstudiantePIE::create([
             'establecimiento_id' => session('establecimiento_id'),
             'alumno_id'          => $request->alumno_id,
             'fecha_ingreso'      => $request->fecha_ingreso,
             'diagnostico'        => $request->diagnostico,
             'observaciones'      => $request->observaciones,
         ]);
+
+        /* ---------------------------------------------------------
+           AUDITORÍA: CREACIÓN
+        --------------------------------------------------------- */
+        logAuditoria(
+            accion: 'create',
+            modulo: 'pie_estudiantes',
+            detalle: 'Agregó al estudiante ID ' . $estudiante->id . ' al PIE',
+            establecimiento_id: $estudiante->establecimiento_id
+        );
 
         return redirect()
             ->route('pie.estudiantes.index')
@@ -99,6 +109,16 @@ class EstudiantePIEController extends Controller
 
         $estudiantePIE->delete();
 
+        /* ---------------------------------------------------------
+           AUDITORÍA: ELIMINACIÓN
+        --------------------------------------------------------- */
+        logAuditoria(
+            accion: 'delete',
+            modulo: 'pie_estudiantes',
+            detalle: 'Eliminó al estudiante PIE ID ' . $idEliminado,
+            establecimiento_id: $estudiantePIE->establecimiento_id
+        );
+        
         return redirect()
             ->route('pie.estudiantes.index')
             ->with('success', 'El estudiante fue retirado del PIE.');
