@@ -102,20 +102,73 @@ return [
     2 => [
         'nombre' => 'Administrador del Establecimiento',
         'accesos' => [
-            'usuarios'         => ['view', 'create', 'edit', 'delete'],
-            'funcionarios'     => ['view', 'create', 'edit', 'delete'],
-            'cursos'           => ['view', 'create', 'edit', 'delete'],
-            'alumnos'          => ['view', 'create', 'edit', 'delete'],
-            'apoderados'       => ['view', 'create', 'edit', 'delete'],
-            'convivencia'      => ['full'],
-            'inspectoria'      => ['full'],
-            'ley_karin'        => ['full'],
-            'pie'              => ['full'],
-            'reportes'         => ['full'],
-            'documentos'       => ['full'],
+
+            // =======================================================
+            // ADMINISTRACIÓN LOCAL DEL ESTABLECIMIENTO
+            // =======================================================
+            'usuarios'           => ['view', 'create', 'edit', 'disable', 'enable'],
+            'funcionarios'       => ['view', 'create', 'edit', 'disable', 'enable'],
+            'cursos'             => ['view', 'create', 'edit', 'delete'],
+            'alumnos'            => ['view', 'create', 'edit', 'delete'],
+            'apoderados'         => ['view', 'create', 'edit', 'delete'],
+            'documentos'         => ['view', 'create', 'edit', 'delete'],
+
+            // =======================================================
+            // AUDITORÍA — SOLO DEL ESTABLECIMIENTO
+            // =======================================================
+            'auditoria'       => ['view'],
+            'auditoria_index' => ['view'],
+            'auditoria_show'  => ['view'],
+
+            // =======================================================
+            // MÓDULO DE CONVIVENCIA COMPLETO
+            // =======================================================
+            'convivencia'        => ['full'],
+            'bitacora'           => ['full'],
+            'seguimientos'       => ['full'],
+            'medidas'            => ['full'],
+            'derivaciones'       => ['full'],
+
+            // =======================================================
+            // INSPECTORÍA COMPLETA
+            // =======================================================
+            'inspectoria'        => ['full'],
+            'novedades'          => ['full'],
+            'accidentes'         => ['full'],
+            'retiros'            => ['full'],
+            'atrasos'            => ['full'],
+            'citaciones'         => ['full'],
+
+            // =======================================================
+            // LEY KARIN COMPLETA
+            // =======================================================
+            'ley_karin'                => ['full'],
+            'conflictos_apoderados'    => ['full'],
+            'conflictos_funcionarios'  => ['full'],
+            'denuncias'                => ['full'],
+
+            // =======================================================
+            // MÓDULO PIE COMPLETO
+            // =======================================================
+            'pie'                 => ['full'],
+            'pie-estudiantes'     => ['full'],
+            'pie-profesionales'   => ['full'],
+            'pie-intervenciones'  => ['full'],
+            'pie-informes'        => ['full'],
+            'pie-planes'          => ['full'],
+            'pie-derivaciones'    => ['full'],
+
+            // =======================================================
+            // REPORTES COMPLETOS
+            // =======================================================
+            'reportes'                => ['view'],
+            'reporte_curso'           => ['view'],
+            'reporte_alumno'          => ['view'],
+            'reporte_funcionario'     => ['view'],
+            'reporte_establecimiento' => ['view'],
+            'dashboard_estadistico'   => ['view'],
         ],
     ],
-
 
     /*
     |--------------------------------------------------------------------------
@@ -125,13 +178,47 @@ return [
     3 => [
         'nombre' => 'Inspector General',
         'accesos' => [
-            'bitacora'         => ['view', 'create', 'edit'],
-            'seguimientos'     => ['view', 'edit'],
-            'medidas'          => ['view', 'create'],
-            'derivaciones'     => ['view', 'create'],
-            'inspectoria'      => ['full'],
-            'reportes'         => ['view'],
-            'alumnos'          => ['view'],
+
+            // =======================================================
+            // INSPECTORÍA — ACCESO COMPLETO
+            // =======================================================
+            'inspectoria'   => ['full'],
+            'novedades'     => ['full'],
+            'accidentes'    => ['full'],
+            'retiros'       => ['full'],
+            'atrasos'       => ['full'],
+            'citaciones'    => ['full'],
+
+            // =======================================================
+            // CONVIVENCIA — ACCESO INTERMEDIO
+            // =======================================================
+            'bitacora'      => ['view', 'create', 'edit'],   // No elimina
+            'seguimientos'  => ['view'],                     // No edita
+            'medidas'       => ['view'],                     // No crea ni edita
+            'derivaciones'  => ['view', 'create'],           // Puede derivar casos
+
+            // =======================================================
+            // PIE — SOLO CONSULTA
+            // =======================================================
+            'pie'                => ['view'],
+            'pie-estudiantes'    => ['view'],
+            'pie-derivaciones'   => ['view'],
+
+            // =======================================================
+            // ALUMNOS Y APODERADOS — SOLO VIEW
+            // =======================================================
+            'alumnos'      => ['view'],
+            'apoderados'   => ['view'],
+
+            // =======================================================
+            // REPORTES — SOLO CONSULTA
+            // =======================================================
+            'reportes'                => ['view'],
+            'reporte_curso'           => ['view'],
+            'reporte_alumno'          => ['view'],
+            'reporte_funcionario'     => ['view'],
+            'reporte_establecimiento' => ['view'],
+            'dashboard_estadistico'   => ['view'],
         ],
     ],
 
@@ -144,16 +231,30 @@ return [
     4 => [
         'nombre' => 'Inspector',
         'accesos' => [
-            'bitacora'         => ['view', 'create'],
-            'seguimientos'     => ['view'],
-            'medidas'          => ['view', 'create'],
-            'inspectoria'      => ['view', 'create', 'edit'],
-            'accidentes'       => ['view', 'create', 'edit'],
-            'retiros'          => ['view', 'create', 'edit'],
-            'atrasos'          => ['view', 'create', 'edit'],
-            'novedades'        => ['view', 'create', 'edit'],
-            'citaciones'       => ['view', 'create', 'edit'],
-            'alumnos'          => ['view'],
+
+            // =======================================================
+            // INSPECTORÍA — ACCESO OPERATIVO COMPLETO
+            // =======================================================
+            'inspectoria'   => ['view', 'create', 'edit'],   // No elimina
+            'novedades'     => ['view', 'create', 'edit'],   // Registra novedades diarias
+            'accidentes'    => ['view', 'create', 'edit'],   // Registra accidentes escolares
+            'retiros'       => ['view', 'create', 'edit'],   // Retiros anticipados
+            'atrasos'       => ['view', 'create', 'edit'],   // Control de atrasos
+            'citaciones'    => ['view', 'create', 'edit'],   // Citaciones a apoderados
+
+            // =======================================================
+            // CONVIVENCIA — ACCESO LIMITADO
+            // =======================================================
+            'bitacora'      => ['view', 'create'],           // Puede registrar incidentes
+            'seguimientos'  => ['view'],                     // Solo lectura
+            'medidas'       => ['view'],                     // Solo lectura
+            'derivaciones'  => ['view'],                     // Solo ver derivaciones
+
+            // =======================================================
+            // ALUMNOS Y APODERADOS — SOLO CONSULTA
+            // =======================================================
+            'alumnos'       => ['view'],
+            'apoderados'    => ['view'],
         ],
     ],
 
@@ -166,11 +267,33 @@ return [
     5 => [
         'nombre' => 'Profesor',
         'accesos' => [
-            'bitacora'         => ['view'],  
-            'seguimientos'     => ['view'],
+
+            // =======================================================
+            // CONVIVENCIA — SOLO CONSULTA
+            // =======================================================
+            'bitacora'      => ['view'],   // Puede ver incidentes de sus alumnos
+            'seguimientos'  => ['view'],   // Ve seguimientos emocionales
+            'medidas'       => ['view'],   // Ve medidas restaurativas
+            'derivaciones'  => ['view'],   // Solo lectura de derivaciones
+
+            // =======================================================
+            // INSPECTORÍA — SOLO CONSULTA
+            // (Opcional en algunos colegios, profesionalmente SÍ pueden ver)
+            // =======================================================
+            //'inspectoria'   => ['view'],   // Ve registros de disciplina del curso
+            //'novedades'     => ['view'],
+            //'accidentes'    => ['view'],
+            //'retiros'       => ['view'],
+            //'atrasos'       => ['view'],
+            //'citaciones'    => ['view'],
+
+            // =======================================================
+            // ALUMNOS Y APODERADOS — CONSULTA
+            // =======================================================
+            'alumnos'       => ['view'],   // Ve datos de sus estudiantes
+            'apoderados'    => ['view'],   // Ve datos del apoderado
         ],
     ],
-
 
     /*
     |--------------------------------------------------------------------------
@@ -180,39 +303,61 @@ return [
     6 => [
         'nombre' => 'Psicólogo / PIE',
         'accesos' => [
-            'seguimientos'       => ['view', 'create', 'edit'],
-            'intervenciones'     => ['view', 'create'],
-            'pie'                => ['view', 'create', 'edit'],
 
-            // SUBMÓDULOS PIE
-            'pie-estudiantes'    => ['view', 'create'],
-            'pie-profesionales'  => ['view', 'create'],
-            'pie-intervenciones' => ['view', 'create'],
-            'pie-informes'       => ['view', 'create'],
-            'pie-planes'         => ['view', 'create'],
-            'pie-derivaciones'   => ['view', 'create'],
+            // =======================================================
+            // CONVIVENCIA — ACCESO PROFESIONAL
+            // =======================================================
+            'bitacora'          => ['view'],                 // Solo lectura
+            'seguimientos'      => ['view', 'create', 'edit'], // Puede crear y editar seguimientos emocionales
+            'medidas'           => ['view'],                 // Solo lectura
+            'derivaciones'      => ['view', 'create'],       // Puede derivar a PIE
 
-            'documentos'         => ['view', 'create'],
-            'derivaciones'       => ['view', 'create'],
-            'bitacora'           => ['view'],
+            // =======================================================
+            // PIE — ACCESO COMPLETO (ROL PRINCIPAL)
+            // =======================================================
+            'pie'                => ['full'],
+            'pie-estudiantes'    => ['full'],
+            'pie-profesionales'  => ['full'],
+            'pie-intervenciones' => ['full'],
+            'pie-informes'       => ['full'],
+            'pie-planes'         => ['full'],
+            'pie-derivaciones'   => ['full'],
+
+            // =======================================================
+            // DOCUMENTOS — ACCESO CONTROLADO
+            // =======================================================
+            'documentos'         => ['view', 'create'],      // Puede subir informes, planes, etc.
+
+            // =======================================================
+            // ALUMNOS / APODERADOS — SOLO CONSULTA
+            // =======================================================
+            'alumnos'            => ['view'],
+            'apoderados'         => ['view'],
         ],
     ],
-
 
     /*
     |--------------------------------------------------------------------------
-    | ROL 7 — ASISTENTE DE AULA
+    | ROL 7 — ASISTENTE DE AULA (DESHABILITADO POR DEFECTO)
     |--------------------------------------------------------------------------
+    |
+    | Este rol está deshabilitado por ahora porque la mayoría de los colegios
+    | no entrega acceso a asistentes de aula. Se deja comentado para que
+    | pueda ser habilitado fácilmente en el futuro si se requiere.
+    |
     */
+    /*
     7 => [
         'nombre' => 'Asistente de Aula',
         'accesos' => [
-            'bitacora'         => ['view'], // antes view_basic
-            'alumnos'          => ['view'],
-            'apoderados'       => ['view'],
+
+            'alumnos'      => ['view'],
+            'apoderados'   => ['view'],
+            'bitacora'     => ['view'],
+
         ],
     ],
-
+    */
 
     /*
     |--------------------------------------------------------------------------
@@ -220,45 +365,103 @@ return [
     |--------------------------------------------------------------------------
     */
     8 => [
-        'nombre' => 'Encargado de Convivencia',
+        'nombre' => 'Encargado de Convivencia Escolar',
         'accesos' => [
-            'convivencia'      => ['full'],
-            'bitacora'         => ['full'],
-            'seguimientos'     => ['full'],
-            'medidas'          => ['full'],
-            'derivaciones'     => ['full'],
-            'pie'              => ['view', 'edit'],
 
-            'ley_karin'                => ['full'],
-            'conflictos_apoderados'    => ['full'],
-            'conflictos_funcionarios'  => ['full'],
-            'denuncias'                => ['full'],
+            // =======================================================
+            // CONVIVENCIA — ACCESO COMPLETO
+            // =======================================================
+            'convivencia'        => ['full'],
+            'bitacora'           => ['full'],
+            'seguimientos'       => ['full'],
+            'medidas'            => ['full'],
+            'derivaciones'       => ['full'],
+            'documentos'         => ['view', 'create', 'edit', 'delete'],
 
-            'reportes'         => ['full'],
-            'documentos'       => ['view', 'create'],
-            'alumnos'          => ['view'],
+            // =======================================================
+            // INSPECTORÍA — ACCESO DE SUPERVISIÓN
+            // =======================================================
+            'inspectoria'        => ['view'],
+            'novedades'          => ['view'],
+            'accidentes'         => ['view'],
+            'retiros'            => ['view'],
+            'atrasos'            => ['view'],
+            'citaciones'         => ['view'],
+
+            // =======================================================
+            // PIE — ACCESO DE ARTICULACIÓN
+            // =======================================================
+            'pie'                => ['view', 'edit'],     // Puede coordinar casos
+            'pie-estudiantes'    => ['view'],
+            'pie-intervenciones' => ['view'],
+            'pie-planes'         => ['view'],
+            'pie-derivaciones'   => ['view', 'create'],   // Puede derivar hacia PIE
+
+            // =======================================================
+            // REPORTES — ACCESO A REPORTES DE CONVIVENCIA
+            // =======================================================
+            'reportes'                => ['view'],
+            'reporte_curso'           => ['view'],
+            'reporte_alumno'          => ['view'],
+            'dashboard_estadistico'   => ['view'],
+
+            // =======================================================
+            // ALUMNOS/APODERADOS — CONSULTA
+            // =======================================================
+            'alumnos'            => ['view'],
+            'apoderados'         => ['view'],
         ],
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | ROL 9 — UTP
+    | ROL 9 — UTP (Unidad Técnico Pedagógica)
     |--------------------------------------------------------------------------
     */
     9 => [
         'nombre' => 'UTP',
         'accesos' => [
-            'bitacora'         => ['view'],
-            'seguimientos'     => ['view'],
-            'medidas'          => ['view'],
-            'derivaciones'     => ['view'],
-            'citaciones'       => ['view'],
-            'inspectoria'      => ['view'],
-            'pie'              => ['view'],
-            'reportes'         => ['view'],
-            'alumnos'          => ['view'],
-            'documentos'       => ['view'],
+
+            // =======================================================
+            // CONVIVENCIA — SOLO LECTURA (MONITOREO)
+            // =======================================================
+            'bitacora'          => ['view'],   // Ve incidentes
+            'seguimientos'      => ['view'],   // Ve seguimientos emocionales
+            'medidas'           => ['view'],   // Ve medidas restaurativas
+            'derivaciones'      => ['view'],   // Ve derivaciones internas
+
+            // =======================================================
+            // INSPECTORÍA — SOLO CONSULTA
+            // =======================================================
+            'inspectoria'       => ['view'],
+            'novedades'         => ['view'],
+            'accidentes'        => ['view'],
+            'retiros'           => ['view'],
+            'atrasos'           => ['view'],
+            'citaciones'        => ['view'],
+
+            // =======================================================
+            // PIE — CONSULTA PROFESIONAL
+            // =======================================================
+            'pie'                => ['view'],
+            'pie-estudiantes'    => ['view'],
+            'pie-intervenciones' => ['view'],
+            'pie-planes'         => ['view'],
+            'pie-derivaciones'   => ['view'],
+
+            // =======================================================
+            // REPORTES — CONSULTA
+            // =======================================================
+            'reportes'                => ['view'],
+            'reporte_curso'           => ['view'],
+            'reporte_alumno'          => ['view'],
+            'dashboard_estadistico'   => ['view'],
+
+            // =======================================================
+            // ALUMNOS Y APODERADOS — CONSULTA
+            // =======================================================
+            'alumnos'           => ['view'],
+            'apoderados'        => ['view'],
         ],
     ],
-
 ];

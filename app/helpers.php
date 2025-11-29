@@ -6,41 +6,43 @@ use App\Models\Auditoria;
 // ==========================
 // HELPER DE PERMISOS
 // ==========================
-function canAccess(string $modulo, string $accion = null): bool
-{
-    $user = Auth::user();
+if (!function_exists('canAccess')) {
+    function canAccess(string $modulo, string $accion = null): bool
+    {
+        $user = Auth::user();
 
-    if (!$user) {
-        return false;
+        if (!$user) {
+            return false;
+        }
+
+        $roles = config('roles');
+        $rolId = $user->rol_id;
+
+        if (!isset($roles[$rolId])) {
+            return false;
+        }
+
+        $accesos = $roles[$rolId]['accesos'];
+
+        // Si no existe el módulo en roles, no puede acceder
+        if (!isset($accesos[$modulo])) {
+            return false;
+        }
+
+        // FULL ACCESS
+        if (in_array('full', $accesos[$modulo])) {
+            return true;
+        }
+
+        // Si no se pidió acción específica, validamos que el módulo tenga acciones válidas
+        if ($accion === null) {
+            $permisosValidos = ['view', 'create', 'edit', 'delete', 'disable'];
+            return count(array_intersect($permisosValidos, $accesos[$modulo])) > 0;
+        }
+
+        // Verificar permiso específico
+        return in_array($accion, $accesos[$modulo]);
     }
-
-    $roles = config('roles');
-    $rolId = $user->rol_id;
-
-    if (!isset($roles[$rolId])) {
-        return false;
-    }
-
-    $accesos = $roles[$rolId]['accesos'];
-
-    // Si no existe el módulo en roles, no puede acceder
-    if (!isset($accesos[$modulo])) {
-        return false;
-    }
-
-    // Si el rol tiene FULL
-    if (in_array('full', $accesos[$modulo])) {
-        return true;
-    }
-
-    // Si no se pidió una acción específica
-    if ($accion === null) {
-        $permisosValidos = ['view','create','edit','delete','disable'];
-        return count(array_intersect($permisosValidos, $accesos[$modulo])) > 0;
-    }
-
-    // Verifica la acción
-    return in_array($accion, $accesos[$modulo]);
 }
 
 // ==========================
