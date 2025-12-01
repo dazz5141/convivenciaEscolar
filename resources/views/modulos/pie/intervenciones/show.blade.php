@@ -29,7 +29,7 @@
 {{-- =========================================================
      PERMISOS
 ========================================================= --}}
-@if(!canAccess('intervenciones','view'))
+@if(!canAccess('pie-intervenciones','view'))
     <div class="alert alert-warning mt-3">
         <i class="bi bi-exclamation-triangle me-2"></i>
         No tienes permisos para visualizar esta intervención PIE.

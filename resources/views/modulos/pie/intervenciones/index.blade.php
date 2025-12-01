@@ -14,7 +14,7 @@
     </div>
 
     {{-- Botón nuevo (BLINDADO) --}}
-    @if(canAccess('intervenciones','create'))
+    @if(canAccess('pie-intervenciones','create'))
         <a href="{{ route('pie.intervenciones.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-2"></i> Nueva Intervención
         </a>
@@ -25,7 +25,7 @@
 {{-- =========================================================
      VALIDAR PERMISOS
 ========================================================= --}}
-@if(!canAccess('intervenciones','view'))
+@if(!canAccess('pie-intervenciones','view'))
     <div class="alert alert-warning">
         <i class="bi bi-exclamation-triangle me-2"></i>
         No tienes permisos para ver las intervenciones PIE.

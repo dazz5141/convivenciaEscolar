@@ -17,7 +17,7 @@ class IntervencionPIEController extends Controller
     public function index(Request $request)
     {
         // Permiso
-        if (!canAccess('intervenciones', 'view')) {
+        if (!canAccess('pie-intervenciones', 'view')) {
             abort(403, 'No tienes permisos para acceder a Intervenciones PIE.');
         }
 
@@ -66,7 +66,7 @@ class IntervencionPIEController extends Controller
     public function create($estudiante_pie_id = null)
     {
         // Permiso
-        if (!canAccess('intervenciones', 'create')) {
+        if (!canAccess('pie-intervenciones', 'create')) {
             abort(403, 'No tienes permisos para registrar intervenciones PIE.');
         }
 
@@ -105,7 +105,7 @@ class IntervencionPIEController extends Controller
     public function store(Request $request)
     {
         // Permiso
-        if (!canAccess('intervenciones', 'create')) {
+        if (!canAccess('pie-intervenciones', 'create')) {
             abort(403, 'No tienes permisos para registrar intervenciones PIE.');
         }
 
@@ -176,7 +176,7 @@ class IntervencionPIEController extends Controller
     public function show($id)
     {
         // Permiso
-        if (!canAccess('intervenciones', 'view')) {
+        if (!canAccess('pie-intervenciones', 'view')) {
             abort(403, 'No tienes permisos para ver intervenciones PIE.');
         }
 

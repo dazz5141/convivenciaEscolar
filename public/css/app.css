@@ -405,3 +405,8 @@ body {
     transform: rotate(180deg);
 }
 
+/* 💡 Mostrar siempre el botón hamburguesa */
+.topbar-toggle {
+    display: block !important;
+}
+

@@ -14,7 +14,7 @@
 {{-- =========================================================
      VALIDAR PERMISOS
 ========================================================= --}}
-@if(!canAccess('intervenciones','create'))
+@if(!canAccess('pie-intervenciones','create'))
     <div class="alert alert-warning mt-3">
         <i class="bi bi-exclamation-triangle me-2"></i>
         No tienes permisos para registrar intervenciones PIE.
